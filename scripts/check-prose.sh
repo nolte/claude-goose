@@ -11,7 +11,20 @@ if ! command -v vale >/dev/null 2>&1; then
   exit 1
 fi
 
-vale --config=.vale.ini sync >/dev/null
+# Output is NOT discarded. An earlier version sent it to /dev/null, so when
+# sync failed in CI the only symptom was "'technical' vocabulary not found"
+# from the next command -- the actual cause was invisible.
+echo "syncing style package..."
+vale --config=.vale.ini sync
+
+# Fail loudly if the sync did not produce what the config declares it needs,
+# rather than letting Vale report a confusing downstream error.
+if [ ! -d ".vale/config/vocabularies/technical" ]; then
+  echo "sync completed but .vale/config/vocabularies/technical is absent" >&2
+  echo "contents of .vale:" >&2
+  find .vale -maxdepth 3 >&2 || true
+  exit 1
+fi
 # .specify/ and .claude/ are vendored and hashed by the specify CLI; linting
 # them would report defects nobody may fix (FR-033).
 mapfile -t files < <(git ls-files '*.md' | grep -vE '^(\.specify|\.claude)/')
