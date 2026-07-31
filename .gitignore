@@ -16,5 +16,12 @@ Thumbs.db
 
 # Vale styles are downloaded from a pinned package by `vale sync`, not authored
 # here. Committing them would fork content that exists to be consumed.
-.vale/nolte-styles/
-.vale/config/vocabularies/technical/
+# Everything under .vale except this project's own vocabulary is produced by
+# `vale sync` from a pinned package. Committing it once already caused a CI
+# failure: the stale copies sat at paths the config no longer searched.
+.vale/*
+!.vale/config/
+.vale/config/*
+!.vale/config/vocabularies/
+.vale/config/vocabularies/*
+!.vale/config/vocabularies/project/

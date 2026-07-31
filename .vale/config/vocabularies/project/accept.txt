@@ -46,3 +46,18 @@ delta_cause
 [Mm]easurability
 ETags?
 args
+
+# --- reviewed 2026-07-31: every term below was read before being accepted.
+# None is a misspelling; each is deliberate usage in this project's prose.
+[Aa]utomations
+headlessly
+inlined
+irreproducible
+parsability
+parsable
+[Rr]eusability
+[Tt]odo
+unconstructible
+underspecification
+unpushed
+unrun
