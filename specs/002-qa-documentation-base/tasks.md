@@ -105,11 +105,11 @@ successor in Phase 5 is `2026-08-02`.
 
 **Independent Test**: Hand a sample of at least 20 statements to a second reader; measure how many they resolve using only the sample and the cited sources.
 
-- [ ] T021 [P] [US2] Write the sampling procedure into `baselines/MAINTENANCE.md`, modelled on `tests/goose-implementation-review/SC-003-SAMPLE.md`: each row carries the claim, where to check it, the URL, and the quoted passage (`FR-003`, `SC-002`)
-- [ ] T022 [US2] Generate `baselines/goose/2026-08-01/VERIFICATION-SAMPLE.md` with at least 20 statements, each self-contained so no lookup is needed (`FR-003`, `SC-002`)
-- [ ] T023 [US2] Mark rows whose source class is `observed` as requiring extra scepticism, and include at least one row covering the recorded contradiction (`FR-004`, `FR-005`) ⟵
+- [X] T021 [P] [US2] Write the sampling procedure into `baselines/MAINTENANCE.md`, modelled on `tests/goose-implementation-review/SC-003-SAMPLE.md`: each row carries the claim, where to check it, the URL, and the quoted passage (`FR-003`, `SC-002`)
+- [X] T022 [US2] Generate `baselines/goose/2026-08-01/VERIFICATION-SAMPLE.md` with at least 20 statements, each self-contained so no lookup is needed (`FR-003`, `SC-002`)
+- [X] T023 [US2] Mark rows whose source class is `observed` as requiring extra scepticism, and include at least one row covering the recorded contradiction (`FR-004`, `FR-005`) ⟵
 - [ ] T024 [US2] Have a reader who did not author the material complete the sample and record the result in `verification.md`. **Cannot be self-certified** — threshold 95% (`SC-002`)
-- [ ] T025 [P] [US2] Add the `quote` field to every authoritative record in `baselines/goose/2026-08-01/sources.md` so a reader need not open the URL to see what was relied upon (`FR-003`)
+- [X] T025 [P] [US2] Add the `quote` field to every authoritative record in `baselines/goose/2026-08-01/sources.md` so a reader need not open the URL to see what was relied upon (`FR-003`)
 - [ ] T026 [US2] Time how long a reader takes to locate the source of an arbitrary statement, and record the measurement; over one minute, record what dominated before adjusting (`SC-005`) ⟵
 
 **Checkpoint**: The citations are shown to carry for someone other than their author.
@@ -122,11 +122,11 @@ successor in Phase 5 is `2026-08-02`.
 
 **Independent Test**: Every gap has a trigger condition; a subject meeting one produces an `undecided` finding in a real review, never a pass.
 
-- [ ] T027 [P] [US3] Verify every gap in `baselines/goose/2026-08-01/coverage.md` carries an id and a trigger condition, and record the check in `verification.md` (`FR-006`, `SC-004`)
-- [ ] T028 [US3] Run a review from `001` against a subject triggering `GAP-EXT-SEMANTICS` with `--params baseline_revision=2026-08-01`, confirming the report shows it as `undecided` rather than passing (`FR-007`, quickstart Scenario 7)
-- [ ] T029 [US3] Record gap priority by observed demand in `baselines/MAINTENANCE.md` per `research.md` Finding 3: `GAP-EXT-SEMANTICS` first, `GAP-RECIPE-FIELDS` second, the four that can never fire under `001`'s scope last (`FR-012`)
-- [ ] T030 [US3] Research `GAP-EXT-SEMANTICS` — what constitutes a well-formed value per extension type — and either produce new criteria or narrow the gap with what was searched, recording sources with `source_commit` (`FR-012`)
-- [ ] T031 [US3] Publish the outcome of T030 as `baselines/goose/2026-08-02/`, leaving `2026-08-01` unmodified, stating in its coverage which gap narrowed and why a comparison will show that as cause `baseline` (`FR-012`, `FR-013`)
+- [X] T027 [P] [US3] Verify every gap in `baselines/goose/2026-08-01/coverage.md` carries an id and a trigger condition, and record the check in `verification.md` (`FR-006`, `SC-004`)
+- [X] T028 [US3] Run a review from `001` against a subject triggering `GAP-EXT-SEMANTICS` with `--params baseline_revision=2026-08-01`, confirming the report shows it as `undecided` rather than passing (`FR-007`, quickstart Scenario 7)
+- [X] T029 [US3] Record gap priority by observed demand in `baselines/MAINTENANCE.md` per `research.md` Finding 3: `GAP-EXT-SEMANTICS` first, `GAP-RECIPE-FIELDS` second, the four that can never fire under `001`'s scope last (`FR-012`)
+- [X] T030 [US3] Research `GAP-EXT-SEMANTICS` — what constitutes a well-formed value per extension type — and either produce new criteria or narrow the gap with what was searched, recording sources with `source_commit` (`FR-012`)
+- [X] T031 [US3] Publish the outcome of T030 as `baselines/goose/2026-08-02/`, leaving `2026-08-01` unmodified, stating in its coverage which gap narrowed and why a comparison will show that as cause `baseline` (`FR-012`, `FR-013`)
 
 **Checkpoint**: The gap list is a working queue, and closing one demonstrably converts it into criteria.
 
@@ -138,13 +138,13 @@ successor in Phase 5 is `2026-08-02`.
 
 **Independent Test**: Run the drift check; matching commits report `unchanged`, a deliberately stale stored commit reports `drifted`.
 
-- [ ] T032 [P] [US4] Write the executable drift check into `baselines/MAINTENANCE.md`: per authoritative record, query the current commit and compare against the stored `source_commit` — Rule A (`FR-008`)
-- [ ] T033 [P] [US4] Write the observed-source rule into `baselines/MAINTENANCE.md`: compare the record's `host_version` against the revision's `goose_version` — Rule B, with re-measurement via the record's `method` (`FR-008`, `FR-010`)
-- [ ] T034 [US4] Run the drift check against `baselines/goose/2026-08-01/` and append one verification record per source (`FR-008`, `FR-009`, `SC-006`)
-- [ ] T035 [US4] Verify drift is actually detected: set a stored `source_commit` to a known older SHA in a scratch copy, re-run, confirm `drifted` — never `unchanged` (`FR-008`)
-- [ ] T036 [US4] Verify the unreachable path: run with the API unavailable and confirm the result records `unreachable`, never `unchanged` (`FR-008`, quickstart Scenario 4)
-- [ ] T037 [US4] Verify Rule B independently: compare an `observed` record against a different declared `goose_version` and confirm it reports `drifted` although its documentation did not move (`FR-008`, quickstart Scenario 5)
-- [ ] T038 [US4] Verify `SC-006` end to end: after a simulated upstream change, confirm every dependent statement is flagged **before** the base is used for a review (`SC-006`) ⟵
+- [X] T032 [P] [US4] Write the executable drift check into `baselines/MAINTENANCE.md`: per authoritative record, query the current commit and compare against the stored `source_commit` — Rule A (`FR-008`)
+- [X] T033 [P] [US4] Write the observed-source rule into `baselines/MAINTENANCE.md`: compare the record's `host_version` against the revision's `goose_version` — Rule B, with re-measurement via the record's `method` (`FR-008`, `FR-010`)
+- [X] T034 [US4] Run the drift check against `baselines/goose/2026-08-01/` and append one verification record per source (`FR-008`, `FR-009`, `SC-006`)
+- [X] T035 [US4] Verify drift is actually detected: set a stored `source_commit` to a known older SHA in a scratch copy, re-run, confirm `drifted` — never `unchanged` (`FR-008`)
+- [X] T036 [US4] Verify the unreachable path: run with the API unavailable and confirm the result records `unreachable`, never `unchanged` (`FR-008`, quickstart Scenario 4)
+- [X] T037 [US4] Verify Rule B independently: compare an `observed` record against a different declared `goose_version` and confirm it reports `drifted` although its documentation did not move (`FR-008`, quickstart Scenario 5)
+- [X] T038 [US4] Verify `SC-006` end to end: after a simulated upstream change, confirm every dependent statement is flagged **before** the base is used for a review (`SC-006`) ⟵
 
 **Checkpoint**: The base ages visibly rather than silently.
 
@@ -152,12 +152,12 @@ successor in Phase 5 is `2026-08-02`.
 
 ## Phase 7: Polish & Cross-Cutting Concerns
 
-- [ ] T039 [P] Run every scenario in `specs/002-qa-documentation-base/quickstart.md` and record outcomes in `baselines/goose/2026-08-01/verification.md`
-- [ ] T040 [P] Verify append-only enforcement: append a verification record, confirm earlier records and the criteria are untouched (`FR-009`, quickstart Scenario 8)
-- [ ] T041 [P] Verify revision retention: confirm `2026-07-31` and `2026-07-31b` are byte-identical to their committed state apart from appended verifications (quickstart Scenario 9)
-- [ ] T042 [P] Confirm every revision file is plain text, readable without special tooling, and diffs cleanly under version control; record in `verification.md` (`FR-014`) ⟵
-- [ ] T043 Update `CLAUDE.md` with `baselines/MAINTENANCE.md`, the drift-check command, and the rule that `ETag`/`Last-Modified` must not be used
-- [ ] T044 Update `specs/001-goose-implementation-review/contracts/baseline-contract.md` to note that revisions from `2026-08-01` onward carry drift anchors and version ranges, without changing what `001` requires
+- [X] T039 [P] Run every scenario in `specs/002-qa-documentation-base/quickstart.md` and record outcomes in `baselines/goose/2026-08-01/verification.md`
+- [X] T040 [P] Verify append-only enforcement: append a verification record, confirm earlier records and the criteria are untouched (`FR-009`, quickstart Scenario 8)
+- [X] T041 [P] Verify revision retention: confirm `2026-07-31` and `2026-07-31b` are byte-identical to their committed state apart from appended verifications (quickstart Scenario 9)
+- [X] T042 [P] Confirm every revision file is plain text, readable without special tooling, and diffs cleanly under version control; record in `verification.md` (`FR-014`) ⟵
+- [X] T043 Update `CLAUDE.md` with `baselines/MAINTENANCE.md`, the drift-check command, and the rule that `ETag`/`Last-Modified` must not be used
+- [X] T044 Update `specs/001-goose-implementation-review/contracts/baseline-contract.md` to note that revisions from `2026-08-01` onward carry drift anchors and version ranges, without changing what `001` requires
 
 ---
 

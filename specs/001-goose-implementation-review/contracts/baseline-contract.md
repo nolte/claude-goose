@@ -65,6 +65,17 @@ This process can be built and released against a baseline covering **a single to
 gaps are declared. Completeness of the baseline is explicitly not a precondition — honesty about
 incompleteness is. This is what decouples the two features' schedules.
 
+## Revisions from 2026-08-01 onward carry more, and require nothing more
+
+Later revisions add `source_commit` and `source_path` to authoritative records, a mandatory
+`version_range` on every criterion, a `verification.md` log, and where applicable `conflicts_with`
+plus `resolution`.
+
+**None of this changes what a consumer must do.** The fields are for the producer's upkeep — drift
+detection and re-verification — and a review that ignores them behaves exactly as before. They are
+noted here only so a reader of an older report is not surprised to find a newer revision richer than
+this contract requires.
+
 ## What this contract does not cover
 
 - How `002` researches its sources — its concern entirely.

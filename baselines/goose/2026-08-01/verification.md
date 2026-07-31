@@ -73,3 +73,35 @@ claim, not the claim itself.
 This is the second time in one session that a check was too naive to distinguish a rule from its
 negation — the first applied a newer schema to an older revision. Both were caught by reading the
 hit rather than trusting the count. A grep is evidence of a string, not of a claim.
+
+## Drift check — executed 2026-07-31
+
+Rule A against the live repository; Rule B against the declared host version.
+
+| Source | Rule | Stored | Current | Result |
+|---|---|---|---|---|
+| S-001 | A | `3254d442c90c` | `3254d442c90c` | `unchanged` |
+| S-004 | A | `3254d442c90c` | `3254d442c90c` | `unchanged` |
+| S-005 | A | `ceb94b24dc69` | `ceb94b24dc69` | `unchanged` |
+| S-002 | A (release metadata) | v1.45.0 | v1.45.0 | `unchanged` |
+| S-003, S-006, S-007, S-008 | B | host v1.45.0 | revision targets v1.45.0 | `unchanged` |
+
+### The three failure paths were provoked, not assumed
+
+A drift check that has only ever returned `unchanged` proves nothing. Each alternative outcome was
+forced:
+
+| Test | Method | Outcome |
+|---|---|---|
+| **`drifted`** | Stored commit set to `000000000000` against `developer-mcp.md` | Reported `drifted`. **Detected** |
+| **`unreachable`** | Query issued against an unreachable API host | Query failed; result is `unreachable`, **never** `unchanged` |
+| **Rule B fires alone** | `S-008` compared against a revision declaring `v1.46.0` | Reported `drifted` although its documentation had not moved |
+
+The last one is the reason two rules exist. An observation has no document to watch: had Rule A been
+applied to `S-008`, it would have reported `unchanged` for a statement that a version bump may have
+silently falsified.
+
+### SC-006 — flagged before use, not after
+
+The cadence requires Stages 1–4 before a revision is published or used. The check above ran before
+this revision was put to work, so no review has consumed it on unverified evidence.

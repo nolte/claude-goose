@@ -19,10 +19,28 @@ Principles III and VI are marked NON-NEGOTIABLE.
 The first feature is built and running. Three top-level trees, split by rate of change:
 
 ```
-baselines/goose/<revision>/   criteria, sources, coverage, criterion format — immutable once published
+baselines/                    MAINTENANCE.md, VERSION.md, SOURCE-FORMAT.md — the upkeep procedure
+baselines/goose/<revision>/   criteria, sources, coverage, criterion format, verification log
 process/goose-implementation-review/   the method: process.md, recipe.yaml, report-template.md, VERSION.md
 tests/goose-implementation-review/     fixtures, golden files, RESULTS.md, PORTABILITY.md
 ```
+
+Current revisions: `2026-07-31`, `2026-07-31b`, `2026-08-01`, `2026-08-02` (latest). **Published
+revisions are immutable** — the only permitted edit is appending to `verification.md`. Corrections
+create a successor. Before publishing one, prove the predecessors are untouched:
+
+```sh
+git diff --quiet HEAD -- baselines/goose/<earlier revision>/ || echo "IMMUTABILITY VIOLATION"
+```
+
+**Check a source for drift** (`baselines/MAINTENANCE.md` has the full procedure):
+
+```sh
+gh api "repos/aaif-goose/goose/commits?path=documentation/docs/<path>.md&per_page=1" --jq '.[0].sha'
+```
+
+Compare against the record's `source_commit`. **Never use `ETag` or `Last-Modified`** — they track
+site deploys, not content, and would flag every statement on every rebuild.
 
 **Run a review:**
 
@@ -51,6 +69,9 @@ recur often enough to state up front:
   That is why file parameters may not carry defaults — a default inlines whatever it points at.
 - **Reproducibility is checked on the `DIGEST v1` block, never on whole reports** (O-11). Prose
   varies harmlessly between runs; the digest must not.
+- **A revision is checked against its own `criterion-format.md`**, never a later one. That file
+  travels inside each revision precisely so old revisions stay interpretable; applying a newer schema
+  reports false defects.
 
 ## Repository state
 

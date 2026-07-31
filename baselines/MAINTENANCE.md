@@ -152,8 +152,19 @@ behaviour the host accepts and the documentation misstates.
 recorded either way.
 
 **Verification**: The new material passes Stage 1, and the outcome is published as a **new
-revision**. A comparison against the old revision must show the narrowed gap as `resolved` with
+revision**. A comparison against the old revision must show any narrowed gap as `resolved` with
 cause `baseline` — it is not a fix to the subject.
+
+**Before publishing, prove the predecessors were not touched:**
+
+```sh
+git diff --quiet HEAD -- baselines/goose/<each earlier revision>/ || echo "IMMUTABILITY VIOLATION"
+```
+
+Only `verification.md` may differ, and only by added lines. This check exists because the rule was
+broken once, additively and with good intentions: `quote` fields were added to a published revision
+to make its citations easier to follow. "It only improves things" is precisely the argument that
+erodes an immutability rule, and the check is cheaper than the argument.
 
 ---
 
