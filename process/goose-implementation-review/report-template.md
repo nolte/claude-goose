@@ -6,6 +6,22 @@
 **Run date**: <YYYY-MM-DD>
 **Compared to**: <prior report, or "none">
 
+```text
+DIGEST v1
+baseline=<revision_id> process=<semver> subject=<sha256 of subject manifest>
+<criterion_id>|<location>|<outcome>|<severity>
+```
+
+<!--
+  The digest is the machine-comparable core of the report and the ONLY part that
+  must be byte-identical between two runs over unchanged inputs. One line per
+  finding, sorted by severity (blocking first), then criterion id, then location.
+  No prose, no extra spacing. With no findings, emit the two header lines only.
+
+  Everything below is explanatory and may be worded freely. FR-005 asks for
+  identical findings, not identical sentences.
+-->
+
 ## Coverage
 
 **Examined**: <in-scope parts reviewed>

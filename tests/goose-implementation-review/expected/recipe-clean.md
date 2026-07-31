@@ -1,10 +1,16 @@
 # Review Report: fixtures/recipe-clean
 
 **Subject**: tests/goose-implementation-review/fixtures/recipe-clean (no revision)
-**Process version**: 0.1.0
+**Process version**: 0.2.0
 **Baseline**: 2026-07-31 for Goose v1.45.0
 **Run date**: <run date>
 **Compared to**: none
+
+```text
+DIGEST v1
+baseline=2026-07-31 process=0.2.0 subject=<sha256 of subject manifest>
+GAP-EXT-INTERNALS|recipe.yaml:extensions[0]|undecided|advisory
+```
 
 ## Coverage
 

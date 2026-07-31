@@ -25,14 +25,22 @@ detection and sourced explanation rather than protection. See `criterion-format.
 
 Each entry was investigated and left uncovered on purpose. None is an oversight.
 
-| Gap | Why uncovered | Effect on a review |
-|---|---|---|
-| **Configuration file** (`config.yaml`) — path, format, keys | `https://goose-docs.ai/docs/guides/config-file/` returned no readable content when consulted. A page of that name exists on the dead `block.github.io` host; whether it survived the migration is unconfirmed | Out of scope for this feature anyway, but recorded so a later revision does not mistake absence for irrelevance |
-| **Recipe `response`, `retry`, `settings`, `sub_recipes` fields** | Documented as existing, but their validation rules were not consulted in depth | A subject using these fields is reported as `undecided` for their correctness, never as passing |
-| **Extension configuration internals** | Extension *types* are documented and covered; what constitutes a well-formed configuration per type is not yet researched | A recipe declaring extensions is checked for type validity only |
-| **Context artifacts** — `.goosehints`, persistent instructions, prompt templates, skills | Out of review scope per `FR-001`. Their documentation was located but not researched | Not examined; appears in the report's `not_examined` |
-| **Subagents, MCP apps, session recipes** | Out of review scope per `FR-001` | Not examined |
-| **Reason for the `block` → `aaif-goose` transfer** | Observed, never explained. No transfer notice found | No criterion depends on it; recorded because an unexplained ownership change is worth knowing |
+**Every gap carries an id.** A gap produces findings just as a criterion does, but it has no
+criterion to name — so it names its gap id instead. Without ids, two reviews of the same subject can
+legitimately disagree about how to label a gap finding, which was observed and broke reproducibility.
+
+**A gap produces exactly one `undecided` finding when, and only when, the subject contains an
+in-scope part the gap applies to.** Gaps whose subject matter is absent, or out of review scope, are
+noted in the coverage statement as not applicable and produce no finding.
+
+| Id | Gap | Why uncovered | Triggers a finding when |
+|---|---|---|---|
+| `GAP-CONFIG` | **Configuration file** (`config.yaml`) — path, format, keys | `https://goose-docs.ai/docs/guides/config-file/` returned no readable content when consulted. A page of that name exists on the dead `block.github.io` host; whether it survived the migration is unconfirmed | Never — configuration files are out of review scope per `FR-001`. Recorded so a later revision does not mistake absence for irrelevance |
+| `GAP-RECIPE-FIELDS` | **Recipe `response`, `retry`, `settings`, `sub_recipes` fields** | Documented as existing, but their validation rules were not consulted in depth | The subject declares at least one of those four fields |
+| `GAP-EXT-INTERNALS` | **Extension configuration internals** | Extension *types* are documented and covered; what constitutes a well-formed configuration per type is not yet researched | The subject declares at least one extension |
+| `GAP-CONTEXT` | **Context artifacts** — `.goosehints`, persistent instructions, prompt templates, skills | Out of review scope per `FR-001`. Their documentation was located but not researched | Never — out of review scope. Appears in `not_examined` if present |
+| `GAP-AGENTS` | **Subagents, MCP apps, session recipes** | Out of review scope per `FR-001` | Never — out of review scope |
+| `GAP-TRANSFER` | **Reason for the `block` → `aaif-goose` transfer** | Observed, never explained. No transfer notice found | Never — no criterion depends on it. Recorded because an unexplained ownership change is worth knowing |
 
 ## What a clean report against this revision means
 

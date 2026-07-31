@@ -1,10 +1,21 @@
 # Review Report: fixtures/recipe-with-deviations
 
 **Subject**: tests/goose-implementation-review/fixtures/recipe-with-deviations (no revision)
-**Process version**: 0.1.0
+**Process version**: 0.2.0
 **Baseline**: 2026-07-31 for Goose v1.45.0
 **Run date**: <run date>
 **Compared to**: none
+
+```text
+DIGEST v1
+baseline=2026-07-31 process=0.2.0 subject=<sha256 of subject manifest>
+R-001|recipe.yaml:top-level|deviation|blocking
+R-004|recipe.yaml:parameters[config_file]|deviation|blocking
+R-005|recipe.yaml:instructions|deviation|blocking
+R-005|recipe.yaml:parameters[unused_param]|deviation|blocking
+GAP-EXT-INTERNALS|recipe.yaml:extensions[0]|undecided|advisory
+R-007|recipe.yaml:extensions[0]|judgment call|advisory
+```
 
 ## Coverage
 
@@ -63,7 +74,7 @@
 | R-003 | pass |
 | R-004 | finding |
 | R-005 | finding (×2) |
-| R-006 | pass (plus one undecided from a declared baseline gap) |
+| R-006 | pass |
 | R-007 | finding (judgment call) |
 
 ### Additionally expected

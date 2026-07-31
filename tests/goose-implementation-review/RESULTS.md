@@ -3,7 +3,7 @@
 Recorded outcomes of fixture and quickstart runs. **A scenario absent from this file has not been
 run.** Nothing here is inferred from reading code; every entry records something that was executed.
 
-**Status as of 2026-07-31: five full reviews executed. Quickstart scenarios 1, 2, 6 and 8 pass; scenario 9 remains untested (see O-10).**
+**Status as of 2026-07-31: eleven full reviews executed. Quickstart scenarios 1, 2, 3, 6 and 8 pass; scenario 9 remains untested (see O-10).**
 
 ## Environment
 
@@ -218,6 +218,30 @@ Option 2 looks right: it makes the criterion testable by construction rather tha
 whatever model runs the review, which is a race the fixture cannot win. It is an operator decision,
 not one to take silently.
 
+### O-11 — Reproducibility: four rounds of underspecification — RESOLVED 2026-07-31
+
+`FR-005` and `SC-002` now hold, verified by two consecutive runs producing byte-identical digests
+that also match the golden file exactly. Getting there exposed four separate defects **in the
+specification**, not in the process. Each was found only by measuring, and each had been invisible
+while reports were compared by reading.
+
+| Round | Observation | Cause | Fix |
+|---|---|---|---|
+| 1 | Whole reports differed: 128 vs 164 lines, 242 differing lines. Findings were identical | Byte-comparing prose is the wrong test. An agent rephrases harmlessly ("are not covered by this baseline" vs "are outside the baseline's coverage") and may add sections | Introduced the `DIGEST v1` block. It is the byte-stable core; prose is free. `FR-005` asks for identical *findings*, not identical sentences |
+| 2 | `subject=` hashes differed for an unchanged subject | "sha256 of the subject manifest" never defined how the manifest is built — absolute vs relative paths, sort order, enumeration order | Defined it exactly: `find . -type f -exec sha256sum {} \; \| sort`, then hash. Runs now reproduce the reference value computed independently |
+| 3 | One run emitted a gap finding labelled `R-006`; the next omitted it entirely | Findings from declared baseline gaps have **no criterion**, yet the contract demanded a criterion id. Both behaviours were defensible under the text | Gaps carry ids (`GAP-…`). A gap finding names its gap id; naming the "nearest" criterion is forbidden. Each gap declares exactly when it triggers |
+| 4 | Same finding located as `recipe.yaml:44` and `recipe.yaml:extensions[0]` | Location notation was never specified. Both were correct | Digest locations are **structural**, never line numbers. Prose may cite lines freely |
+
+**Round 4's fix matters beyond reproducibility.** A positional digest would break `FR-012`: inserting
+one line at the top of a subject shifts every line number, so the next comparison would report every
+unchanged finding as `resolved` plus an identical `new` one. Structural addresses survive
+reformatting.
+
+**What this says about the deferral in the plan.** The absence of a deterministic checker is not
+what threatened `FR-005`. Every failure came from the *specification* being ambiguous enough that two
+correct executions could differ. Writing a scripted checker first would have hard-coded one arbitrary
+answer to each of these four questions without anyone noticing the questions existed.
+
 ### O-9 — The fixture contradicted its own header comment
 
 The first review reported that `recipe-with-deviations` declared an `R-006 nonsense_type` defect in
@@ -288,3 +312,35 @@ fixture, not by the process misbehaving.
 
 **Quickstart Scenario 9 remains untested.** T027 stays open for that reason, even though all three
 of its runs were performed.
+
+## Reproducibility procedure (T030)
+
+To verify `FR-005` / `SC-002` for any subject:
+
+```sh
+SUBJ=<path to subject>
+for i in 1 2; do
+  GOOSE_PROVIDER=claude-acp GOOSE_MODEL=default \
+    goose run --no-session --recipe process/goose-implementation-review/recipe.yaml \
+      --params subject_path="$SUBJ" --params output_path="/tmp/run-$i.md"
+  sed -n '/^DIGEST v1/,/^```/p' "/tmp/run-$i.md" | grep -v '^```' > "/tmp/d$i.txt"
+done
+diff /tmp/d1.txt /tmp/d2.txt && echo "reproducible"
+```
+
+**Compare digests, not whole reports.** Differing prose is expected and acceptable; a differing
+digest is a real failure. Independently verify the subject hash with
+`cd "$SUBJ" && find . -type f -exec sha256sum {} \; | sort | sha256sum`.
+
+### Runs 6–11 — reproducibility (2026-07-31)
+
+| Runs | Digest outcome |
+|---|---|
+| 1st pair | Whole reports differed by 242 lines; findings identical. Digest introduced |
+| 2nd pair | Digests differed in `subject=` only. Manifest computation specified exactly |
+| 3rd pair | Gap finding labelled `R-006` in one run, omitted in the other. Gap ids introduced |
+| 4th pair | Location `recipe.yaml:44` vs `recipe.yaml:extensions[0]`. Structural notation mandated |
+| **5th pair** | **Identical. Also matches `expected/recipe-clean.md` exactly** |
+
+`FR-005` and `SC-002` are satisfied for this subject. Eleven full reviews were run in total; every
+one left its subject byte-identical.

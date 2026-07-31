@@ -21,10 +21,20 @@ written, because a partial report understates coverage without saying so.
    `coverage.md`, and `criterion-format.md`.
 3. When `compare_to` is set, that report exists and names a baseline revision.
 
-**Action**: Record a checksum of every file under `subject_path`. Read the baseline revision and the
-process version.
+**Action**: Build the subject manifest and read the baseline revision and process version.
 
-**Output**: The subject checksum manifest; the resolved baseline revision id and Goose version.
+The manifest is built **exactly** this way — an underspecified manifest yields different hashes for
+identical input, which has been observed:
+
+```sh
+# from within subject_path
+find . -type f -exec sha256sum {} \; | sort
+```
+
+That is: one line per regular file, `<sha256><two spaces><path relative to subject_path>`, sorted by
+byte value. The manifest hash reported in the digest is the SHA-256 of that output.
+
+**Output**: The subject manifest and its hash; the resolved baseline revision id and Goose version.
 
 **Complete when**: All preconditions hold and the manifest is recorded.
 
@@ -110,14 +120,27 @@ Three rules govern this:
 
 **Precondition**: Stage 2 complete.
 
-**Action**: For every criterion whose topic appears in the baseline's declared gaps, and every
-criterion whose decision procedure could not be applied, emit a finding with outcome `undecided`
-stating what was missing.
+**Action**: Two distinct sources of `undecided`, handled separately:
+
+1. **Declared baseline gaps.** Walk `coverage.md`'s gap table in id order. For each gap, apply its
+   stated "triggers a finding when" condition to the subject. If it holds, emit **exactly one**
+   finding: outcome `undecided`, identified by the **gap id** (`GAP-…`), located at the in-scope part
+   that triggered it, severity `advisory`, sourced to the gap entry. If it does not hold, record it
+   in the coverage statement as not applicable and emit nothing.
+2. **Criteria that could not be decided.** A criterion whose decision procedure could not be applied
+   emits an `undecided` finding identified by its criterion id, stating what was missing.
+
+**A gap finding names a gap id, never a criterion id.** Gaps have no criterion — substituting the
+nearest one is guesswork, and two runs will guess differently. That was observed: one run labelled a
+gap finding `R-006`, another omitted it entirely, and the digests diverged.
 
 **Output**: The undecided findings, and the coverage statement's `baseline_gaps` field.
 
-**Complete when**: Every declared gap in the baseline's `coverage.md` that touches an in-scope part
-has produced either an undecided finding or an explicit note that it does not apply here.
+**Complete when**: Every gap in `coverage.md` has been evaluated against its trigger condition, and
+each has produced either exactly one finding or a not-applicable note.
+
+**Verification**: The count of gap findings plus not-applicable notes equals the number of gaps in
+the baseline. Any gap appearing in neither list was skipped.
 
 **Verification**: No criterion is recorded as passing whose topic is a declared gap. This is the
 single check that prevents an incomplete baseline from producing false confidence — a gap silently
@@ -152,12 +175,23 @@ report is discarded rather than annotated.
 
 **Precondition**: Stage 4 passed.
 
-**Action**: Render the report per `report-template.md`, sorted by severity then location.
+**Action**: Render the report per `report-template.md`, sorted by severity then location. Emit the
+`DIGEST v1` block immediately after the header, before any prose.
 
 **Output**: A report at `output_path`.
 
-**Complete when**: The report is written and contains a header, a coverage statement, the findings,
-and the `Criteria Applied` table.
+**Complete when**: The report is written and contains a header, the digest, a coverage statement,
+the findings, and the `Criteria Applied` table.
+
+**On the digest**: it is the only part required to be byte-stable across runs. Emit it mechanically —
+one line per finding, sorted by severity, then identity, then location, with no prose and no
+trailing whitespace. Two runs over an unchanged subject and baseline that produce differing digests
+are a real reproducibility failure; differing prose is not.
+
+**Digest locations are structural, never line numbers**: `top-level`, `<key>`, `<key>[<name>]`, or
+`<key>[<index>]` — for example `parameters[config_file]` or `extensions[0]`. Prose may and should
+cite line numbers; the digest may not. A line number shifts when anything above it is edited, which
+would make every unchanged finding look resolved-and-new on the next comparison.
 
 **Verification**: Every finding carries `Criterion`, `Location` and `Source`. **A report containing
 a finding missing any of the three is invalid and must not be written.** Publication is blocked, not

@@ -1,6 +1,6 @@
 # Process Version
 
-**0.1.0**
+**0.2.0**
 
 This is the semantic version of the review process itself, as required by Constitution Principle II
 ("Plans Are Versioned Artifacts").
@@ -31,7 +31,13 @@ the same distinction the delta rules require when comparing two reviews.
 
 | Version | Date | Change |
 |---|---|---|
-| 0.1.0 | 2026-07-31 | Initial. Pre-release: the process has not yet performed a real review |
+| 0.1.0 | 2026-07-31 | Initial. Pre-release: the process had not yet performed a real review |
+| 0.2.0 | 2026-07-31 | Added the `DIGEST v1` block to the report format. Two real runs over an unchanged subject produced identical findings but differing prose, so byte-comparing whole reports was the wrong test for `FR-005`. The digest is the byte-stable core; prose is free |
+
+**On the bump**: changing the report format breaks existing golden files, which the semantics above
+call MAJOR. Under `0.x` that is expressed as a minor bump — the process is pre-release and its
+format is not yet promised to anyone. The first release is 1.0.0, after which such a change becomes
+a genuine MAJOR.
 
 **0.x means pre-release.** Per Constitution Principle V, this process is not released until it has
 performed a genuine review in its home repository — its own recipe being the first subject. The

@@ -172,3 +172,17 @@ The finding cuts both ways: the host enforcing most criteria also means most of 
 duplicates a check that already exists. `R-002` is the exception — the documentation states the rule
 and the parser ignores it — and it is the strongest argument that this feature is worth building.
 Future baseline growth should favour criteria the host does **not** enforce.
+
+**Second update, 2026-07-31 — `FR-005` verified, and the deferral is vindicated.** T040 required
+recording any divergence here. Four rounds of it occurred, and all four were *specification*
+defects rather than consequences of having no scripted checker:
+
+1. Byte-comparing whole reports is the wrong test — prose varies harmlessly while findings match.
+2. The subject manifest hash was never defined precisely enough to reproduce.
+3. Findings derived from baseline gaps had no identity of their own.
+4. Location notation was unspecified; line numbers and structural addresses were both "correct".
+
+Each was fixed in the contract, and two consecutive runs then produced byte-identical digests
+matching the golden file. Writing a deterministic checker first would have frozen one arbitrary
+answer to each of these four questions before anyone knew the questions existed. The deferral stands,
+and the reproducibility surface is now the digest rather than the whole report.

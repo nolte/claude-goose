@@ -103,20 +103,20 @@ of this tree — it arrives as the `subject_path` parameter.
 
 ### Tests for User Story 2
 
-- [ ] T030 [P] [US2] Add the reproducibility procedure to `tests/goose-implementation-review/RESULTS.md`: run T012 twice and diff the two reports byte for byte
+- [X] T030 [P] [US2] Add the reproducibility procedure to `tests/goose-implementation-review/RESULTS.md`: run T012 twice and diff the two reports byte for byte
 - [ ] T031 [P] [US2] Create fixture `tests/goose-implementation-review/fixtures/recipe-version-mismatch/recipe.yaml` declaring a Goose version outside the baseline's stated range, for the version-mismatch Edge Case
 - [ ] T032 [P] [US2] Add the offline procedure to `tests/goose-implementation-review/RESULTS.md`: run a review with upstream unreachable, for the "reference documentation cannot be reached" Edge Case ⟵
 
 ### Implementation for User Story 2
 
 - [ ] T033 [US2] Implement baseline pinning in `process/goose-implementation-review/recipe.yaml`: the `baseline_revision` parameter selects a revision directory and defaults to `latest`
-- [ ] T034 [US2] Emit `process_version`, `baseline_revision`, `goose_version`, and `run_date` into the report header per `contracts/review-report.md` (`FR-004`)
+- [X] T034 [US2] Emit `process_version`, `baseline_revision`, `goose_version`, and `run_date` into the report header per `contracts/review-report.md` (`FR-004`)
 - [ ] T035 [US2] Implement the version-mismatch rule in `process/goose-implementation-review/process.md`: a subject built against a version outside the baseline range yields one dedicated finding, not a flood of derived deviations
 - [ ] T036 [US2] Implement the upstream drift check in `process/goose-implementation-review/process.md`: an available newer baseline revision is reported as its own finding, never applied silently mid-review (`FR-010`)
 - [ ] T037 [US2] Implement offline behaviour in `process/goose-implementation-review/process.md`: with upstream unreachable, the review proceeds against the pinned baseline and states that drift could not be checked, or refuses — never reviewing silently against nothing ⟵
 - [ ] T038 [US2] Create a second baseline revision `baselines/goose/<later-date>/` containing at least one corrected or added criterion, so revision handling is exercised against real data rather than assumed ⟵
 - [ ] T039 [US2] Verify revision retention: confirm `baselines/goose/2026-07-31/` is byte-identical to its published state after T038, and that a report naming it remains interpretable (`FR-011`). Record in `tests/goose-implementation-review/RESULTS.md` ⟵
-- [ ] T040 [US2] Verify the byte-identity check from T030 passes; if it fails, record the divergence in `specs/001-goose-implementation-review/plan.md` Complexity Tracking, since the deterministic-checker deferral must then be revisited
+- [X] T040 [US2] Verify the byte-identity check from T030 passes; if it fails, record the divergence in `specs/001-goose-implementation-review/plan.md` Complexity Tracking, since the deterministic-checker deferral must then be revisited
 
 **Checkpoint**: Reviews are reproducible and their yardstick is stated.
 
