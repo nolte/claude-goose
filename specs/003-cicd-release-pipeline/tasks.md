@@ -84,9 +84,9 @@ values must flip; if they do not, the mechanism is not acting here (quickstart S
 - [X] T013 [P] [US1] Implement the prose lint check via Vale (`FR-005`)
 - [X] T014 [P] [US1] Implement the recipe parse check invoking `goose run --recipe … --explain`, which exercises the host's own parser at no LLM cost (`FR-006`)
 - [X] T015 [P] [US1] Implement the format check — trailing whitespace, final newline, line endings (`FR-007`)
-- [ ] T016 [US1] Create `.github/workflows/static-gate.yml` calling `nolte/gh-plumbing/.github/workflows/reusable-pre-commit.yaml@v1.1.26`, running unconditionally on every pull request to `develop` with no path filters (`FR-009`, `FR-028`)
-- [ ] T017 [US1] Declare a minimum permission set in `static-gate.yml` — read only (`FR-026`)
-- [ ] T018 [US1] Report each class as a separately named unit so a failure names its cause (`FR-007`, `SC-001`)
+- [X] T016 [US1] Create `.github/workflows/static-gate.yml` calling `nolte/gh-plumbing/.github/workflows/reusable-pre-commit.yaml@v1.1.26`, running unconditionally on every pull request to `develop` with no path filters (`FR-009`, `FR-028`)
+- [X] T017 [US1] Declare a minimum permission set in `static-gate.yml` — read only (`FR-026`)
+- [X] T018 [US1] Report each class as a separately named unit so a failure names its cause (`FR-007`, `SC-001`)
 
 ### Verification — the part that makes the gate real
 
@@ -149,7 +149,7 @@ values must flip; if they do not, the mechanism is not acting here (quickstart S
 - [ ] T046 [P] Create `.github/workflows/dependency-review.yml` calling the shared dependency-review workflow at `@v1.1.26` (`FR-029`)
 - [ ] T047 [P] Record in `OMISSIONS.md` how each supply-chain obligation is discharged — by record rather than by a scan with findings, since the repository ships no dependency manifest (`FR-029`, `FR-030`)
 - [ ] T048 [P] Verify every workflow declares an explicit minimum permission set (`FR-026`)
-- [ ] T049 [P] Verify no definition in this repository contains a floating reference: `grep -rn 'uses:.*@\(develop\|main\|master\)$' .github/` returns nothing (`SC-013`)
+- [X] T049 [P] Verify no definition in this repository contains a floating reference: `grep -rn 'uses:.*@\(develop\|main\|master\)$' .github/` returns nothing (`SC-013`)
 - [ ] T050 Verify every stage the governing design names is answerable from `OMISSIONS.md` as "runs" or "omitted, because … revisit when …" (`FR-030`, `SC-012`)
 - [ ] T051 Verify portability: copy the added artifacts into a second repository and run `task ci` without editing any of them (`FR-032`, `SC-014`)
 - [ ] T052 Verify no file hashed in `.specify/integrations/*.json` was hand-edited (`FR-033`)

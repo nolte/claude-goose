@@ -45,28 +45,32 @@ repos:
     hooks:
       - id: recipe-schema
         name: recipe schema class
-        entry: task ci:recipe-schema
+        entry: ./scripts/check-recipe-schema.sh process/goose-implementation-review/recipe.yaml
         language: system
         pass_filenames: false
         files: ^process/goose-implementation-review/recipe\.yaml$
 
       - id: recipe-parse
         name: recipe parse class (goose --explain)
-        entry: task ci:recipe-parse
+        # Needs the goose binary; runs in the tooled CI job, not the shared one.
+        stages: [manual]
+        entry: ./scripts/check-recipe-parse.sh process/goose-implementation-review/recipe.yaml
         language: system
         pass_filenames: false
         files: ^process/goose-implementation-review/recipe\.yaml$
 
       - id: prose
         name: prose lint class (vale)
-        entry: task ci:prose
+        # Needs the vale binary and a synced style package.
+        stages: [manual]
+        entry: ./scripts/check-prose.sh
         language: system
         pass_filenames: false
         files: \.md$
 
       - id: internal-links
         name: internal link class (offline)
-        entry: task ci:links
+        entry: ./scripts/check-internal-links.sh
         language: system
         pass_filenames: false
         files: \.md$

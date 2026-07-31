@@ -1,0 +1,76 @@
+---
+name: Static Gate
+
+# Runs unconditionally on every pull request targeting the integration branch
+# (FR-009). NO path filters: a path filter is a decision that certain changes
+# need no verification, which is exactly the assumption defects exploit.
+on:
+  pull_request:
+    branches: [develop]
+  push:
+    branches: [develop]
+  workflow_dispatch:
+
+# Minimum permission set (FR-026). The gate reads; it never writes.
+permissions:
+  contents: read
+
+# A gate run may be cancelled when superseded -- unlike release workflows,
+# which must never be cancelled in flight (FR-027).
+concurrency:
+  group: static-gate-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Six of the ten check classes need nothing beyond Python and pre-commit, so
+  # they come from the shared workflow rather than being reimplemented here
+  # (FR-028). Pinned to a tag, never a branch (FR-012, SC-013).
+  #
+  # Produces the status context: `shared / Static CI Tests`
+  shared:
+    uses: nolte/gh-plumbing/.github/workflows/reusable-pre-commit.yaml@v1.1.26
+
+  # The remaining classes need tools the shared workflow does not install:
+  # vale for prose, goose for the recipe parse check. They are repository
+  # -specific rather than shared pipeline mechanics, so implementing them here
+  # does not contradict FR-028 -- nothing about a Goose recipe check is
+  # identical across repositories.
+  #
+  # Produces the status context: `tooled / Tooled Checks`
+  tooled:
+    name: Tooled Checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6.0.0
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.x'
+
+      - name: Install the pinned check toolchain
+        run: pip install -r requirements-ci.txt
+
+      - name: Install vale
+        uses: errata-ai/vale-action@v2.1.1
+        with:
+          version: 3.17.0
+          # This action can lint on its own; here it is used only to place the
+          # binary. The prose class runs through the same script as locally, so
+          # the two cannot disagree (SC-004).
+          files: __onlyModified
+          fail_on_error: false
+
+      - name: Install goose
+        id: goose
+        run: |
+          set -euo pipefail
+          curl -fsSL https://github.com/aaif-goose/goose/releases/download/v1.45.0/download_cli.sh \
+            -o /tmp/install-goose.sh || {
+              echo "::error::goose installer could not be fetched"
+              exit 1
+            }
+          CONFIGURE=false bash /tmp/install-goose.sh
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Run the tool-dependent classes
+        run: pre-commit run --hook-stage manual --all-files --show-diff-on-failure
