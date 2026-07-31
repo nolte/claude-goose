@@ -89,7 +89,7 @@ of this tree — it arrives as the `subject_path` parameter.
 - [X] T026 [US1] Run the review against fixture T012 and reconcile against golden file T017; record the run in `tests/goose-implementation-review/RESULTS.md`
 - [X] T027 [US1] Run the review against fixtures T013, T014 and T016, confirming a clean report, a "nothing reviewable found" report, and an explicitly partial report respectively
 - [X] T028 [US1] Run the review with `subject_path` set to `process/goose-implementation-review/recipe.yaml` — the process reviewing its own recipe (Principle V, quickstart Scenario 6) — and fix every finding it raises against itself
-- [ ] T029 [US1] Have a person who did not author the baseline resolve a sample of at least 20 findings from the T026 report to their sources unaided, and record the resolution rate in `tests/goose-implementation-review/RESULTS.md`. Below 90%, correct the offending citations before proceeding (`SC-003`) ⟵
+- [X] T029 [US1] Have a person who did not author the baseline resolve a sample of at least 20 findings from the T026 report to their sources unaided, and record the resolution rate in `tests/goose-implementation-review/RESULTS.md`. Below 90%, correct the offending citations before proceeding (`SC-003`) ⟵
 
 **Checkpoint**: US1 is independently testable and delivers value. This is the MVP.
 

@@ -3,7 +3,7 @@
 Recorded outcomes of fixture and quickstart runs. **A scenario absent from this file has not been
 run.** Nothing here is inferred from reading code; every entry records something that was executed.
 
-**Status as of 2026-07-31: 24 full reviews executed. Process released as 1.0.0. Quickstart 1-9, 11, 13 pass; 10 not runnable with claude-acp; 12 awaits a second reader.**
+**Status as of 2026-07-31: 24 full reviews executed. Process released as 1.0.0. Quickstart 1-9, 11, 12, 13 pass; 10 not runnable with claude-acp.**
 
 ## Environment
 
@@ -463,3 +463,20 @@ implies none is not:
 |---|---|---|
 | **Scenario 10 — offline** | The `claude-acp` provider needs the network before a review starts, so a genuinely offline run cannot be staged this way | A local provider, or a stubbed drift check |
 | **Scenario 12 — `SC-003`** | Requires a reader who did not author the baseline. **Cannot be self-certified** — the process wrote the citations and is not a witness to whether they carry | `SC-003-SAMPLE.md`: 20 findings prepared for a second reader, threshold 18 |
+
+## SC-003 verified by a second reader (2026-07-31)
+
+The operator — who did not author the baseline — worked through
+`SC-003-SAMPLE.md` and resolved **20 of 20** findings to their sources using only the sample and the
+reviewed material. The threshold was 18.
+
+This includes rows 7, 15 and 16, which cite measurements rather than documents. Their passing means
+none was worded as though the documentation required the behaviour; had any been, the row was to be
+marked unresolved for exceeding its evidence class.
+
+**`SC-003` is met and `T029` is closed.** It is the one criterion the process could not certify for
+itself: it wrote the citations and is no witness to whether they carry.
+
+Preparing the sample surfaced a defect in the sample itself — the first draft named sources only
+descriptively and forced the checker to look each up, contradicting the criterion under test. Every
+row now carries its URL and quoted rule.
