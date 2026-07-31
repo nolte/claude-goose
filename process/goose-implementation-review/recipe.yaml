@@ -46,6 +46,14 @@ parameters:
     default: ""
     description: "Path to a prior report, to classify findings as new, resolved or unchanged. Empty means no comparison"
 
+  # Makes partial coverage testable without out-sizing a context window.
+  # "0" means no limit, which is the normal operating mode.
+  - key: max_bytes_per_pass
+    input_type: number
+    requirement: optional
+    default: "0"
+    description: "Byte budget for one review pass; 0 means unlimited. Files beyond the budget are reported as not examined"
+
 instructions: |
   You are performing a read-only review of a Goose implementation. Follow
   process.md in this directory exactly; it defines six stages, each with a
@@ -107,6 +115,13 @@ prompt: |
   disk, report it as a BASELINE-DRIFT finding and otherwise ignore it — do not
   apply it, do not merge it, do not treat it as an improvement. The revision id
   in the digest must be the one named here.
+
+  Coverage budget for this pass: {{ max_bytes_per_pass }} bytes (0 = unlimited).
+  If non-zero, take in-scope files in ascending path order until the budget is
+  spent. Every file not taken goes in `not_examined` with the reason "coverage
+  limit". A single file larger than the whole budget is never partially reviewed
+  — it goes in `not_examined` with the reason "exceeds per-pass budget". A
+  partial review is fine; a partial review that reads as complete is not.
 
   Prior report to compare against: {{ compare_to }}
   If that value is non-empty, run Stage 6: read that report's DIGEST block and

@@ -87,7 +87,7 @@ of this tree — it arrives as the `subject_path` parameter.
 - [X] T024 [US1] Implement and verify the read-only invariant in `process/goose-implementation-review/process.md`: record a checksum of every file under `subject_path` before the run, re-check after, and fail the run if any differ. Record the check in `tests/goose-implementation-review/RESULTS.md` (`FR-006`) ⟵
 - [X] T025 [US1] Implement partial-coverage handling in `process/goose-implementation-review/process.md`: when a subject cannot be reviewed in one pass, the unreviewed parts are listed in `not_examined` with a reason, so a partial review can never read as complete (`FR-008`, `SC-006`) ⟵
 - [X] T026 [US1] Run the review against fixture T012 and reconcile against golden file T017; record the run in `tests/goose-implementation-review/RESULTS.md`
-- [ ] T027 [US1] Run the review against fixtures T013, T014 and T016, confirming a clean report, a "nothing reviewable found" report, and an explicitly partial report respectively
+- [X] T027 [US1] Run the review against fixtures T013, T014 and T016, confirming a clean report, a "nothing reviewable found" report, and an explicitly partial report respectively
 - [X] T028 [US1] Run the review with `subject_path` set to `process/goose-implementation-review/recipe.yaml` — the process reviewing its own recipe (Principle V, quickstart Scenario 6) — and fix every finding it raises against itself
 - [ ] T029 [US1] Have a person who did not author the baseline resolve a sample of at least 20 findings from the T026 report to their sources unaided, and record the resolution rate in `tests/goose-implementation-review/RESULTS.md`. Below 90%, correct the offending citations before proceeding (`SC-003`) ⟵
 
@@ -169,12 +169,12 @@ of this tree — it arrives as the `subject_path` parameter.
 
 **Purpose**: Release readiness
 
-- [ ] T052 [P] Run every scenario in `specs/001-goose-implementation-review/quickstart.md` end to end and record outcomes in `tests/goose-implementation-review/RESULTS.md`
-- [ ] T053 [P] Reconcile `baselines/goose/2026-07-31/coverage.md` against the criteria actually implemented, so no covered-but-unimplemented criterion is claimed (`SC-006`)
-- [ ] T054 Time a full review of the reference fixture from T015, from invocation to a triaged findings list, and record the measurement in `tests/goose-implementation-review/RESULTS.md`. Over 15 minutes, record what dominated the time before adjusting scope (`SC-005`) ⟵
-- [ ] T055 [P] Confirm every generated report is plain text, readable without special tooling, and diffs cleanly under version control; record the check in `tests/goose-implementation-review/RESULTS.md` (`FR-013`) ⟵
-- [ ] T056 Update `CLAUDE.md` with the now-existing `baselines/`, `process/`, and `tests/` trees and the commands to run a review
-- [ ] T057 Re-run the self-review from T028 against the finished process and confirm it raises no finding it would flag in another subject (Principle V)
+- [X] T052 [P] Run every scenario in `specs/001-goose-implementation-review/quickstart.md` end to end and record outcomes in `tests/goose-implementation-review/RESULTS.md`
+- [X] T053 [P] Reconcile `baselines/goose/2026-07-31/coverage.md` against the criteria actually implemented, so no covered-but-unimplemented criterion is claimed (`SC-006`)
+- [X] T054 Time a full review of the reference fixture from T015, from invocation to a triaged findings list, and record the measurement in `tests/goose-implementation-review/RESULTS.md`. Over 15 minutes, record what dominated the time before adjusting scope (`SC-005`) ⟵
+- [X] T055 [P] Confirm every generated report is plain text, readable without special tooling, and diffs cleanly under version control; record the check in `tests/goose-implementation-review/RESULTS.md` (`FR-013`) ⟵
+- [X] T056 Update `CLAUDE.md` with the now-existing `baselines/`, `process/`, and `tests/` trees and the commands to run a review
+- [X] T057 Re-run the self-review from T028 against the finished process and confirm it raises no finding it would flag in another subject (Principle V)
 
 ---
 

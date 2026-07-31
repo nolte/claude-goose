@@ -67,6 +67,9 @@ instructions: |
   Report only what the merged changes state. Do not infer intent that is not written down,
   and do not describe work that was not merged.
 
+prompt: |
+  Compile the release notes for {{ milestone }} now.
+
 extensions:
   - type: builtin
     name: developer

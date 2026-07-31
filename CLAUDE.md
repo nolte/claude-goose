@@ -14,13 +14,55 @@ reusability by construction, plans as versioned artifacts, auditable revisions, 
 fidelity toward Goose's documented provider interface, dogfooding, and evidence-backed claims.
 Principles III and VI are marked NON-NEGOTIABLE.
 
+## The review process (shipped, v1.0.0)
+
+The first feature is built and running. Three top-level trees, split by rate of change:
+
+```
+baselines/goose/<revision>/   criteria, sources, coverage, criterion format — immutable once published
+process/goose-implementation-review/   the method: process.md, recipe.yaml, report-template.md, VERSION.md
+tests/goose-implementation-review/     fixtures, golden files, RESULTS.md, PORTABILITY.md
+```
+
+**Run a review:**
+
+```sh
+GOOSE_PROVIDER=claude-acp GOOSE_MODEL=default \
+  goose run --no-session --recipe process/goose-implementation-review/recipe.yaml \
+    --params subject_path=<path> \
+    --params baseline_revision=2026-07-31b \
+    --params output_path=./review-report.md
+```
+
+Optional: `compare_to=<prior report>` for a delta, `max_bytes_per_pass=<n>` to force partial
+coverage. Requires Goose 1.45.0 and `claude-agent-acp`.
+
+**Validate without an LLM call**: `goose run --recipe <file> --explain` runs Goose's real parser.
+This is how five of the ten baseline criteria are decided, and it costs nothing.
+
+**Before changing anything here, read `tests/goose-implementation-review/RESULTS.md`.** It records
+twelve findings from real runs, several of which contradict what the documentation implies. Three
+recur often enough to state up front:
+
+- **A constraint belongs in the recipe's `prompt`, not only in `instructions`** (O-12). Two separate
+  parameters were silently ignored when specified only in `instructions`, verbatim and correctly
+  rendered. Naming them in `prompt` fixed both on the first attempt.
+- **`input_type: file` reads the file and substitutes its contents** (O-6). It is not a path handle.
+  That is why file parameters may not carry defaults — a default inlines whatever it points at.
+- **Reproducibility is checked on the `DIGEST v1` block, never on whole reports** (O-11). Prose
+  varies harmlessly between runs; the digest must not.
+
 ## Repository state
 
-This repository contains **no product code yet** — only a freshly initialized GitHub Spec Kit v0.14.3 scaffold (`.claude/skills/`, `.specify/`). There is no README, no dependency manifest, no build/lint/test tooling, and no source tree.
+Feature 002 (`qa-documentation-base`) is specified but not implemented — it is what grows the
+baseline beyond its current ten criteria. Beyond the three trees above there is no other product
+code: no README, no dependency manifest, no compiled language. The Spec Kit scaffold
+(`.claude/skills/`, `.specify/`) drives the workflow described below.
 
 Consequences for any work here:
 
-- **There are no build, lint, or test commands to run.** Do not invent or guess them. The stack is chosen during `/speckit-plan` of the first feature and materialized by `/speckit-implement`; only then do such commands exist. Once they do, add them to this file.
+- **There is no build or lint step.** The deliverables are Markdown and YAML. Verification is: `goose run --explain` for parse-level checks, and full review runs reconciled against golden files under `tests/goose-implementation-review/expected/`.
+- **Verify a change to the process by re-running the self-review** — the process reviewing its own directory. It must produce no findings. This is a release condition from Constitution Principle V, not a nicety.
 - The constitution **is** ratified (v1.0.0), so the *Constitution Check* gate in every `plan.md` is live rather than vacuous. `plan-template.md:43` resolves its gates from that file at runtime; do not hard-code them into the template.
 - Two known template inconsistencies are recorded in the constitution's Sync Impact Report: `spec-template.md:3` says "Feature Branch" although state is not branch-derived, and `tasks-template.md:12` calls tests OPTIONAL where Principle III requires a verification step per stage. Both are upstream-owned — fix via `.specify/templates/overrides/` if they bite.
 
@@ -42,7 +84,7 @@ Supporting commands: `/speckit-checklist` (domain-specific quality checklist), `
 
 `.specify/workflows/speckit/workflow.yml` bundles specify → plan → tasks → implement with `type: gate` approval steps after spec and after plan; rejecting a gate aborts the run.
 
-Feature artifacts live in `specs/<NNN>-<short-name>/` (three-digit sequential prefix, per `init-options.json: feature_numbering: sequential`). `specs/` does not exist yet — `create-new-feature.sh` creates it.
+Feature artifacts live in `specs/<NNN>-<short-name>/` (three-digit sequential prefix, per `init-options.json: feature_numbering: sequential`). Two exist: `001-goose-implementation-review` (built) and `002-qa-documentation-base` (specified only).
 
 ## Feature state is not derived from the git branch
 

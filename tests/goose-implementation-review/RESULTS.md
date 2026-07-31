@@ -3,7 +3,7 @@
 Recorded outcomes of fixture and quickstart runs. **A scenario absent from this file has not been
 run.** Nothing here is inferred from reading code; every entry records something that was executed.
 
-**Status as of 2026-07-31: twenty-two full reviews executed. Quickstart scenarios 1, 2, 3, 4, 5, 6, 7 and 8 pass; scenario 9 untested (O-10), offline branch untested (T037).**
+**Status as of 2026-07-31: 24 full reviews executed. Process released as 1.0.0. Quickstart 1-9, 11, 13 pass; 10 not runnable with claude-acp; 12 awaits a second reader.**
 
 ## Environment
 
@@ -442,3 +442,24 @@ provider, a constraint that must hold belongs in `prompt`.
 **Minor deviation, not corrected**: findings classified `unchanged` also carry a `cause`, though
 Stage 6 specifies a cause only for changed findings. Harmless and redundant rather than wrong;
 recorded so the next reader knows it was noticed.
+
+### Runs 23–24 — Phase 7 (2026-07-31)
+
+| Run | Result |
+|---|---|
+| **Partial coverage** — oversized fixture, `max_bytes_per_pass=5000` against 11215 bytes | **PASS.** "Examined: none"; the file listed under `not_examined` with reason "exceeds per-pass budget". Scenario 9 tested at last, and O-10 closed |
+| **Timed review** — reference fixture (`SC-005`) | **PASS.** 197 seconds against a 900-second limit. The run also found `R-010` in that fixture, which predated the criterion; `prompt` was added to restore its intended conformance |
+| **Final self-review** (`T057`, Principle V) | **PASS.** Digest carries no finding lines at all. The finished process violates none of the ten criteria it enforces, including the three added in `2026-07-31b` |
+
+**Released as 1.0.0.** Principle V's condition is met. From here the report format and parameter
+contract are promised to consumers: a breaking change is a genuine MAJOR bump.
+
+## What remains unverified at 1.0.0
+
+Stated here rather than hidden, because a release with two known gaps is honest and a release that
+implies none is not:
+
+| Gap | Why | Route to closing it |
+|---|---|---|
+| **Scenario 10 — offline** | The `claude-acp` provider needs the network before a review starts, so a genuinely offline run cannot be staged this way | A local provider, or a stubbed drift check |
+| **Scenario 12 — `SC-003`** | Requires a reader who did not author the baseline. **Cannot be self-certified** — the process wrote the citations and is not a witness to whether they carry | `SC-003-SAMPLE.md`: 20 findings prepared for a second reader, threshold 18 |

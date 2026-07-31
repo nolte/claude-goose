@@ -39,14 +39,23 @@ from a review that never ran.
 ## Scenario 3 — Reproducibility (US2, SC-002, FR-005)
 
 Run the review twice against an unchanged fixture with the same `baseline_revision`. Compare the two
-reports byte for byte.
+**digests**, not the whole reports.
 
-**Expected**: Identical files. Ordering is fixed by the report contract precisely so this comparison
-is meaningful.
+```sh
+sed -n '/^DIGEST v1/,/^```/p' report-1.md | grep -v '^```' > d1.txt
+sed -n '/^DIGEST v1/,/^```/p' report-2.md | grep -v '^```' > d2.txt
+diff d1.txt d2.txt
+```
 
-**Fails if**: the files differ in anything but a timestamp. Any other difference means findings are
-not reproducible, and the deferral recorded in the plan's Complexity Tracking must be revisited —
-a deterministic checker becomes necessary.
+**Expected**: Identical digests. Prose may differ freely.
+
+**Fails if**: the digests differ. That is a genuine reproducibility failure and the deferral in the
+plan's Complexity Tracking must be revisited.
+
+**Why not the whole report**: measured, it fails. Two runs produced identical findings while the
+prose differed by 242 lines — one wrote "are not covered by this baseline", the other "are outside
+the baseline's coverage". `FR-005` asks for identical findings, not identical sentences; demanding
+the latter would push toward templated, less useful reports.
 
 ## Scenario 4 — Undecidable criteria are visible (FR-007)
 
@@ -104,12 +113,19 @@ foreign repository that promise is the difference between a review and an interv
 
 ## Scenario 9 — A partial review says so (SC-006, FR-008)
 
-Run against the oversized fixture, which cannot be reviewed in one pass.
+Run against a subject with `max_bytes_per_pass` set below the subject's size, e.g. the oversized
+fixture (11215 bytes) with a budget of 5000.
 
-**Expected**: A report whose `not_examined` lists the unreviewed parts with a reason.
+**Expected**: A report whose `not_examined` lists every unreviewed file with a reason — `coverage
+limit` for files beyond the budget, `exceeds per-pass budget` for a single file larger than the whole
+budget.
 
-**Fails if**: `not_examined` reads "none" while parts went unexamined. That is the difference
-between an honest partial result and a false claim of completeness.
+**Fails if**: `not_examined` reads "none" while parts went unexamined. That is the difference between
+an honest partial result and a false claim of completeness.
+
+**Why a declared budget rather than a genuinely huge fixture**: sizing a committed fixture to exceed
+whatever context window runs next is a race the fixture cannot win. A 397-line "oversized" fixture
+was read whole, leaving this path untested until the budget existed.
 
 ## Scenario 10 — Offline behaviour (Edge Case)
 

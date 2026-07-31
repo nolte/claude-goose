@@ -1,6 +1,6 @@
 # Process Version
 
-**0.2.0**
+**1.0.0**
 
 This is the semantic version of the review process itself, as required by Constitution Principle II
 ("Plans Are Versioned Artifacts").
@@ -33,12 +33,14 @@ the same distinction the delta rules require when comparing two reviews.
 |---|---|---|
 | 0.1.0 | 2026-07-31 | Initial. Pre-release: the process had not yet performed a real review |
 | 0.2.0 | 2026-07-31 | Added the `DIGEST v1` block to the report format. Two real runs over an unchanged subject produced identical findings but differing prose, so byte-comparing whole reports was the wrong test for `FR-005`. The digest is the byte-stable core; prose is free |
+| 1.0.0 | 2026-07-31 | **First release.** Added `max_bytes_per_pass`, Stage 3b (pinning, version mismatch, revision drift, offline) and Stage 6 (delta). Principle V's condition is met: 24 real reviews, a final self-review with no findings, and two foreign repositories |
 
-**On the bump**: changing the report format breaks existing golden files, which the semantics above
-call MAJOR. Under `0.x` that is expressed as a minor bump — the process is pre-release and its
-format is not yet promised to anyone. The first release is 1.0.0, after which such a change becomes
-a genuine MAJOR.
+**On reaching 1.0.0**: the format is now promised to consumers. From here, any change to the report
+format or the parameter contract that breaks existing golden files is a genuine MAJOR bump, not a
+minor one. The freedom to reshape the digest without ceremony ended with this release.
 
-**0.x means pre-release.** Per Constitution Principle V, this process is not released until it has
-performed a genuine review in its home repository — its own recipe being the first subject. The
-first release version is 1.0.0.
+**What justified it**: Principle V requires an artifact to perform real work in this repository
+before release. It has — 24 full reviews, including a final self-review that produced no findings at
+all, and runs in two unrelated repositories with no edits to the process.
+
+

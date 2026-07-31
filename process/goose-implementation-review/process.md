@@ -65,9 +65,22 @@ manifest. A file that appears in none of them is an unreported gap in coverage.
 found. Do not produce a clean report — "nothing to review" and "nothing wrong" are different claims,
 and conflating them is the failure this stage exists to prevent.
 
-**When the subject is too large for one pass**: Review what fits, list the remainder in
-`not_examined` with the reason, and continue. A partial review is acceptable; a partial review that
-reads as complete is not.
+**When the subject exceeds the coverage budget**: `max_bytes_per_pass` declares a byte budget for one
+pass. `0` means unlimited and is the normal operating mode.
+
+With a non-zero budget: take in-scope files in ascending path order until the budget is spent. Every
+file not taken goes in `not_examined` with the reason `coverage limit`. A single file larger than the
+whole budget is **never partially reviewed** — half a YAML document cannot be judged — and goes in
+`not_examined` with the reason `exceeds per-pass budget`.
+
+A partial review is acceptable; a partial review that reads as complete is not.
+
+**Why the budget is a declared input rather than a property of the reviewing agent.** Coverage
+limits were originally expected to arise naturally when a subject outgrew a context window. In
+practice a 397-line "oversized" fixture was read in one pass with nothing omitted, so the path went
+untested — and sizing a committed fixture to out-grow whatever model runs next is a race the fixture
+cannot win. An explicit budget makes the behaviour testable with a small fixture and a small limit,
+and stops it depending on the model's capacity.
 
 ---
 

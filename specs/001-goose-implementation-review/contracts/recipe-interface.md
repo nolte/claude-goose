@@ -25,6 +25,7 @@ Per the reference, `title` and `description` are required, and at least one of `
 | `baseline_revision` | string | no | `latest` | Which baseline revision to apply |
 | `output_path` | string | no | `./review-report.md` | Where the report is written |
 | `compare_to` | string | no | `""` (empty — no comparison) | A prior report, to compute a delta |
+| `max_bytes_per_pass` | number | no | `0` (unlimited) | Byte budget for one pass; files beyond it are reported as not examined |
 
 **Constraints inherited from the host schema**, quoted from the reference:
 
