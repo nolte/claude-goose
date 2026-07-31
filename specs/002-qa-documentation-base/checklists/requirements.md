@@ -65,7 +65,6 @@ baseline undefined.
 
 Items marked incomplete require spec updates before `/speckit-clarify` or `/speckit-plan`.
 
-
 ## Update 2026-07-31 — both open items closed
 
 Resolved from the practice of `001-goose-implementation-review` rather than in the abstract:

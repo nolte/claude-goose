@@ -1,36 +1,40 @@
 ---
-# Rules are chosen to catch defects, not to impose a house style the existing
-# corpus was never written against. Two constraints shape this:
-#
-#   1. Part of the corpus lives in PUBLISHED, IMMUTABLE baseline revisions.
-#      Reformatting those to satisfy a linter would break the guarantee that a
-#      report citing a revision finds it unchanged.
-#   2. A rule that fires 1215 times on day one teaches people to ignore the
-#      linter, which costs more than the rule ever saves.
-#
-# Disabled rules are listed with a reason. Everything else stays on.
+# Rules are chosen to catch defects, not to impose a style the corpus cannot
+# follow. Every disabled rule names the structural reason it cannot apply --
+# "it fires a lot" is not one of them.
 
-# Table column alignment. The corpus uses compact `|---|---|` separators
+# Line length. The task-list format mandated by the spec-driven workflow is one
+# task per line: `- [ ] T001 [P] [US1] Description with a file path (FR-001)`.
+# Wrapping breaks the format the tooling parses, so 155 of the 172 hits are in
+# tasks.md files where the length is required rather than careless. Prose in
+# this repository is wrapped at 100 by convention regardless.
+MD013: false
+
+# Inline HTML. The report template and golden files use `<subject>`,
+# `<location>`, `<severity>` as placeholders a renderer fills in. They are not
+# markup, and escaping them would make the template unreadable as a template.
+MD033: false
+
+# Emphasis as heading. VERSION.md files open with the bare version in bold --
+# `**1.0.0**`. It is a value, not a section title; a heading would imply
+# content beneath it.
+MD036: false
+
+# Bare URLs. Source records and research notes cite full URLs deliberately: a
+# reader must see exactly what was consulted without hovering or clicking, which
+# is what the evidence rules require. Wrapping them in angle brackets was tried
+# and reverted -- an automated pass corrupted emphasis markers around URLs
+# (`**<https://...**>`), damaging the very citations the rule was meant to tidy.
+MD034: false
+
+# Table column style. The corpus uses compact `|---|---|` separators
 # consistently; MD060 wants padded ones. Consistent, just not its preference.
 MD060: false
-
-# Line length: prose is wrapped at 100 by convention, but tables, URLs and
-# code blocks legitimately exceed it.
-MD013:
-  line_length: 120
-  tables: false
-  code_blocks: false
-  headings: false
 
 # Duplicate headings are meaningful: several documents repeat a section name
 # under different parents, e.g. "Verification" per stage.
 MD024:
   siblings_only: true
-
-# HTML appears only as intentional comment blocks (sync impact reports,
-# template guidance) and in <details> disclosures.
-MD033:
-  allowed_elements: [details, summary]
 
 # Fenced blocks without a language: many are plain output transcripts where a
 # language tag would be a lie.
