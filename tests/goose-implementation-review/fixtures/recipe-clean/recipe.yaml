@@ -1,0 +1,45 @@
+# FIXTURE — satisfies every criterion in baselines/goose/2026-07-31/ruleset.md.
+# Expected findings: ../../expected/recipe-clean.md (none, but with full coverage reporting)
+#
+# Conformance:
+#   R-001  title and description both present and non-empty
+#   R-002  instructions present
+#   R-003  every optional parameter carries a default
+#   R-004  no file parameter carries a default (report_style is a string)
+#   R-005  every template variable is defined; every parameter is used
+#   R-006  declared extension type is documented
+#   R-007  no code-executing extension declared, so no judgment call arises
+
+version: "1.0.0"
+title: "Changelog Summarizer"
+description: "Summarizes a changelog into release highlights for a chosen audience"
+
+parameters:
+  - key: changelog_path
+    input_type: file
+    requirement: required
+    description: "The changelog to summarize"
+
+  - key: audience
+    input_type: string
+    requirement: optional
+    default: "end users"
+    description: "Who the summary is written for"
+
+  - key: report_style
+    input_type: select
+    requirement: optional
+    default: "bullets"
+    description: "How the summary is formatted"
+    options:
+      - "bullets"
+      - "prose"
+
+instructions: |
+  Read the changelog at {{ changelog_path }} and summarize it for {{ audience }}.
+  Format the summary as {{ report_style }}.
+  Report only what the changelog states; do not infer unreleased work.
+
+extensions:
+  - type: builtin
+    name: developer

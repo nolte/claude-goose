@@ -1,0 +1,15 @@
+# OS / editor noise
+.DS_Store
+Thumbs.db
+*.swp
+*.tmp
+.idea/
+.vscode/
+
+# Spec Kit feature state — machine-local pointer, not shared project state
+.specify/feature.json
+
+# Review reports produced by ad-hoc runs.
+# Reports that belong to the record are committed deliberately under
+# tests/goose-implementation-review/ instead.
+/review-report.md

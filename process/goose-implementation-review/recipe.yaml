@@ -1,0 +1,118 @@
+version: "1.0.0"
+title: "Goose Implementation Review"
+description: "Read-only review of Goose recipe definitions and their declared extension configurations against a pinned baseline of documented rules"
+
+parameters:
+  # input_type: string, NOT file — corrected after the first real run.
+  #
+  # `file` does not mean "a path to a file"; it means "read this file and
+  # substitute its contents". Passing a directory fails with
+  #   "Failed to read parameter file <dir>: Is a directory (os error 21)"
+  # and passing a single file would inline that one file, hiding every other
+  # file in the subject from the review.
+  #
+  # This also explains R-004 more deeply than the documentation states it:
+  # file parameters IMPORT content, which is why a default path would leak
+  # whatever it points at. The rule is about data flow, not schema tidiness.
+  #
+  # No default is needed here because the parameter is required; the R-003
+  # default obligation applies only to optional ones.
+  - key: subject_path
+    input_type: string
+    requirement: required
+    description: "Path to the Goose implementation to review (file or directory)"
+
+  - key: baseline_revision
+    input_type: string
+    requirement: optional
+    default: "latest"
+    description: "Which baseline revision to apply, or 'latest'"
+
+  - key: output_path
+    input_type: string
+    requirement: optional
+    default: "./review-report.md"
+    description: "Where the review report is written"
+
+  # Deliberately input_type: string rather than file, although it names a file.
+  # An OPTIONAL FILE PARAMETER IS UNCONSTRUCTIBLE under the documented rules:
+  # "Optional parameters must have default values" requires a default, while
+  # "File parameters cannot have default values" forbids one. Typing it as a
+  # string path satisfies both. This is a finding about the rule set itself,
+  # discovered by holding this recipe to the criteria it enforces on others.
+  - key: compare_to
+    input_type: string
+    requirement: optional
+    default: ""
+    description: "Path to a prior report, to classify findings as new, resolved or unchanged. Empty means no comparison"
+
+instructions: |
+  You are performing a read-only review of a Goose implementation. Follow
+  process.md in this directory exactly; it defines six stages, each with a
+  precondition, an output, a completion condition, and a verification step.
+
+  Inputs for this run:
+    - Subject under review:  {{ subject_path }}
+    - Baseline revision:     {{ baseline_revision }}
+    - Report destination:    {{ output_path }}
+    - Prior report to compare against: {{ compare_to }}
+      (empty means no comparison is requested; skip delta classification entirely)
+
+  Absolute constraints, in force for every stage:
+
+    1. NEVER modify anything under {{ subject_path }}. Checksum every file
+       before Stage 1 and verify after Stage 3. Any difference fails the run
+       and the report is discarded, however correct the findings are.
+    2. NEVER execute the subject. Findings come from reading the material.
+    3. NEVER invent a criterion. Only criteria present in the baseline
+       revision's ruleset.md may produce findings. An expectation that seems
+       obviously right but is not in the ruleset is not a finding — at most it
+       is a proposed criterion for the baseline.
+    4. NEVER write a finding without a criterion id, a location, and the source
+       its criterion cites. A report containing such a finding is invalid and
+       must not be written at all.
+    5. NEVER report a declared baseline gap as passing. Gaps become findings
+       with outcome `undecided`.
+    6. NEVER phrase a finding more strongly than its criterion's evidence_class
+       supports. Only `authoritative` criteria may state that something is wrong.
+
+  Report the result using report-template.md. Include the coverage statement and
+  the Criteria Applied table even when there are no findings — a clean subject
+  and an unexamined one must never look alike.
+
+# `prompt` is required in addition to `instructions`, not merely one of the two.
+# The reference states "At least one of instructions or prompt must be present",
+# and the parser accepts a recipe with only `instructions` — but a headless run
+# then fails with "no text provided for prompt in headless mode". `instructions`
+# describes HOW to work; `prompt` is the starting impulse, and without it a
+# non-interactive run has nothing to begin.
+#
+# This recipe hit that failure itself, which is precisely what R-002 warns about
+# and why that criterion is marked host_enforced: no.
+prompt: |
+  Review the Goose implementation at {{ subject_path }} now, following process.md
+  stage by stage. Write the report to {{ output_path }} and state plainly what you
+  examined and what you did not.
+
+# No `extensions` are declared, and that is now a verified decision rather than
+# an open question. The Developer extension — which supplies the file tools this
+# process needs — is enabled by default on installation, so declaring it would
+# add nothing. Whether an explicit `extensions` list REPLACES the defaults rather
+# than adding to them has not been verified, and an incomplete list would then
+# silently remove the tools this process depends on. Not declaring is the
+# safe option under that uncertainty.
+#
+# SECURITY NOTE — the read-only promise is enforced by DETECTION, not prevention.
+# The Developer extension exposes `shell`, `write` and `edit`; per the
+# documentation, goose "can run system commands with your user privileges and
+# edit any accessible file". Nothing in this recipe technically prevents a write
+# to the subject. What protects the subject is:
+#   1. the explicit constraints in `instructions` above, and
+#   2. Stage 4 of process.md, which re-checksums the subject and fails the run
+#      on any difference.
+# Stage 4 is therefore not a formality. It is the only mechanism that can catch
+# a violation, and it catches it after the fact.
+#
+# `inline_python` is deliberately never used: executing code is unnecessary for
+# a read-only review and would widen the trust surface for a process whose
+# subjects may be untrusted third-party material.

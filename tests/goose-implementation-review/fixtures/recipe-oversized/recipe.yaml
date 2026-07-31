@@ -1,0 +1,397 @@
+# FIXTURE — deliberately too large to review in a single pass.
+#
+# Purpose: verify that a partial review says so. The process must list what it did
+# not examine, with a reason, in the report's `not_examined` field. A report that
+# omits the unexamined remainder would read as a complete review of a subject that
+# was only partly read — the failure this fixture exists to catch.
+#
+# "Too large" is not a fixed number of lines; it depends on the reviewing agent's
+# context budget. This fixture is sized well beyond a comfortable single pass so the
+# behaviour is reachable regardless of that budget. If a future agent reviews it
+# entirely in one pass, enlarge the fixture rather than deleting the scenario.
+#
+# The recipe is otherwise CONFORMANT: any finding here should concern coverage,
+# not correctness.
+
+version: "1.0.0"
+title: "Monorepo Batch Auditor"
+description: "Runs a per-package audit across every package in a large monorepo and aggregates the results"
+
+parameters:
+  - key: monorepo_path
+    input_type: file
+    requirement: required
+    description: "Root of the monorepo to audit"
+
+  - key: fail_threshold
+    input_type: number
+    requirement: optional
+    default: "1"
+    description: "Number of package failures tolerated before the run is marked failed"
+
+instructions: |
+  Audit every package under {{ monorepo_path }}.
+  Mark the run failed once more than {{ fail_threshold }} packages fail.
+  Report per-package results, then the aggregate.
+
+sub_recipes:
+  - name: "audit-package-01"
+    path: "./sub/audit-package-01.yaml"
+    values:
+      package_index: "1"
+      scope: "package-01"
+      retry_budget: "2"
+  - name: "audit-package-02"
+    path: "./sub/audit-package-02.yaml"
+    values:
+      package_index: "2"
+      scope: "package-02"
+      retry_budget: "2"
+  - name: "audit-package-03"
+    path: "./sub/audit-package-03.yaml"
+    values:
+      package_index: "3"
+      scope: "package-03"
+      retry_budget: "2"
+  - name: "audit-package-04"
+    path: "./sub/audit-package-04.yaml"
+    values:
+      package_index: "4"
+      scope: "package-04"
+      retry_budget: "2"
+  - name: "audit-package-05"
+    path: "./sub/audit-package-05.yaml"
+    values:
+      package_index: "5"
+      scope: "package-05"
+      retry_budget: "2"
+  - name: "audit-package-06"
+    path: "./sub/audit-package-06.yaml"
+    values:
+      package_index: "6"
+      scope: "package-06"
+      retry_budget: "2"
+  - name: "audit-package-07"
+    path: "./sub/audit-package-07.yaml"
+    values:
+      package_index: "7"
+      scope: "package-07"
+      retry_budget: "2"
+  - name: "audit-package-08"
+    path: "./sub/audit-package-08.yaml"
+    values:
+      package_index: "8"
+      scope: "package-08"
+      retry_budget: "2"
+  - name: "audit-package-09"
+    path: "./sub/audit-package-09.yaml"
+    values:
+      package_index: "9"
+      scope: "package-09"
+      retry_budget: "2"
+  - name: "audit-package-10"
+    path: "./sub/audit-package-10.yaml"
+    values:
+      package_index: "10"
+      scope: "package-10"
+      retry_budget: "2"
+  - name: "audit-package-11"
+    path: "./sub/audit-package-11.yaml"
+    values:
+      package_index: "11"
+      scope: "package-11"
+      retry_budget: "2"
+  - name: "audit-package-12"
+    path: "./sub/audit-package-12.yaml"
+    values:
+      package_index: "12"
+      scope: "package-12"
+      retry_budget: "2"
+  - name: "audit-package-13"
+    path: "./sub/audit-package-13.yaml"
+    values:
+      package_index: "13"
+      scope: "package-13"
+      retry_budget: "2"
+  - name: "audit-package-14"
+    path: "./sub/audit-package-14.yaml"
+    values:
+      package_index: "14"
+      scope: "package-14"
+      retry_budget: "2"
+  - name: "audit-package-15"
+    path: "./sub/audit-package-15.yaml"
+    values:
+      package_index: "15"
+      scope: "package-15"
+      retry_budget: "2"
+  - name: "audit-package-16"
+    path: "./sub/audit-package-16.yaml"
+    values:
+      package_index: "16"
+      scope: "package-16"
+      retry_budget: "2"
+  - name: "audit-package-17"
+    path: "./sub/audit-package-17.yaml"
+    values:
+      package_index: "17"
+      scope: "package-17"
+      retry_budget: "2"
+  - name: "audit-package-18"
+    path: "./sub/audit-package-18.yaml"
+    values:
+      package_index: "18"
+      scope: "package-18"
+      retry_budget: "2"
+  - name: "audit-package-19"
+    path: "./sub/audit-package-19.yaml"
+    values:
+      package_index: "19"
+      scope: "package-19"
+      retry_budget: "2"
+  - name: "audit-package-20"
+    path: "./sub/audit-package-20.yaml"
+    values:
+      package_index: "20"
+      scope: "package-20"
+      retry_budget: "2"
+  - name: "audit-package-21"
+    path: "./sub/audit-package-21.yaml"
+    values:
+      package_index: "21"
+      scope: "package-21"
+      retry_budget: "2"
+  - name: "audit-package-22"
+    path: "./sub/audit-package-22.yaml"
+    values:
+      package_index: "22"
+      scope: "package-22"
+      retry_budget: "2"
+  - name: "audit-package-23"
+    path: "./sub/audit-package-23.yaml"
+    values:
+      package_index: "23"
+      scope: "package-23"
+      retry_budget: "2"
+  - name: "audit-package-24"
+    path: "./sub/audit-package-24.yaml"
+    values:
+      package_index: "24"
+      scope: "package-24"
+      retry_budget: "2"
+  - name: "audit-package-25"
+    path: "./sub/audit-package-25.yaml"
+    values:
+      package_index: "25"
+      scope: "package-25"
+      retry_budget: "2"
+  - name: "audit-package-26"
+    path: "./sub/audit-package-26.yaml"
+    values:
+      package_index: "26"
+      scope: "package-26"
+      retry_budget: "2"
+  - name: "audit-package-27"
+    path: "./sub/audit-package-27.yaml"
+    values:
+      package_index: "27"
+      scope: "package-27"
+      retry_budget: "2"
+  - name: "audit-package-28"
+    path: "./sub/audit-package-28.yaml"
+    values:
+      package_index: "28"
+      scope: "package-28"
+      retry_budget: "2"
+  - name: "audit-package-29"
+    path: "./sub/audit-package-29.yaml"
+    values:
+      package_index: "29"
+      scope: "package-29"
+      retry_budget: "2"
+  - name: "audit-package-30"
+    path: "./sub/audit-package-30.yaml"
+    values:
+      package_index: "30"
+      scope: "package-30"
+      retry_budget: "2"
+  - name: "audit-package-31"
+    path: "./sub/audit-package-31.yaml"
+    values:
+      package_index: "31"
+      scope: "package-31"
+      retry_budget: "2"
+  - name: "audit-package-32"
+    path: "./sub/audit-package-32.yaml"
+    values:
+      package_index: "32"
+      scope: "package-32"
+      retry_budget: "2"
+  - name: "audit-package-33"
+    path: "./sub/audit-package-33.yaml"
+    values:
+      package_index: "33"
+      scope: "package-33"
+      retry_budget: "2"
+  - name: "audit-package-34"
+    path: "./sub/audit-package-34.yaml"
+    values:
+      package_index: "34"
+      scope: "package-34"
+      retry_budget: "2"
+  - name: "audit-package-35"
+    path: "./sub/audit-package-35.yaml"
+    values:
+      package_index: "35"
+      scope: "package-35"
+      retry_budget: "2"
+  - name: "audit-package-36"
+    path: "./sub/audit-package-36.yaml"
+    values:
+      package_index: "36"
+      scope: "package-36"
+      retry_budget: "2"
+  - name: "audit-package-37"
+    path: "./sub/audit-package-37.yaml"
+    values:
+      package_index: "37"
+      scope: "package-37"
+      retry_budget: "2"
+  - name: "audit-package-38"
+    path: "./sub/audit-package-38.yaml"
+    values:
+      package_index: "38"
+      scope: "package-38"
+      retry_budget: "2"
+  - name: "audit-package-39"
+    path: "./sub/audit-package-39.yaml"
+    values:
+      package_index: "39"
+      scope: "package-39"
+      retry_budget: "2"
+  - name: "audit-package-40"
+    path: "./sub/audit-package-40.yaml"
+    values:
+      package_index: "40"
+      scope: "package-40"
+      retry_budget: "2"
+  - name: "audit-package-41"
+    path: "./sub/audit-package-41.yaml"
+    values:
+      package_index: "41"
+      scope: "package-41"
+      retry_budget: "2"
+  - name: "audit-package-42"
+    path: "./sub/audit-package-42.yaml"
+    values:
+      package_index: "42"
+      scope: "package-42"
+      retry_budget: "2"
+  - name: "audit-package-43"
+    path: "./sub/audit-package-43.yaml"
+    values:
+      package_index: "43"
+      scope: "package-43"
+      retry_budget: "2"
+  - name: "audit-package-44"
+    path: "./sub/audit-package-44.yaml"
+    values:
+      package_index: "44"
+      scope: "package-44"
+      retry_budget: "2"
+  - name: "audit-package-45"
+    path: "./sub/audit-package-45.yaml"
+    values:
+      package_index: "45"
+      scope: "package-45"
+      retry_budget: "2"
+  - name: "audit-package-46"
+    path: "./sub/audit-package-46.yaml"
+    values:
+      package_index: "46"
+      scope: "package-46"
+      retry_budget: "2"
+  - name: "audit-package-47"
+    path: "./sub/audit-package-47.yaml"
+    values:
+      package_index: "47"
+      scope: "package-47"
+      retry_budget: "2"
+  - name: "audit-package-48"
+    path: "./sub/audit-package-48.yaml"
+    values:
+      package_index: "48"
+      scope: "package-48"
+      retry_budget: "2"
+  - name: "audit-package-49"
+    path: "./sub/audit-package-49.yaml"
+    values:
+      package_index: "49"
+      scope: "package-49"
+      retry_budget: "2"
+  - name: "audit-package-50"
+    path: "./sub/audit-package-50.yaml"
+    values:
+      package_index: "50"
+      scope: "package-50"
+      retry_budget: "2"
+  - name: "audit-package-51"
+    path: "./sub/audit-package-51.yaml"
+    values:
+      package_index: "51"
+      scope: "package-51"
+      retry_budget: "2"
+  - name: "audit-package-52"
+    path: "./sub/audit-package-52.yaml"
+    values:
+      package_index: "52"
+      scope: "package-52"
+      retry_budget: "2"
+  - name: "audit-package-53"
+    path: "./sub/audit-package-53.yaml"
+    values:
+      package_index: "53"
+      scope: "package-53"
+      retry_budget: "2"
+  - name: "audit-package-54"
+    path: "./sub/audit-package-54.yaml"
+    values:
+      package_index: "54"
+      scope: "package-54"
+      retry_budget: "2"
+  - name: "audit-package-55"
+    path: "./sub/audit-package-55.yaml"
+    values:
+      package_index: "55"
+      scope: "package-55"
+      retry_budget: "2"
+  - name: "audit-package-56"
+    path: "./sub/audit-package-56.yaml"
+    values:
+      package_index: "56"
+      scope: "package-56"
+      retry_budget: "2"
+  - name: "audit-package-57"
+    path: "./sub/audit-package-57.yaml"
+    values:
+      package_index: "57"
+      scope: "package-57"
+      retry_budget: "2"
+  - name: "audit-package-58"
+    path: "./sub/audit-package-58.yaml"
+    values:
+      package_index: "58"
+      scope: "package-58"
+      retry_budget: "2"
+  - name: "audit-package-59"
+    path: "./sub/audit-package-59.yaml"
+    values:
+      package_index: "59"
+      scope: "package-59"
+      retry_budget: "2"
+  - name: "audit-package-60"
+    path: "./sub/audit-package-60.yaml"
+    values:
+      package_index: "60"
+      scope: "package-60"
+      retry_budget: "2"

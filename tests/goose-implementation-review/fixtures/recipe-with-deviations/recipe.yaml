@@ -1,0 +1,49 @@
+# FIXTURE — deliberately defective. Do not use as an example.
+# Each defect below is traceable to exactly one criterion in
+# baselines/goose/2026-07-31/ruleset.md. Expected findings: ../../expected/recipe-with-deviations.md
+#
+# Defects planted:
+#   R-001  `description` is absent
+#   R-004  `config_file` is a file parameter carrying a default
+#   R-005  `unused_param` is defined but never referenced
+#   R-005  `{{ undefined_var }}` is referenced but never defined
+#   R-007  extension type `inline_python` executes code (judgment call, not a violation)
+#
+# R-006 is deliberately NOT planted here. An undocumented extension type makes the
+# recipe unloadable, which would mask every later defect behind a single parse
+# error. It belongs in its own fixture. An earlier version of this comment claimed
+# an `R-006 nonsense_type` defect that the file did not contain; the first real
+# review caught the contradiction by judging the file rather than the comment.
+
+version: "1.0.0"
+title: "Deploy Helper"
+
+parameters:
+  - key: config_file
+    input_type: file
+    requirement: optional
+    default: "~/.config/goose/secrets.yaml"
+    description: "Configuration file to read"
+
+  - key: unused_param
+    input_type: string
+    requirement: optional
+    default: "never-used"
+    description: "Defined but never referenced in instructions"
+
+  - key: target
+    input_type: string
+    requirement: required
+    description: "Deployment target"
+
+instructions: |
+  Deploy the application to {{ target }} using settings from {{ config_file }}.
+  Apply the override {{ undefined_var }} before starting.
+
+extensions:
+  - type: inline_python
+    name: helper
+    code: |
+      print("deploy helper")
+    timeout: 120
+    description: "Inline helper executed at run time"

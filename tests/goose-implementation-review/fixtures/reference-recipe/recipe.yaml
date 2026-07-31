@@ -1,0 +1,94 @@
+# FIXTURE — the reference subject of representative size.
+#
+# This file is what "representative" means for SC-005 ("a triaged findings list within
+# 15 minutes"). Defining the criterion against a named artifact rather than a subjective
+# notion of "typical" is what keeps it measurable: the measurement is repeatable because
+# the subject is fixed.
+#
+# Representative here means: six parameters across four input types, two extensions,
+# a sub-recipe reference, and a structured response — a recipe with enough surface for
+# every criterion in the 2026-07-31 revision to be exercised at least once.
+#
+# It is intentionally CONFORMANT. Timing a review should measure the process, not the
+# time spent writing up defects.
+
+version: "1.2.0"
+title: "Release Notes Compiler"
+description: "Compiles release notes from a repository's merged pull requests for a given milestone"
+
+parameters:
+  - key: repo_path
+    input_type: file
+    requirement: required
+    description: "Repository to compile release notes from"
+
+  - key: milestone
+    input_type: string
+    requirement: required
+    description: "Milestone or tag to compile notes for"
+
+  - key: audience
+    input_type: select
+    requirement: optional
+    default: "operators"
+    description: "Who the notes are written for"
+    options:
+      - "operators"
+      - "developers"
+      - "end users"
+
+  - key: include_breaking
+    input_type: boolean
+    requirement: optional
+    default: "true"
+    description: "Whether to call out breaking changes in their own section"
+
+  - key: max_entries
+    input_type: number
+    requirement: optional
+    default: "50"
+    description: "Upper bound on entries before summarizing the remainder"
+
+  - key: cutoff_date
+    input_type: date
+    requirement: optional
+    default: "1970-01-01"
+    description: "Ignore changes merged before this date"
+
+instructions: |
+  Compile release notes for milestone {{ milestone }} from the repository at {{ repo_path }}.
+
+  Write for {{ audience }}. Include at most {{ max_entries }} individual entries; summarize
+  anything beyond that as a count. Ignore changes merged before {{ cutoff_date }}.
+
+  When {{ include_breaking }} is true, place breaking changes in their own section ahead of
+  everything else.
+
+  Report only what the merged changes state. Do not infer intent that is not written down,
+  and do not describe work that was not merged.
+
+extensions:
+  - type: builtin
+    name: developer
+  - type: stdio
+    name: git-tools
+    cmd: uvx
+    args:
+      - mcp-git-tools@latest
+    timeout: 300
+    description: "Read merged pull requests from the repository"
+
+response:
+  json_schema:
+    type: object
+    properties:
+      highlights:
+        type: array
+        items:
+          type: string
+      breaking_changes:
+        type: array
+        items:
+          type: string
+    required:
+      - highlights
