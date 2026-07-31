@@ -62,8 +62,8 @@ values must flip; if they do not, the mechanism is not acting here (quickstart S
 **⚠️ CRITICAL**: `develop` does not exist yet. Every workflow in this feature targets it.
 
 - [X] T006 Create `develop` from the current `main` and push it, so the branch every pull request targets exists (`FR-013`)
-- [ ] T007 Write `.github/settings.yml` extending `nolte/gh-plumbing:.github/commons-settings.yml`, declaring only what the commons does not: this repository's required-check contexts and its `develop` branch entry (`FR-014`, `FR-015`, `FR-017`)
-- [ ] T008 Record the pre-sync baseline (`default_branch`, `allow_merge_commit`, `allow_rebase_merge`) in `OMISSIONS.md` so the settings mechanism's effect is measurable afterwards (`FR-014`)
+- [X] T007 Write `.github/settings.yml` extending `nolte/gh-plumbing:.github/commons-settings.yml`, declaring only what the commons does not: this repository's required-check contexts and its `develop` branch entry (`FR-014`, `FR-015`, `FR-017`)
+- [X] T008 Record the pre-sync baseline (`default_branch`, `allow_merge_commit`, `allow_rebase_merge`) in `OMISSIONS.md` so the settings mechanism's effect is measurable afterwards (`FR-014`)
 
 **Checkpoint**: The integration branch exists and the settings file is ready to prove itself.
 

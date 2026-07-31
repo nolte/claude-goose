@@ -1,0 +1,68 @@
+---
+# Synced to GitHub by https://probot.github.io/apps/settings/
+#
+# The App reacts to pushes that touch THIS file. A change to the upstream
+# `_extends:` source does not trigger a sync on its own — when a commons change
+# should propagate here, touch this file as well (a comment edit is enough) so
+# the App re-runs the merge. Tracked upstream as nolte/gh-plumbing#331.
+#
+# What the commons already supplies, and this file therefore does NOT restate:
+#   - default_branch: develop          (FR-013)
+#   - squash-merge only                (keeps develop linear for the drafter)
+#   - the portfolio-wide label set
+#
+# What the commons deliberately leaves empty, so consumers must declare it:
+#   - required_status_checks.contexts  (FR-015)
+#
+# Branch entries merge by `name`, so declaring only `develop` here leaves any
+# inherited entry for other branches intact.
+
+_extends: gh-plumbing:.github/commons-settings.yml
+
+repository:
+  name: claude-goose
+  description: >-
+    Reusable, revision-safe multi-stage implementation plans for Goose,
+    with Claude Code as an ACP provider.
+  topics: goose, claude-code, acp, spec-driven-development, review-automation
+
+branches:
+  - name: develop
+    protection:
+      required_status_checks:
+        strict: true
+        # DELIBERATELY EMPTY until the static-gate workflow exists and its
+        # check names are known (T016 → T027).
+        #
+        # A required context that no workflow ever produces blocks every pull
+        # request forever: GitHub waits for a check that will never report.
+        # Declaring names ahead of the workflow that emits them would make this
+        # repository unmergeable, which is a worse failure than having no
+        # required checks yet.
+        #
+        # When they are added, only the classes that pass the existing corpus
+        # may go in first — see OMISSIONS.md, "Gate status at introduction".
+        # A required check that fails on every pull request from day one
+        # teaches contributors to ignore checks.
+        contexts: []
+      required_pull_request_reviews:
+        required_approving_review_count: 0
+        dismiss_stale_reviews: true
+      enforce_admins: false
+      restrictions: null
+
+# NOTE ON `main`, deliberately not declared here.
+#
+# `main` is already protected by a repository RULESET
+# (`default-branch-protection`: pull_request, deletion, non_fast_forward,
+# required_linear_history). Rulesets and classic branch protection are separate
+# mechanisms that coexist; both are evaluated and the stricter wins.
+#
+# This file configures classic protection. Adding a `main` entry here would
+# layer a second, weaker mechanism over a working one without replacing it, and
+# would invite the belief that this file is what guards `main`. It is not.
+#
+# A check for "is main protected?" must query BOTH mechanisms. Querying only
+# GET /repos/../branches/main/protection returns 404 here and reads as
+# "unprotected" while the ruleset actively rejects pushes — a mistake this
+# project made once and recorded in OMISSIONS.md.

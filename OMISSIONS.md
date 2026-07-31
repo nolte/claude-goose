@@ -160,3 +160,34 @@ day one teaches contributors to ignore checks, which costs more than the rule sa
 
 **Revisit when**: the corpus findings are worked down. The four passing classes can be declared
 required immediately; the other three follow.
+
+## Bootstrap: the settings file cannot enable itself (2026-07-31)
+
+The Probot Settings App reacts to pushes on the repository's **default branch**. That branch is
+currently `main`, while `.github/settings.yml` lands on `develop` — and the setting the file most
+needs to apply is `default_branch: develop`, inherited from the commons.
+
+**The file therefore cannot bring itself into effect.** Nothing is wrong with it; the sequence is
+simply circular:
+
+| Step | Blocked by |
+|---|---|
+| Sync `settings.yml` from `develop` | App watches `main` |
+| Make `develop` the default | That is what the sync would do |
+| Push `settings.yml` to `main` directly | Ruleset rejects direct pushes |
+
+Three ways out, in descending order of preference:
+
+1. **Switch the default branch to `develop` once, by hand.** A single bootstrap action; every
+   subsequent change flows through the file. This is the intended end state anyway.
+2. **Merge `develop` into `main` through a pull request.** The ruleset permits this. It also
+   contradicts the target model, in which `main` is written only by release propagation.
+3. **Wait for the first release to propagate to `main`.** Correct in the long run, but propagation
+   is itself blocked (see above), so this does not resolve today.
+
+**Recorded rather than worked around**, because the circularity is a property of the mechanism and
+will recur in any repository adopting these settings from a non-default branch. The first option is
+a deliberate operator action, not something this feature should perform silently.
+
+**Revisit when**: the default branch is `develop`. At that point the pre-sync baseline above becomes
+measurable exactly as quickstart Scenario 4b describes.

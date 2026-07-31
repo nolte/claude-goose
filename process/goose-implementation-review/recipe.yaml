@@ -1,6 +1,8 @@
 version: "1.0.0"
 title: "Goose Implementation Review"
-description: "Read-only review of Goose recipe definitions and their declared extension configurations against a pinned baseline of documented rules"
+description: >-
+  Read-only review of Goose recipe definitions and their declared extension
+  configurations against a pinned baseline of documented rules
 
 parameters:
   # input_type: string, NOT file — corrected after the first real run.
@@ -52,7 +54,9 @@ parameters:
     input_type: number
     requirement: optional
     default: "0"
-    description: "Byte budget for one review pass; 0 means unlimited. Files beyond the budget are reported as not examined"
+    description: >-
+      Byte budget for one review pass; 0 means unlimited. Files beyond the budget are reported as not
+      examined
 
 instructions: |
   You are performing a read-only review of a Goose implementation. Follow
