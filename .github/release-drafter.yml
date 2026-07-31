@@ -1,0 +1,52 @@
+---
+# Note categories for the drafter (FR-018). Derived from the Conventional
+# Commits types this repository actually uses, so a merged pull request lands
+# in a category rather than in an "uncategorised" bucket nobody reads.
+
+name-template: 'v$RESOLVED_VERSION'
+tag-template: 'v$RESOLVED_VERSION'
+
+categories:
+  - title: 'Features'
+    labels: [feature, enhancement]
+  - title: 'Fixes'
+    labels: [fix, bugfix, bug]
+  - title: 'Documentation and specifications'
+    labels: [documentation, docs]
+  - title: 'Pipeline and tooling'
+    labels: [ci, build, chore]
+  - title: 'Tests and verification'
+    labels: [test]
+
+change-template: '- $TITLE (#$NUMBER) @$AUTHOR'
+change-title-escapes: '\<*_&'
+
+version-resolver:
+  major:
+    labels: [major, breaking]
+  minor:
+    labels: [minor, feature, enhancement]
+  patch:
+    labels: [patch, fix, bugfix, chore, documentation]
+  default: patch
+
+# Conventional Commits prefixes map onto the labels above, so a squash-merged
+# pull request is categorised by its title even when nobody applied a label.
+autolabeler:
+  - label: feature
+    title: ['/^feat(\(.+\))?!?:/']
+  - label: fix
+    title: ['/^fix(\(.+\))?!?:/']
+  - label: documentation
+    title: ['/^docs(\(.+\))?!?:/']
+  - label: test
+    title: ['/^test(\(.+\))?!?:/']
+  - label: chore
+    title: ['/^(chore|build|ci)(\(.+\))?!?:/']
+
+template: |
+  ## What changed
+
+  $CHANGES
+
+  **Full changelog**: https://github.com/$OWNER/$REPOSITORY/compare/$PREVIOUS_TAG...v$RESOLVED_VERSION

@@ -111,7 +111,7 @@ values must flip; if they do not, the mechanism is not acting here (quickstart S
 - [ ] T026 [US2] Push `.github/settings.yml` to the default branch and confirm the App acts: `default_branch` becomes `develop`, `allow_merge_commit` and `allow_rebase_merge` become `false` (`FR-014`, quickstart Scenario 4b)
 - [X] T027 [US2] Declare the seven static-gate checks as required status contexts on `develop` in `.github/settings.yml` — the commons leaves these empty by policy, so they are satisfied here (`FR-015`)
 - [ ] T028 [US2] Declare the feature-branch prefixes the governing branching model requires (`FR-017`)
-- [ ] T029 [US2] Create `.github/workflows/automerge.yml` calling the shared automerge workflow pinned at `@v1.1.26` (`FR-016`, `FR-028`)
+- [X] T029 [US2] Create `.github/workflows/automerge.yml` calling the shared automerge workflow pinned at `@v1.1.26` (`FR-016`, `FR-028`)
 - [ ] T030 [US2] Verify protection is restored after deletion through the platform UI (`SC-007`)
 - [X] T031 [US2] Verify a direct push to the release-presentation branch is rejected (`SC-008`)
 - [ ] T032 [US2] Verify an approved pull request with green required checks merges without a manual click (`SC-006`)
@@ -126,13 +126,13 @@ values must flip; if they do not, the mechanism is not acting here (quickstart S
 
 **Independent Test**: Publication refuses in each of its three refusal cases and succeeds in none of them.
 
-- [ ] T033 [P] [US3] Create `.github/workflows/release-drafter.yml` calling the shared drafter at `@v1.1.26`, accumulating notes on `develop` (`FR-018`, `FR-028`)
-- [ ] T034 [P] [US3] Create `.github/release-drafter.yml` declaring the note categories (`FR-018`)
-- [ ] T035 [US3] Create `.github/workflows/release-publish.yml` calling the shared publish workflow at `@v1.1.26`, `workflow_dispatch` only, exposing `tag` and `dry_run` (`FR-019`, `FR-022`)
-- [ ] T036 [US3] Declare that release and delivery workflows are never cancelled in flight (`FR-027`)
-- [ ] T037 [US3] Create `.github/workflows/release-propagate.yml` calling the shared propagation workflow at `@v1.1.26` (`FR-024`)
-- [ ] T038 [US3] Record in `OMISSIONS.md` that propagation will not start under the default token, with its revisit condition — `FR-024` requires the incompleteness to be visible (`FR-024`, `FR-030`)
-- [ ] T039 [US3] Declare in `OMISSIONS.md` that the repository has no version-bearing files, so nothing is treated as authoritative for a version (`FR-025`)
+- [X] T033 [P] [US3] Create `.github/workflows/release-drafter.yml` calling the shared drafter at `@v1.1.26`, accumulating notes on `develop` (`FR-018`, `FR-028`)
+- [X] T034 [P] [US3] Create `.github/release-drafter.yml` declaring the note categories (`FR-018`)
+- [X] T035 [US3] Create `.github/workflows/release-publish.yml` calling the shared publish workflow at `@v1.1.26`, `workflow_dispatch` only, exposing `tag` and `dry_run` (`FR-019`, `FR-022`)
+- [X] T036 [US3] Declare that release and delivery workflows are never cancelled in flight (`FR-027`)
+- [X] T037 [US3] Create `.github/workflows/release-propagate.yml` calling the shared propagation workflow at `@v1.1.26` (`FR-024`)
+- [X] T038 [US3] Record in `OMISSIONS.md` that propagation will not start under the default token, with its revisit condition — `FR-024` requires the incompleteness to be visible (`FR-024`, `FR-030`)
+- [X] T039 [US3] Declare in `OMISSIONS.md` that the repository has no version-bearing files, so nothing is treated as authoritative for a version (`FR-025`)
 - [ ] T040 [US3] Verify refusal 1: dispatch publish for a tag with no drafter-produced draft (`FR-020`, `SC-010`)
 - [ ] T041 [US3] Verify refusal 2: dispatch publish for a hand-crafted tag and confirm no tag is created or rewritten (`FR-021`, `SC-010`)
 - [ ] T042 [US3] Verify refusal 3: dispatch publish while required checks on `develop` are red (`SC-010`)
@@ -146,8 +146,8 @@ values must flip; if they do not, the mechanism is not acting here (quickstart S
 
 ## Phase 6: Polish & Cross-Cutting Concerns
 
-- [ ] T046 [P] Create `.github/workflows/dependency-review.yml` calling the shared dependency-review workflow at `@v1.1.26` (`FR-029`)
-- [ ] T047 [P] Record in `OMISSIONS.md` how each supply-chain obligation is discharged — by record rather than by a scan with findings, since the repository ships no dependency manifest (`FR-029`, `FR-030`)
+- [X] T046 [P] Create `.github/workflows/dependency-review.yml` calling the shared dependency-review workflow at `@v1.1.26` (`FR-029`)
+- [X] T047 [P] Record in `OMISSIONS.md` how each supply-chain obligation is discharged — by record rather than by a scan with findings, since the repository ships no dependency manifest (`FR-029`, `FR-030`)
 - [X] T048 [P] Verify every workflow declares an explicit minimum permission set (`FR-026`)
 - [X] T049 [P] Verify no definition in this repository contains a floating reference: `grep -rn 'uses:.*@\(develop\|main\|master\)$' .github/` returns nothing (`SC-013`)
 - [ ] T050 Verify every stage the governing design names is answerable from `OMISSIONS.md` as "runs" or "omitted, because … revisit when …" (`FR-030`, `SC-012`)

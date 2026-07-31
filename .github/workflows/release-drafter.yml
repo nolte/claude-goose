@@ -1,0 +1,32 @@
+---
+name: Release Drafter
+
+# Accumulates notes from merged pull requests into a draft release, and creates
+# the tag (FR-018). The tag's provenance is the drafter and only the drafter --
+# the publish workflow must never create or rewrite one (FR-021).
+on:
+  push:
+    branches: [develop]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: read
+
+# Release and delivery operations are NEVER cancelled in flight (FR-027). A
+# cancelled draft update can leave the draft inconsistent with what merged.
+concurrency:
+  group: release-drafter
+  cancel-in-progress: false
+
+jobs:
+  draft:
+    uses: nolte/gh-plumbing/.github/workflows/reusable-release-drafter.yml@v1.1.26
+    with:
+      # Empty when no portfolio App identity is configured. The shared workflow
+      # falls back to GITHUB_TOKEN, which drafts correctly but cannot trigger
+      # the downstream propagation -- see OMISSIONS.md.
+      app-id: ${{ vars.PORTFOLIO_APP_ID }}
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}
+      app-private-key: ${{ secrets.PORTFOLIO_APP_PRIVATE_KEY }}

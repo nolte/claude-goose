@@ -1,0 +1,44 @@
+---
+name: Release Publish
+
+# Draft → Published, and nothing else (FR-019). workflow_dispatch only: a
+# release must never happen as a side effect of a merge.
+#
+# The shared workflow refuses in three cases (SC-010):
+#   1. no open drafter-produced draft exists for the tag  (FR-020)
+#   2. the tag was hand-crafted rather than drafter-made  (FR-021)
+#   3. required checks on the integration branch are red
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to publish. Must match an open release-drafter draft."
+        required: true
+        type: string
+      dry_run:
+        description: "Validate every condition without flipping draft=false."
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+# NEVER cancelled in flight (FR-027). A cancelled publish can leave a release
+# half-transitioned, and the recovery is manual -- exactly the hand-editing
+# this chain exists to avoid.
+concurrency:
+  group: release-publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    uses: nolte/gh-plumbing/.github/workflows/reusable-release-publish.yml@v1.1.26
+    with:
+      tag: ${{ inputs.tag }}
+      dry_run: ${{ inputs.dry_run }}
+      app-id: ${{ vars.PORTFOLIO_APP_ID }}
+      auto-align: true
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}
+      app-private-key: ${{ secrets.PORTFOLIO_APP_PRIVATE_KEY }}

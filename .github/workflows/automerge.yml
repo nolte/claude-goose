@@ -1,0 +1,24 @@
+---
+name: Automerge
+
+# Merges an approved pull request once every required check is green (FR-016).
+on:
+  pull_request:
+    types: [labeled, unlabeled, synchronize, opened, edited, ready_for_review, reopened, unlocked]
+  pull_request_review:
+    types: [submitted]
+  check_suite:
+    types: [completed]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  automerge:
+    uses: nolte/gh-plumbing/.github/workflows/reusable-automerge.yaml@v1.1.26
+    with:
+      app-id: ${{ vars.PORTFOLIO_APP_ID }}
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}
+      app-private-key: ${{ secrets.PORTFOLIO_APP_PRIVATE_KEY }}
