@@ -17,6 +17,10 @@
 # Branch entries merge by `name`, so declaring only `develop` here leaves any
 # inherited entry for other branches intact.
 
+# Last propagation: 2026-07-31 — first sync after the default branch was
+# switched to develop by hand, breaking the bootstrap circularity recorded in
+# OMISSIONS.md. Touch this line to force a re-merge of the commons.
+
 _extends: gh-plumbing:.github/commons-settings.yml
 
 repository:
