@@ -90,8 +90,32 @@ measurable rather than assumed (quickstart Scenario 4b).
 | `allow_rebase_merge` | `true` | `false` |
 | `allow_squash_merge` | `true` | `true` |
 | `delete_branch_on_merge` | `false` | `true` |
-| `main` branch protection | absent | present |
+| `main` branch protection (classic) | absent | present |
+| `main` protection (**ruleset**) | **already active** — see correction below | unchanged |
 | `develop` branch | **does not exist** | exists, protected, required checks declared |
+
+### Correction to this baseline (2026-07-31)
+
+The row "`main` branch protection: absent" was **measured wrongly**. It came from
+`GET /repos/…/branches/main/protection`, which returns 404 here — but that endpoint reports only
+*classic* branch protection. This repository uses a **repository ruleset**, a separate mechanism the
+protection endpoint does not see:
+
+| | |
+|---|---|
+| Ruleset | `default-branch-protection`, enforcement `active` |
+| Applies to | `refs/heads/main` |
+| Rules | `pull_request`, `deletion`, `non_fast_forward`, `required_linear_history` |
+
+**`SC-008` is therefore already satisfied, and was verified by accident**: an attempt to push six
+commits directly to `main` was rejected with "push declined due to repository rule violations". That
+is the acceptance criterion demonstrated on live infrastructure rather than by inspection.
+
+**Consequence for the settings work**: `.github/settings.yml` configures *classic* protection, which
+coexists with the ruleset rather than replacing it. Both are evaluated and the stricter wins. The
+settings file must therefore not be written on the assumption that it is the only thing guarding
+`main` — and a future check for "is `main` protected?" must query **both** mechanisms, or it will
+report a repository as unprotected while a ruleset is actively rejecting pushes.
 
 **If these values do not change after the file lands, the Settings App is not acting on this
 repository** — whatever its installation page shows. The App is demonstrably working in this account

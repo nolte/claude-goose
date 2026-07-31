@@ -61,7 +61,7 @@ values must flip; if they do not, the mechanism is not acting here (quickstart S
 
 **⚠️ CRITICAL**: `develop` does not exist yet. Every workflow in this feature targets it.
 
-- [ ] T006 Create `develop` from the current `main` and push it, so the branch every pull request targets exists (`FR-013`)
+- [X] T006 Create `develop` from the current `main` and push it, so the branch every pull request targets exists (`FR-013`)
 - [ ] T007 Write `.github/settings.yml` extending `nolte/gh-plumbing:.github/commons-settings.yml`, declaring only what the commons does not: this repository's required-check contexts and its `develop` branch entry (`FR-014`, `FR-015`, `FR-017`)
 - [ ] T008 Record the pre-sync baseline (`default_branch`, `allow_merge_commit`, `allow_rebase_merge`) in `OMISSIONS.md` so the settings mechanism's effect is measurable afterwards (`FR-014`)
 
@@ -113,7 +113,7 @@ values must flip; if they do not, the mechanism is not acting here (quickstart S
 - [ ] T028 [US2] Declare the feature-branch prefixes the governing branching model requires (`FR-017`)
 - [ ] T029 [US2] Create `.github/workflows/automerge.yml` calling the shared automerge workflow pinned at `@v1.1.26` (`FR-016`, `FR-028`)
 - [ ] T030 [US2] Verify protection is restored after deletion through the platform UI (`SC-007`)
-- [ ] T031 [US2] Verify a direct push to the release-presentation branch is rejected (`SC-008`)
+- [X] T031 [US2] Verify a direct push to the release-presentation branch is rejected (`SC-008`)
 - [ ] T032 [US2] Verify an approved pull request with green required checks merges without a manual click (`SC-006`)
 
 **Checkpoint**: Branch behaviour survives a UI edit, which is what "as code" has to mean.
