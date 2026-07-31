@@ -103,10 +103,17 @@ the dependent statements are flagged.
 - What happens when the official documentation and the actual observable behavior disagree? Both
   observations must be recorded with their sources, and the conflict stated — not silently resolved
   in favor of one.
-- What happens when a widely followed practice has no authoritative source? It may only be recorded
-  as a community convention, explicitly marked as such, never as a documented rule.
-- What happens when the only available source is second-hand (a blog post, a forum answer)? The
-  statement's evidential strength must be visible to the reader.
+- What happens when a widely followed practice has no authoritative source? It does not enter the
+  base. Per `FR-011` community practice is an excluded source class; the topic is recorded as a
+  declared gap instead, so the QA process reports it undecidable rather than passing.
+- What happens when the only available source is second-hand (a blog post, a forum answer)? It cannot
+  back a statement. Where the behavior can be reproduced, record it as an **observation** with the
+  method, host version and date — that is an admissible class, provided the statement is worded as an
+  observation and never as a documented requirement.
+- What happens when observation contradicts the documentation? Record both, state the conflict, and
+  let the observation stand as an observation. This is not hypothetical: the shipped baseline's two
+  most valuable criteria exist precisely because measured behavior departs from what the
+  documentation implies.
 - What happens when a source is version-specific? The statement must carry the version it holds for;
   an unversioned claim about versioned behavior is not acceptable.
 - What happens when a cited source becomes unreachable? The statement must not silently remain as
@@ -137,13 +144,28 @@ the dependent statements are flagged.
 - **FR-009**: Verification history MUST be retained. Re-verifying a statement adds a confirmation
   without erasing earlier ones.
 - **FR-010**: Statements about version-specific behavior MUST record the version range they hold for.
-- **FR-011**: Admissible source classes and their ranking are [NEEDS CLARIFICATION: which sources
-  count as authoritative — official documentation only, or also the upstream source code and release
-  notes? And may widely-followed community practice be recorded at all when no authoritative source
-  exists, or must it be excluded entirely?]
-- **FR-012**: The base MUST cover the topics the QA process depends on, namely [NEEDS CLARIFICATION:
-  which subject areas must be covered — this follows from the artifact scope still open as FR-001 of
-  feature 001-goose-implementation-review]
+- **FR-011**: Admissible source classes and their ranking are fixed to the four the review process
+  already uses in production, in descending strength:
+  1. **Official documentation** — the canonical documentation site.
+  2. **Upstream repository and releases** — source, release notes, published version metadata.
+  3. **Observation** — a reproducible measurement of actual behavior, recorded with the method, the
+     host version, and the date. Statements derived from it MUST be worded as observations and MUST
+     NOT be phrased as documented requirements.
+  4. **Excluded** — community practice, blog posts and forum answers may not back a statement.
+
+  Classes 1 and 2 are authoritative; class 3 is not, and the distinction MUST be visible to a reader
+  (`FR-004`). Class 3 is nonetheless indispensable: the two most valuable criteria in the shipped
+  baseline rest on it, because they describe behavior that contradicts what the documentation
+  implies. Class 4 is excluded because search results have already been observed to surface stale
+  content from a dead documentation host with confident summaries attached.
+- **FR-012**: The base MUST cover the topics the QA process declares as gaps. The consuming baseline's
+  coverage declaration is the work list: each declared gap names a topic that is deliberately
+  uncovered, and closing one converts it into a criterion. This makes the scope evidence-derived
+  rather than invented, and inherently prioritized — a gap only exists because a review needed it and
+  found nothing.
+
+  The base MUST NOT be considered complete when the gap list empties; new host versions produce new
+  gaps. Completeness is not a release condition (see Assumptions); honesty about incompleteness is.
 - **FR-013**: Material MUST be reviewable as a change: what was added or altered, and on which
   sources it rests, MUST be apparent without reading the whole base.
 - **FR-014**: The base MUST be a plain-text, version-controllable set of documents readable without

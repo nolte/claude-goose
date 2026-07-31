@@ -13,13 +13,13 @@
 
 ## Requirement Completeness
 
-- [ ] No [NEEDS CLARIFICATION] markers remain
+- [X] No [NEEDS CLARIFICATION] markers remain
 - [x] Requirements are testable and unambiguous
 - [x] Success criteria are measurable
 - [x] Success criteria are technology-agnostic (no implementation details)
 - [x] All acceptance scenarios are defined
 - [x] Edge cases are identified
-- [ ] Scope is clearly bounded
+- [X] Scope is clearly bounded
 - [x] Dependencies and assumptions identified
 
 ## Feature Readiness
@@ -64,3 +64,17 @@ baseline undefined.
   consequence explicitly so the weaker number cannot be read as tolerance for invention.
 
 Items marked incomplete require spec updates before `/speckit-clarify` or `/speckit-plan`.
+
+
+## Update 2026-07-31 — both open items closed
+
+Resolved from the practice of `001-goose-implementation-review` rather than in the abstract:
+
+- **`FR-011`** — the four source classes the shipped baseline already uses, with observation kept as
+  an explicitly non-authoritative class. It is indispensable rather than a concession: the two
+  criteria that catch what the host lets through both rest on it.
+- **`FR-012`** — the consuming baseline's declared gaps are the work list. Evidence-derived and
+  inherently prioritized: a gap exists only because a review needed the topic and found nothing.
+
+**Scope is clearly bounded** now passes as a consequence: the source classes bound what may enter the
+base, and the gap list bounds what it must cover.
