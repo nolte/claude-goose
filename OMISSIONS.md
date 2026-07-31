@@ -311,3 +311,36 @@ workflow produces blocks every pull request forever, and one that always fails t
 to ignore checks.
 
 **All ten hooks pass, in both stages, locally and in CI.**
+
+## Release chain: built, partly verified (2026-07-31)
+
+Five workflows are in place, each a thin wrapper around a pinned shared workflow.
+
+| Piece | Status |
+|---|---|
+| Release drafter | **verified** — ran on push to `develop` and produced draft `v0.1.0` |
+| Draft notes | Empty ("No changes"), correctly: nothing has been merged via pull request yet |
+| Publish, refusal on unknown tag | **verified** — dispatch for `v99.99.99` failed as required |
+| Publish, dry run on a valid draft | **fails, cause not yet established** |
+| Propagation | Expected not to start under the default token; escape hatch present |
+
+### The unresolved publish failure
+
+A dry run against the real draft `v0.1.0` fails with **zero jobs started**, so no log exists to read.
+The release correctly remains a draft, so nothing was published in error.
+
+Ruled out by measurement:
+
+- All six `reusable-*` workflows exist at the pinned tag `v1.1.26`.
+- The secrets contract matches: `token` required, `app-private-key` optional.
+- `auto-align` **is** a valid input — see the correction below.
+
+**A wrong diagnosis is recorded here on purpose.** I concluded `auto-align` was not an input because
+a `grep` over the workflow returned nothing, removed it, and pushed the "fix". Reading the contract
+properly — parsing the YAML instead of grepping it — shows the inputs are
+`tag, dry_run, app-id, asset-filename, auto-align`. The empty output was a failure of my command,
+not evidence of absence, and I treated it as evidence. The input has been restored.
+
+**Next step**: the failure is at workflow level rather than inside a job, so the remaining candidates
+are the caller's own syntax or a permissions/visibility condition on the reusable call. It needs the
+run's raw annotation, which the API did not surface through the endpoints tried here.

@@ -133,7 +133,7 @@ values must flip; if they do not, the mechanism is not acting here (quickstart S
 - [X] T037 [US3] Create `.github/workflows/release-propagate.yml` calling the shared propagation workflow at `@v1.1.26` (`FR-024`)
 - [X] T038 [US3] Record in `OMISSIONS.md` that propagation will not start under the default token, with its revisit condition — `FR-024` requires the incompleteness to be visible (`FR-024`, `FR-030`)
 - [X] T039 [US3] Declare in `OMISSIONS.md` that the repository has no version-bearing files, so nothing is treated as authoritative for a version (`FR-025`)
-- [ ] T040 [US3] Verify refusal 1: dispatch publish for a tag with no drafter-produced draft (`FR-020`, `SC-010`)
+- [X] T040 [US3] Verify refusal 1: dispatch publish for a tag with no drafter-produced draft (`FR-020`, `SC-010`)
 - [ ] T041 [US3] Verify refusal 2: dispatch publish for a hand-crafted tag and confirm no tag is created or rewritten (`FR-021`, `SC-010`)
 - [ ] T042 [US3] Verify refusal 3: dispatch publish while required checks on `develop` are red (`SC-010`)
 - [ ] T043 [US3] Verify `dry_run: true` evaluates every condition and leaves the release a draft (`FR-022`, `SC-009`)
