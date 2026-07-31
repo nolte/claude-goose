@@ -272,7 +272,24 @@ Each failure was in the pipeline rather than in the code it checks, and each was
    now excluded for the same reason `.specify/` and `.claude/` are: what must not be changed must not
    be linted.
 
-### Open: the vale vocabulary path
+### Resolved: the vale vocabulary path
+
+**Cause: committed sync artefacts, not a path bug.** An earlier sync had been committed before
+`.gitignore` covered it. Those copies sat under `.vale/.vale-config/styles/`, a path the current
+config does not search, while `.vale-config/0-nolte-styles.ini` re-declared `StylesPath` relatively.
+Vale searched the right place, found nothing, and a stale copy sat nearby doing nothing.
+
+Only this project's own vocabulary is tracked now. A clean-checkout simulation confirmed sync
+populates the path the config searches.
+
+Twelve terms were then flagged, and each was read before acceptance —
+`automations`, `headlessly`, `parsable`, `unconstructible` and similar. **None was a misspelling.**
+
+`Vale.Terms` is disabled for the same structural reason as several markdown rules: it enforces
+vocabulary casing and flags `# Ruleset — Revision 2026-07-31`, a heading inside a published,
+immutable revision. Spelling is enforced; casing is not.
+
+### Superseded: the original vocabulary-path entry
 
 `vale sync` writes the package to `<StylesPath>/.vale-config/styles`, while `Vocab = technical`
 searches `<StylesPath>/config/vocabularies`. The two disagree, so the vocabulary is never found in a
@@ -286,8 +303,11 @@ discarded.
 **Revisit**: set `Vocab` to the path the package actually populates, or point `StylesPath` at it.
 Requires one more measurement against a clean checkout, not a guess.
 
-### Consequence for T027
+### Both contexts are now required
 
-Job names are now known: `shared / Static CI Tests` and `Tooled Checks`. Neither may become a
-required context yet — both currently fail, and a required check that fails on every pull request
-from day one teaches contributors to ignore checks.
+`shared / Static CI Tests` and `Tooled Checks` are declared as required status contexts on `develop`
+and confirmed applied. **Both were verified green in CI before being required** — a context that no
+workflow produces blocks every pull request forever, and one that always fails teaches contributors
+to ignore checks.
+
+**All ten hooks pass, in both stages, locally and in CI.**

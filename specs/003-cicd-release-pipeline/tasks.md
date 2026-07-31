@@ -95,8 +95,8 @@ values must flip; if they do not, the mechanism is not acting here (quickstart S
 - [X] T021 [P] [US1] Prove the prose check fails on a word the Vale style rejects (`FR-010`, `SC-002`)
 - [X] T022 [US1] Prove both recipe checks fail: remove a required field for the schema check, then break parsing for the `--explain` check (`FR-010`, `SC-002`)
 - [X] T023 [US1] Run `task ci` on a clean checkout and confirm it reports the same seven classes with the same verdict as CI (`SC-004`)
-- [ ] T024 [US1] Re-run the gate on the same commit with a cold cache and confirm an identical verdict; record that this holds against a fixed shared-repository state, not unconditionally (`FR-011`, `SC-003`)
-- [ ] T025 [US1] Confirm a Markdown/YAML-only pull request reaches a verdict without waiting on any full review run (`FR-031`, `SC-005`)
+- [X] T024 [US1] Re-run the gate on the same commit with a cold cache and confirm an identical verdict; record that this holds against a fixed shared-repository state, not unconditionally (`FR-011`, `SC-003`)
+- [X] T025 [US1] Confirm a Markdown/YAML-only pull request reaches a verdict without waiting on any full review run (`FR-031`, `SC-005`)
 
 **Checkpoint**: US1 is independently testable. Seven checks exist and every one has been shown to fail.
 
@@ -109,7 +109,7 @@ values must flip; if they do not, the mechanism is not acting here (quickstart S
 **Independent Test**: Delete a protection rule through the UI; it returns on the next sync.
 
 - [ ] T026 [US2] Push `.github/settings.yml` to the default branch and confirm the App acts: `default_branch` becomes `develop`, `allow_merge_commit` and `allow_rebase_merge` become `false` (`FR-014`, quickstart Scenario 4b)
-- [ ] T027 [US2] Declare the seven static-gate checks as required status contexts on `develop` in `.github/settings.yml` — the commons leaves these empty by policy, so they are satisfied here (`FR-015`)
+- [X] T027 [US2] Declare the seven static-gate checks as required status contexts on `develop` in `.github/settings.yml` — the commons leaves these empty by policy, so they are satisfied here (`FR-015`)
 - [ ] T028 [US2] Declare the feature-branch prefixes the governing branching model requires (`FR-017`)
 - [ ] T029 [US2] Create `.github/workflows/automerge.yml` calling the shared automerge workflow pinned at `@v1.1.26` (`FR-016`, `FR-028`)
 - [ ] T030 [US2] Verify protection is restored after deletion through the platform UI (`SC-007`)
@@ -148,7 +148,7 @@ values must flip; if they do not, the mechanism is not acting here (quickstart S
 
 - [ ] T046 [P] Create `.github/workflows/dependency-review.yml` calling the shared dependency-review workflow at `@v1.1.26` (`FR-029`)
 - [ ] T047 [P] Record in `OMISSIONS.md` how each supply-chain obligation is discharged — by record rather than by a scan with findings, since the repository ships no dependency manifest (`FR-029`, `FR-030`)
-- [ ] T048 [P] Verify every workflow declares an explicit minimum permission set (`FR-026`)
+- [X] T048 [P] Verify every workflow declares an explicit minimum permission set (`FR-026`)
 - [X] T049 [P] Verify no definition in this repository contains a floating reference: `grep -rn 'uses:.*@\(develop\|main\|master\)$' .github/` returns nothing (`SC-013`)
 - [ ] T050 Verify every stage the governing design names is answerable from `OMISSIONS.md` as "runs" or "omitted, because … revisit when …" (`FR-030`, `SC-012`)
 - [ ] T051 Verify portability: copy the added artifacts into a second repository and run `task ci` without editing any of them (`FR-032`, `SC-014`)
