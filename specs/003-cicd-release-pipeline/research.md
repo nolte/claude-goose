@@ -193,11 +193,36 @@ What `commons-settings.yml` already supplies — and this repository therefore m
    requires touching the local file — the shared repository documents this and tracks it as
    `nolte/gh-plumbing#331`.
 
-**Unverified**: whether the Settings App is installed on this repository. The installation endpoint
-requires App authentication and returned 401 with a user token. Branch protection on `main` is
-currently absent (404), which is consistent with either "not installed" or "installed but never
-run". **The App being installed is a precondition this feature cannot satisfy from inside the
-repository**, and it belongs in `OMISSIONS.md` with its revisit condition.
+**Installation status, measured 2026-07-31.** The operator reports the App is now configured. The
+direct endpoint still cannot confirm it — it requires App authentication and returns 401 to a user
+token — but an indirect check is decisive enough:
+
+| Check | Result |
+|---|---|
+| `gh-plumbing/branches/develop/protection` | Protected, with `static / Static CI Tests` as a required context |
+| This repository's `main` protection | **Absent** |
+| This repository's `default_branch` | **`main`**, not `develop` |
+| `allow_merge_commit` / `allow_rebase_merge` | **`true`** — the commons sets squash-only |
+
+The App therefore demonstrably works in this account. It has simply not acted here yet, which is
+exactly right: **without a `.github/settings.yml` in this repository there is nothing for it to
+apply.**
+
+### This gives the feature a concrete proof of effect
+
+The current divergence from the commons is measurable, so the first sync is verifiable rather than
+assumed. After `.github/settings.yml` lands on the default branch:
+
+| Setting | Before (now) | After, if the App is working |
+|---|---|---|
+| `default_branch` | `main` | `develop` |
+| `allow_merge_commit` | `true` | `false` |
+| `allow_rebase_merge` | `true` | `false` |
+| `main` protection | absent | present, direct push rejected |
+
+**If those values do not change, the App is not acting on this repository** — whatever its
+installation page says. That is a far better test than an installation check, because it measures the
+effect rather than the configuration.
 
 **Alternatives considered**: declaring protection through a workflow using the REST API. Rejected —
 it duplicates a portfolio mechanism that already exists, contradicting `FR-028`, and would need a

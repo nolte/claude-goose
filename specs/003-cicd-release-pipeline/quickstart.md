@@ -61,6 +61,27 @@ task ci
 **Fails if**: a check exists only in a workflow file. A contributor cannot then verify before
 pushing, which turns CI into the first place defects surface.
 
+## Scenario 4b — The settings mechanism actually acts on this repository (US2, FR-014)
+
+Before `.github/settings.yml` exists, record the baseline:
+
+```sh
+gh api repos/<owner>/<repo> --jq '{default_branch, allow_merge_commit, allow_rebase_merge}'
+```
+
+Then commit the file to the default branch and re-run the same command.
+
+**Expected**: `default_branch` becomes `develop`; `allow_merge_commit` and `allow_rebase_merge`
+become `false`, inherited from the portfolio commons.
+
+**Fails if**: nothing changes. The App is then not acting on this repository, **whatever its
+installation page shows** — and every branch-protection requirement in this feature silently does
+nothing. This scenario measures the effect rather than the configuration, which is the only check
+that distinguishes the two.
+
+**Note**: the App reacts to pushes touching *this* file. An upstream change to the commons propagates
+to nobody until each consumer touches its own copy (`gh-plumbing#331`).
+
 ## Scenario 5 — Protection is restored after UI deletion (US2, SC-007)
 
 Delete a branch-protection rule through the platform UI, then let the settings mechanism run.
