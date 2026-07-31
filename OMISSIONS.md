@@ -344,3 +344,51 @@ not evidence of absence, and I treated it as evidence. The input has been restor
 **Next step**: the failure is at workflow level rather than inside a job, so the remaining candidates
 are the caller's own syntax or a permissions/visibility condition on the reusable call. It needs the
 run's raw annotation, which the API did not surface through the endpoints tried here.
+
+
+## Correction: the portfolio App identity does exist (2026-07-31)
+
+Two entries above rest on a premise that is **wrong**. The spec's Assumptions state "No portfolio App
+identity is available initially", and this file repeated it as the reason release propagation cannot
+cascade.
+
+Measured instead:
+
+| | |
+|---|---|
+| `PORTFOLIO_APP_ID` | present, as a repository variable |
+| `PORTFOLIO_APP_PRIVATE_KEY` | present, as a repository secret |
+
+I discovered this while testing the opposite hypothesis — that the publish workflow failed *because*
+the secret was missing. It was not, and the credentials had been there the whole time. The
+assumption was inherited from the spec and never checked, which is the failure this project's
+evidence rules exist to prevent.
+
+**What follows**: the propagation entry needs re-testing rather than rewriting from another
+assumption. With an App identity available, the `release: published` cascade may well fire, and the
+"expected not to complete" note may be obsolete. That is a measurement to take, not a conclusion to
+draw here.
+
+## The publish dry run: what is ruled out, and what is not
+
+Four dispatches, all failing with **zero jobs started and no annotation**. The release correctly
+stays a draft each time, so nothing has been published in error.
+
+Ruled out by measurement:
+
+| Hypothesis | Result |
+|---|---|
+| The reusable workflow is missing at the pinned tag | All six exist at `v1.1.26` |
+| The input signature differs between `v1.1.26` and `develop` | Identical: `tag, dry_run, app-id, asset-filename, auto-align` |
+| `auto-align` is not a valid input | It **is** valid — I removed it wrongly and restored it |
+| Cross-repository calls are blocked | `reusable-pre-commit` succeeds cross-repository in the same run set |
+| The App secret is missing | It exists |
+| The caller differs structurally from the working original | Identical apart from the ref |
+
+**Not established.** The failure is at workflow level, before job creation, and GitHub surfaces no
+annotation through the API endpoints tried. The remaining candidates are a permissions mismatch
+between caller and reusable, or a condition inside the reusable's own job-level `if:`.
+
+Recorded as open rather than guessed at. Three of the hypotheses above were wrong and two of them led
+me to change working files — which is why the next step should be reading the run's annotation in the
+web UI, where GitHub does display startup errors, rather than another round of edit-and-dispatch.
