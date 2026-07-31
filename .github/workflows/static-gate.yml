@@ -50,15 +50,19 @@ jobs:
       - name: Install the pinned check toolchain
         run: pip install -r requirements-ci.txt
 
+      # Installed by download rather than via errata-ai/vale-action. That action
+      # lints as its primary function and fails the step on findings before the
+      # style package has been synced -- it cannot be used merely to place a
+      # binary. The prose class must run through the same script as locally, or
+      # the two can disagree (SC-004).
       - name: Install vale
-        uses: errata-ai/vale-action@v2.1.1
-        with:
-          version: 3.17.0
-          # This action can lint on its own; here it is used only to place the
-          # binary. The prose class runs through the same script as locally, so
-          # the two cannot disagree (SC-004).
-          files: __onlyModified
-          fail_on_error: false
+        run: |
+          set -euo pipefail
+          curl -fsSL "https://github.com/errata-ai/vale/releases/download/v3.17.0/vale_3.17.0_Linux_64-bit.tar.gz" \
+            -o /tmp/vale.tar.gz
+          mkdir -p "$HOME/.local/bin"
+          tar -xzf /tmp/vale.tar.gz -C "$HOME/.local/bin" vale
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
       - name: Install goose
         id: goose

@@ -33,10 +33,13 @@ repos:
     hooks:
       - id: markdownlint
         args: [--config, .markdownlint.yaml]
-        # .specify/ and .claude/ are both vendored by the specify CLI and hashed
-        # in its manifests; editing them is forbidden (FR-033), so linting them
-        # would report defects nobody may fix.
-        exclude: ^(\.specify|\.claude)/
+        # Three trees are excluded for the same reason: their contents may not
+        # be edited, so reporting defects in them would be reporting work
+        # nobody is permitted to do.
+        #   .specify/, .claude/  vendored and hashed by the specify CLI (FR-033)
+        #   baselines/goose/     PUBLISHED revisions are immutable; a report
+        #                        citing one must find it byte-identical
+        exclude: ^(\.specify|\.claude|baselines/goose)/
 
 
   # Classes with no upstream hook: defined locally, invoked through the task
