@@ -54,4 +54,3 @@ every such rule. A report citing `2026-08-01` must find it as it was when the re
 
 Detected by `git diff --quiet HEAD` against the predecessor directories, which is now the check that
 belongs in the publication routine.
-

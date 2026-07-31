@@ -13,3 +13,8 @@ Thumbs.db
 # Reports that belong to the record are committed deliberately under
 # tests/goose-implementation-review/ instead.
 /review-report.md
+
+# Vale styles are downloaded from a pinned package by `vale sync`, not authored
+# here. Committing them would fork content that exists to be consumed.
+.vale/nolte-styles/
+.vale/config/vocabularies/technical/

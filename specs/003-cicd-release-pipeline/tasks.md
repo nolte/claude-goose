@@ -47,11 +47,11 @@ values must flip; if they do not, the mechanism is not acting here (quickstart S
 
 **Purpose**: The entry point and tool pinning every later phase depends on
 
-- [ ] T001 Create `Taskfile.yml` with a `ci` target and one target per check class, so the gate is one command locally and in CI (`FR-008`, `SC-004`)
-- [ ] T002 [P] Create `requirements-ci.txt` pinning every check tool to an exact version — no ranges, no `latest` (`FR-012`, `SC-013`)
-- [ ] T003 [P] Create `.pre-commit-config.yaml` declaring the static checks, so CI and a workstation run identical definitions (`SC-004`)
-- [ ] T004 [P] Create `.vale.ini` consuming styles from `nolte/vale-style@v0.1.17` rather than authoring rules here (`FR-005`, `FR-028`)
-- [ ] T005 Create `OMISSIONS.md` with the five known omissions from plan.md, each carrying a reason and a revisit condition (`FR-030`, `SC-012`)
+- [X] T001 Create `Taskfile.yml` with a `ci` target and one target per check class, so the gate is one command locally and in CI (`FR-008`, `SC-004`)
+- [X] T002 [P] Create `requirements-ci.txt` pinning every check tool to an exact version — no ranges, no `latest` (`FR-012`, `SC-013`)
+- [X] T003 [P] Create `.pre-commit-config.yaml` declaring the static checks, so CI and a workstation run identical definitions (`SC-004`)
+- [X] T004 [P] Create `.vale.ini` consuming styles from `nolte/vale-style@v0.1.17` rather than authoring rules here (`FR-005`, `FR-028`)
+- [X] T005 Create `OMISSIONS.md` with the five known omissions from plan.md, each carrying a reason and a revisit condition (`FR-030`, `SC-012`)
 
 ---
 
@@ -77,23 +77,23 @@ values must flip; if they do not, the mechanism is not acting here (quickstart S
 
 ### Implementation
 
-- [ ] T009 [US1] Implement the YAML parse check as a `Taskfile.yml` target over every `*.yml`/`*.yaml` (`FR-001`)
-- [ ] T010 [P] [US1] Implement the Markdown lint check over every `*.md` (`FR-002`)
-- [ ] T011 [P] [US1] Implement the recipe schema check against `process/goose-implementation-review/recipe.yaml` (`FR-003`)
-- [ ] T012 [P] [US1] Implement the offline internal link check — relative paths and anchors, no network (`FR-004`)
-- [ ] T013 [P] [US1] Implement the prose lint check via Vale (`FR-005`)
-- [ ] T014 [P] [US1] Implement the recipe parse check invoking `goose run --recipe … --explain`, which exercises the host's own parser at no LLM cost (`FR-006`)
-- [ ] T015 [P] [US1] Implement the format check — trailing whitespace, final newline, line endings (`FR-007`)
+- [X] T009 [US1] Implement the YAML parse check as a `Taskfile.yml` target over every `*.yml`/`*.yaml` (`FR-001`)
+- [X] T010 [P] [US1] Implement the Markdown lint check over every `*.md` (`FR-002`)
+- [X] T011 [P] [US1] Implement the recipe schema check against `process/goose-implementation-review/recipe.yaml` (`FR-003`)
+- [X] T012 [P] [US1] Implement the offline internal link check — relative paths and anchors, no network (`FR-004`)
+- [X] T013 [P] [US1] Implement the prose lint check via Vale (`FR-005`)
+- [X] T014 [P] [US1] Implement the recipe parse check invoking `goose run --recipe … --explain`, which exercises the host's own parser at no LLM cost (`FR-006`)
+- [X] T015 [P] [US1] Implement the format check — trailing whitespace, final newline, line endings (`FR-007`)
 - [ ] T016 [US1] Create `.github/workflows/static-gate.yml` calling `nolte/gh-plumbing/.github/workflows/reusable-pre-commit.yaml@v1.1.26`, running unconditionally on every pull request to `develop` with no path filters (`FR-009`, `FR-028`)
 - [ ] T017 [US1] Declare a minimum permission set in `static-gate.yml` — read only (`FR-026`)
 - [ ] T018 [US1] Report each class as a separately named unit so a failure names its cause (`FR-007`, `SC-001`)
 
 ### Verification — the part that makes the gate real
 
-- [ ] T019 [US1] Prove the YAML check fails: introduce an unbalanced quote, confirm only that class fails, revert (`FR-010`, `SC-002`)
-- [ ] T020 [P] [US1] Prove the Markdown, link and format checks fail on their respective defects, one at a time (`FR-010`, `SC-002`)
-- [ ] T021 [P] [US1] Prove the prose check fails on a word the Vale style rejects (`FR-010`, `SC-002`)
-- [ ] T022 [US1] Prove both recipe checks fail: remove a required field for the schema check, then break parsing for the `--explain` check (`FR-010`, `SC-002`)
+- [X] T019 [US1] Prove the YAML check fails: introduce an unbalanced quote, confirm only that class fails, revert (`FR-010`, `SC-002`)
+- [X] T020 [P] [US1] Prove the Markdown, link and format checks fail on their respective defects, one at a time (`FR-010`, `SC-002`)
+- [X] T021 [P] [US1] Prove the prose check fails on a word the Vale style rejects (`FR-010`, `SC-002`)
+- [X] T022 [US1] Prove both recipe checks fail: remove a required field for the schema check, then break parsing for the `--explain` check (`FR-010`, `SC-002`)
 - [ ] T023 [US1] Run `task ci` on a clean checkout and confirm it reports the same seven classes with the same verdict as CI (`SC-004`)
 - [ ] T024 [US1] Re-run the gate on the same commit with a cold cache and confirm an identical verdict; record that this holds against a fixed shared-repository state, not unconditionally (`FR-011`, `SC-003`)
 - [ ] T025 [US1] Confirm a Markdown/YAML-only pull request reaches a verdict without waiting on any full review run (`FR-031`, `SC-005`)

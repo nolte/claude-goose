@@ -1,0 +1,48 @@
+# Project vocabulary (FR-005).
+#
+# Terms Vale.Spelling flags that are correct in this project. Two categories:
+#
+#   1. Field names from the data models. They appear in table cells written in
+#      bold rather than backticks, so IgnoredScopes cannot reach them. Rewriting
+#      them is not an option: some live in PUBLISHED, IMMUTABLE baseline
+#      revisions, and editing those to satisfy a linter would break the
+#      guarantee that a report citing a revision finds it unchanged.
+#
+#   2. Domain terms this project uses deliberately and consistently.
+#
+# Regex is supported; entries are case-sensitive unless made otherwise.
+
+# --- data-model field names
+host_enforced
+evidence_class
+applies_to
+decision_procedure
+version_range
+source_path
+source_commit
+conflicts_with
+input_type
+inline_python
+streamable_http
+goosehints
+goose_version
+baseline_revision
+subject_path
+compare_to
+max_bytes_per_pass
+delta_status
+delta_cause
+
+# --- domain terms
+[Uu]nsourced
+[Uu]nresearched
+[Uu]nderspecified
+[Rr]unnability
+[Bb]uildable
+[Tt]emplated
+[Dd]eliverables
+[Ii]nlines
+[Pp]arser
+[Mm]easurability
+ETags?
+args

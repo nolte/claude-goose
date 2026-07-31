@@ -6,7 +6,7 @@
 
 **Status**: Draft
 
-**Input**: User description: "Es soll eine umfangreiche cicd geben, dafür sollen die worfklows von gh-plumping verwendet werden, Du finedest ausführliche beschreibungen des release prozesses unter /home/nolte/repos/github/claude-shared/spec, dabei soll der release prozess unterstützt werden und die markdown und yaml files sollen statischen tests unterzogen werden."
+**Input**: User description (verbatim, not corrected): `Es soll eine umfangreiche cicd geben, dafür sollen die worfklows von gh-plumping verwendet werden, Du finedest ausführliche beschreibungen des release prozesses unter /home/nolte/repos/github/claude-shared/spec, dabei soll der release prozess unterstützt werden und die markdown und yaml files sollen statischen tests unterzogen werden.`
 
 ## Context
 

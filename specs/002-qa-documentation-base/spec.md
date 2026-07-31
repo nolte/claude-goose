@@ -6,7 +6,7 @@
 
 **Status**: Draft
 
-**Input**: User description: "Es soll eine Dokumenten basis entstehen auf welchem der qs prozess für die goose implementierungen beruht. Die Dokumente müssen gründlich recherchiert sein. es dürfen keine Infromationen erfunden werden !"
+**Input**: User description (verbatim, not corrected): `Es soll eine Dokumenten basis entstehen auf welchem der qs prozess für die goose implementierungen beruht. Die Dokumente müssen gründlich recherchiert sein. es dürfen keine Infromationen erfunden werden !`
 
 ## User Scenarios & Testing *(mandatory)*
 

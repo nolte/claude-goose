@@ -1,0 +1,72 @@
+---
+# The static gate. These definitions are the single source of truth: CI runs
+# exactly this file, so `task ci` on a workstation and the pipeline cannot
+# disagree (SC-004).
+#
+# Every rev is an exact tag. No branches, no ranges (FR-012, SC-013).
+
+repos:
+  # Format class (FR-007) and YAML parse class (FR-001)
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+        args: [--fix=lf]
+      - id: check-yaml
+        name: check-yaml (YAML parse class)
+        # The review recipe and fixtures are Goose recipes, not plain YAML
+        # documents; they are validated by their own classes instead.
+        exclude: ^(process/|tests/goose-implementation-review/fixtures/)
+
+  # YAML lint, stricter than parse alone (FR-001)
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.38.0
+    hooks:
+      - id: yamllint
+        args: [--strict, -c, .yamllint.yml]
+
+  # Markdown lint class (FR-002)
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.49.1
+    hooks:
+      - id: markdownlint
+        args: [--config, .markdownlint.yaml]
+        # .specify/ and .claude/ are both vendored by the specify CLI and hashed
+        # in its manifests; editing them is forbidden (FR-033), so linting them
+        # would report defects nobody may fix.
+        exclude: ^(\.specify|\.claude)/
+
+
+  # Classes with no upstream hook: defined locally, invoked through the task
+  # runner so they behave identically here and in CI (FR-008).
+  - repo: local
+    hooks:
+      - id: recipe-schema
+        name: recipe schema class
+        entry: task ci:recipe-schema
+        language: system
+        pass_filenames: false
+        files: ^process/goose-implementation-review/recipe\.yaml$
+
+      - id: recipe-parse
+        name: recipe parse class (goose --explain)
+        entry: task ci:recipe-parse
+        language: system
+        pass_filenames: false
+        files: ^process/goose-implementation-review/recipe\.yaml$
+
+      - id: prose
+        name: prose lint class (vale)
+        entry: task ci:prose
+        language: system
+        pass_filenames: false
+        files: \.md$
+
+      - id: internal-links
+        name: internal link class (offline)
+        entry: task ci:links
+        language: system
+        pass_filenames: false
+        files: \.md$

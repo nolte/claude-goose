@@ -1,0 +1,9 @@
+# Pinned check toolchain (FR-012, SC-013).
+#
+# Exact versions only. A range or a floating tag would let the same commit
+# reach different verdicts on different days, which SC-003 forbids.
+#
+# These are pipeline inputs, not project dependencies: this repository ships
+# no installable artifact.
+
+pre-commit==4.5.0

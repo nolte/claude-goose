@@ -1,0 +1,40 @@
+---
+# Rules are chosen to catch defects, not to impose a house style the existing
+# corpus was never written against. Two constraints shape this:
+#
+#   1. Part of the corpus lives in PUBLISHED, IMMUTABLE baseline revisions.
+#      Reformatting those to satisfy a linter would break the guarantee that a
+#      report citing a revision finds it unchanged.
+#   2. A rule that fires 1215 times on day one teaches people to ignore the
+#      linter, which costs more than the rule ever saves.
+#
+# Disabled rules are listed with a reason. Everything else stays on.
+
+# Table column alignment. The corpus uses compact `|---|---|` separators
+# consistently; MD060 wants padded ones. Consistent, just not its preference.
+MD060: false
+
+# Line length: prose is wrapped at 100 by convention, but tables, URLs and
+# code blocks legitimately exceed it.
+MD013:
+  line_length: 120
+  tables: false
+  code_blocks: false
+  headings: false
+
+# Duplicate headings are meaningful: several documents repeat a section name
+# under different parents, e.g. "Verification" per stage.
+MD024:
+  siblings_only: true
+
+# HTML appears only as intentional comment blocks (sync impact reports,
+# template guidance) and in <details> disclosures.
+MD033:
+  allowed_elements: [details, summary]
+
+# Fenced blocks without a language: many are plain output transcripts where a
+# language tag would be a lie.
+MD040: false
+
+# First line need not be a heading: several files open with YAML frontmatter.
+MD041: false

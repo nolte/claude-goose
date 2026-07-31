@@ -42,5 +42,3 @@ minor one. The freedom to reshape the digest without ceremony ended with this re
 **What justified it**: Principle V requires an artifact to perform real work in this repository
 before release. It has — 24 full reviews, including a final self-review that produced no findings at
 all, and runs in two unrelated repositories with no edits to the process.
-
-

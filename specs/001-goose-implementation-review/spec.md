@@ -6,7 +6,7 @@
 
 **Status**: Draft
 
-**Input**: User description: "Es sollen hochwertige automatisierungen auf goose basis entstehen, dafür muss ein reviewprozess für bestehende Goose implementierungen geschaffen werden, welcher sich an den best prectices und an aktuellen Dokumentationen orientiert."
+**Input**: User description (verbatim, not corrected): `Es sollen hochwertige automatisierungen auf goose basis entstehen, dafür muss ein reviewprozess für bestehende Goose implementierungen geschaffen werden, welcher sich an den best prectices und an aktuellen Dokumentationen orientiert.`
 
 ## User Scenarios & Testing *(mandatory)*
 

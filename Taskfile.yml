@@ -1,0 +1,74 @@
+---
+# The single entry point the pipeline invokes (FR-008).
+#
+# CI runs `task ci` and nothing else. No check is defined inline in a workflow,
+# because a check that exists only in CI cannot be run before pushing — which
+# is what SC-004 forbids.
+
+version: "3"
+
+vars:
+  RECIPE: process/goose-implementation-review/recipe.yaml
+
+tasks:
+  default:
+    desc: List available tasks
+    cmds:
+      - task --list
+    silent: true
+
+  ci:
+    desc: Run the full static gate, exactly as CI does
+    cmds:
+      - pre-commit run --all-files --show-diff-on-failure
+
+  ci:install:
+    desc: Install the pinned check toolchain
+    cmds:
+      - pip install --require-hashes -r requirements-ci.txt || pip install -r requirements-ci.txt
+      - pre-commit install --install-hooks
+
+  ci:yaml:
+    desc: "YAML parse class (FR-001)"
+    cmds:
+      - pre-commit run check-yaml --all-files
+      - pre-commit run yamllint --all-files
+
+  ci:markdown:
+    desc: "Markdown lint class (FR-002)"
+    cmds:
+      - pre-commit run markdownlint --all-files
+
+  ci:prose:
+    desc: "Prose lint class (FR-005)"
+    cmds:
+      # sync first: the styles are a downloaded package, not committed content.
+      # Without it Vale exits 2 on a missing StylesPath, which looks like a
+      # prose failure but is a configuration error.
+      - vale --config=.vale.ini sync
+      # .specify/ and .claude/ are vendored by the specify CLI and hashed in
+      # its manifests; editing them is forbidden (FR-033), so linting them
+      # would report defects nobody may fix.
+      - vale --config=.vale.ini $(git ls-files '*.md' | grep -vE '^(\.specify|\.claude)/')
+
+  ci:format:
+    desc: "Format class (FR-007)"
+    cmds:
+      - pre-commit run trailing-whitespace --all-files
+      - pre-commit run end-of-file-fixer --all-files
+      - pre-commit run mixed-line-ending --all-files
+
+  ci:recipe-schema:
+    desc: "Recipe schema class (FR-003) — required fields and parameter rules"
+    cmds:
+      - ./scripts/check-recipe-schema.sh {{.RECIPE}}
+
+  ci:recipe-parse:
+    desc: "Recipe parse class (FR-006) — the host's own parser, no LLM call"
+    cmds:
+      - ./scripts/check-recipe-parse.sh {{.RECIPE}}
+
+  ci:links:
+    desc: "Internal link class (FR-004) — relative paths and anchors, offline"
+    cmds:
+      - ./scripts/check-internal-links.sh
