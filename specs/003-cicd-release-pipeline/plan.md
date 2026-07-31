@@ -97,7 +97,9 @@ specs/003-cicd-release-pipeline/
 │   ├── release-propagate.yml  # FR-024: align the release-presentation branch
 │   ├── automerge.yml          # FR-016: merge when approved and green
 │   └── dependency-review.yml  # FR-029: supply-chain obligation
-├── settings.yml               # FR-013…FR-015, FR-017: branch roles and protection as code
+├── settings.yml               # FR-013…FR-015, FR-017: extends the portfolio commons; declares
+│                              #   THIS repository's required-check contexts (the commons leaves
+│                              #   them empty by policy). Synced by the Probot Settings App
 └── release-drafter.yml        # drafting categories
 
 Taskfile.yml                   # FR-008: the single entry point the pipeline invokes
@@ -113,8 +115,24 @@ themselves live in `.pre-commit-config.yaml` so the identical set runs locally a
 workstation" a single command rather than a list.
 
 `OMISSIONS.md` is a first-class artifact rather than a comment, because `FR-030` and `SC-012` require
-every omitted stage to be answerable — and because this feature has three real omissions to declare,
-not zero.
+every omitted stage to be answerable — and because this feature has real omissions to declare, not
+zero.
+
+**On `settings.yml`.** `FR-014` requires a committed, synchronized file but names no mechanism. The
+portfolio has settled it: the Probot Settings App, with consumers extending
+`nolte/gh-plumbing:.github/commons-settings.yml`. Three properties of that arrangement shape the
+work (research Finding 5):
+
+- `default_branch: develop` and squash-only merging are **inherited**, so this repository does not
+  restate them.
+- Required-check contexts are **not** inherited — the commons leaves them empty by explicit policy.
+  `FR-015` is satisfied by declaring them here.
+- Branch entries merge by `name`, so declaring only `develop` locally leaves inherited entries alone.
+
+**The App's installation is a precondition this feature cannot satisfy.** Whether it is installed
+could not be verified (the endpoint needs App authentication), and `main` currently has no protection
+at all. If the App is absent, every branch-protection requirement silently does nothing — which is
+why it belongs in `OMISSIONS.md` rather than being assumed.
 
 ## Complexity Tracking
 

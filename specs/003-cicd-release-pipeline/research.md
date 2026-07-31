@@ -4,7 +4,8 @@
 **Consulted**: 2026-07-31
 
 Every external dependency the spec's Assumptions section names was checked for existence rather than
-assumed. Two assumptions turned out to be stale, and one shared workflow cannot be used as-is.
+assumed. One assumption turned out to be stale, one shared workflow cannot be used as-is, and one
+precondition could not be verified at all.
 
 ---
 
@@ -159,6 +160,49 @@ incompleteness to be visible — the omissions record is where it becomes visibl
 
 ---
 
+## Finding 5: Branch settings use the Probot Settings App with an `_extends` baseline
+
+| | |
+|---|---|
+| **Decision** | `.github/settings.yml` extending `nolte/gh-plumbing:.github/commons-settings.yml`, and declaring this repository's own required-check contexts. |
+| **Evidence** | authoritative — both files read from the shared repository, 2026-07-31 |
+
+`FR-014` requires a committed, synchronized file but names **no mechanism and no filename**. The
+portfolio has already settled both: settings are "synced to GitHub by
+https://probot.github.io/apps/settings/", and consumers extend a shared baseline.
+
+What `commons-settings.yml` already supplies — and this repository therefore must not restate:
+
+| Setting | Value | Relevance |
+|---|---|---|
+| `default_branch` | `develop` | Satisfies `FR-013` without local declaration |
+| Merge strategy | squash-merge only | Keeps `develop` linear so release-drafter's parsing stays predictable |
+
+**Three consequences the plan must reflect:**
+
+1. **Required-check contexts are declared per repository, not in the commons.** The shared file
+   deliberately leaves `required_status_checks.contexts` empty, with the stated policy that
+   "Consumers MUST declare their own required-check contexts in their per-repo
+   `.github/settings.yml`". `FR-015` is therefore satisfied *here*, not inherited.
+
+2. **Branch entries merge by `name`.** Declaring only `develop` locally keeps the inherited entries
+   for other branches intact.
+
+3. **Commons changes do not propagate on their own.** The App reacts to pushes touching the
+   *consumer's* file; an upstream change to `commons-settings.yml` triggers nothing. Propagating one
+   requires touching the local file — the shared repository documents this and tracks it as
+   `nolte/gh-plumbing#331`.
+
+**Unverified**: whether the Settings App is installed on this repository. The installation endpoint
+requires App authentication and returned 401 with a user token. Branch protection on `main` is
+currently absent (404), which is consistent with either "not installed" or "installed but never
+run". **The App being installed is a precondition this feature cannot satisfy from inside the
+repository**, and it belongs in `OMISSIONS.md` with its revisit condition.
+
+**Alternatives considered**: declaring protection through a workflow using the REST API. Rejected —
+it duplicates a portfolio mechanism that already exists, contradicting `FR-028`, and would need a
+token with administrative scope on every run.
+
 ## Open questions
 
 | Question | Status |
@@ -166,6 +210,7 @@ incompleteness to be visible — the omissions record is where it becomes visibl
 | Does `reusable-pre-commit.yaml` accept inputs for which hooks to run, or is it driven entirely by `.pre-commit-config.yaml`? | **Unverified.** Its input contract was not read in full; the repository will supply a pre-commit config either way |
 | Which Vale package name does `nolte/vale-style@v0.1.17` publish, and how is it referenced? | **Unverified.** Needed when the Vale config is written, not for planning |
 | Does the platform resolve a tagged workflow's inner `@develop` at the tag or at the branch tip? | **Unverified**, and the answer changes only how strongly Finding 3 must be worded, not the decision |
+| Is the Probot Settings App installed on this repository? | **Unverified** — the endpoint needs App auth. A precondition outside this feature's control; recorded in `OMISSIONS.md` |
 
 None blocks planning; all three are recorded so a later reader knows they were not silently assumed.
 
