@@ -17,9 +17,9 @@
 # Branch entries merge by `name`, so declaring only `develop` here leaves any
 # inherited entry for other branches intact.
 
-# Last propagation: 2026-07-31 — first sync after the default branch was
-# switched to develop by hand, breaking the bootstrap circularity recorded in
-# OMISSIONS.md. Touch this line to force a re-merge of the commons.
+# Last propagation: 2026-07-31 — second sync. The first applied repository
+# settings and labels but left develop unprotected; see the branches block for
+# why. Touch this line to force a re-merge of the commons.
 
 _extends: gh-plumbing:.github/commons-settings.yml
 
@@ -49,10 +49,19 @@ branches:
         # A required check that fails on every pull request from day one
         # teaches contributors to ignore checks.
         contexts: []
-      required_pull_request_reviews:
-        required_approving_review_count: 0
-        dismiss_stale_reviews: true
+      # A protection block whose every rule is a no-op is not applied at all.
+      # The first sync set repository settings and labels correctly but left
+      # develop unprotected, because `contexts: []` plus
+      # `required_approving_review_count: 0` amounts to "require nothing".
+      #
+      # These rules bite without inventing a phantom check: no force pushes, no
+      # deletion, linear history. Review and status-check requirements are added
+      # in T027, once the workflow that produces those checks exists.
+      required_pull_request_reviews: null
       enforce_admins: false
+      required_linear_history: true
+      allow_force_pushes: false
+      allow_deletions: false
       restrictions: null
 
 # NOTE ON `main`, deliberately not declared here.
