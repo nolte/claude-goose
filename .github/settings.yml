@@ -17,7 +17,7 @@
 # Branch entries merge by `name`, so declaring only `develop` here leaves any
 # inherited entry for other branches intact.
 
-# Last propagation: 2026-07-31 — second sync. The first applied repository
+# Last propagation: 2026-07-31 — third sync: required contexts declared. The first applied repository
 # settings and labels but left develop unprotected; see the branches block for
 # why. Touch this line to force a re-merge of the commons.
 
@@ -35,20 +35,17 @@ branches:
     protection:
       required_status_checks:
         strict: true
-        # DELIBERATELY EMPTY until the static-gate workflow exists and its
-        # check names are known (T016 → T027).
+        # Both contexts were verified green in CI before being required here.
+        # A required context that no workflow produces blocks every pull request
+        # forever, and one that always fails teaches contributors to ignore
+        # checks -- so neither name was written down until a run proved it
+        # exists and passes.
         #
-        # A required context that no workflow ever produces blocks every pull
-        # request forever: GitHub waits for a check that will never report.
-        # Declaring names ahead of the workflow that emits them would make this
-        # repository unmergeable, which is a worse failure than having no
-        # required checks yet.
-        #
-        # When they are added, only the classes that pass the existing corpus
-        # may go in first — see OMISSIONS.md, "Gate status at introduction".
-        # A required check that fails on every pull request from day one
-        # teaches contributors to ignore checks.
-        contexts: []
+        # shared / Static CI Tests  -- six classes from the pinned shared workflow
+        # Tooled Checks             -- prose and recipe-parse, which need vale and goose
+        contexts:
+          - shared / Static CI Tests
+          - Tooled Checks
       # A protection block whose every rule is a no-op is not applied at all.
       # The first sync set repository settings and labels correctly but left
       # develop unprotected, because `contexts: []` plus
