@@ -24,7 +24,8 @@ tasks:
       # need vale and goose and run in the tooled CI job. Locally both run, so
       # `task ci` and CI reach the same verdict (SC-004).
       - pre-commit run --all-files --show-diff-on-failure
-      - pre-commit run --hook-stage manual --all-files --show-diff-on-failure
+      - pre-commit run recipe-parse --hook-stage manual --all-files --show-diff-on-failure
+      - pre-commit run prose --hook-stage manual --all-files --show-diff-on-failure
 
   ci:install:
     desc: Install the pinned check toolchain

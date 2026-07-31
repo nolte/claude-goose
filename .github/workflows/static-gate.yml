@@ -76,5 +76,10 @@ jobs:
           CONFIGURE=false bash /tmp/install-goose.sh
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
+      # Named explicitly rather than by stage. A hook with no `stages:` key runs
+      # in every stage, so `--hook-stage manual` alone re-runs the six classes
+      # the shared job already covered -- and fails this job for their findings.
       - name: Run the tool-dependent classes
-        run: pre-commit run --hook-stage manual --all-files --show-diff-on-failure
+        run: |
+          pre-commit run recipe-parse --hook-stage manual --all-files --show-diff-on-failure
+          pre-commit run prose --hook-stage manual --all-files --show-diff-on-failure
