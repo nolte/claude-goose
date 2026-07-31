@@ -94,7 +94,7 @@ values must flip; if they do not, the mechanism is not acting here (quickstart S
 - [X] T020 [P] [US1] Prove the Markdown, link and format checks fail on their respective defects, one at a time (`FR-010`, `SC-002`)
 - [X] T021 [P] [US1] Prove the prose check fails on a word the Vale style rejects (`FR-010`, `SC-002`)
 - [X] T022 [US1] Prove both recipe checks fail: remove a required field for the schema check, then break parsing for the `--explain` check (`FR-010`, `SC-002`)
-- [ ] T023 [US1] Run `task ci` on a clean checkout and confirm it reports the same seven classes with the same verdict as CI (`SC-004`)
+- [X] T023 [US1] Run `task ci` on a clean checkout and confirm it reports the same seven classes with the same verdict as CI (`SC-004`)
 - [ ] T024 [US1] Re-run the gate on the same commit with a cold cache and confirm an identical verdict; record that this holds against a fixed shared-repository state, not unconditionally (`FR-011`, `SC-003`)
 - [ ] T025 [US1] Confirm a Markdown/YAML-only pull request reaches a verdict without waiting on any full review run (`FR-031`, `SC-005`)
 

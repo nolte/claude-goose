@@ -239,3 +239,55 @@ exists.
 
 Two branches, two different mechanisms, deliberately. A check for "is this branch protected?" must
 query both, or it will report `main` as unprotected while a ruleset actively rejects pushes to it.
+
+## Gate in CI: status after the first four runs (2026-07-31)
+
+The gate now runs on every push and pull request to `develop`, in two jobs.
+
+| Class | CI verdict | Note |
+|---|---|---|
+| Format (3 hooks) | **pass** | |
+| YAML parse + lint | **pass** | |
+| Recipe schema | **pass** | |
+| Internal links | **pass** | |
+| **Recipe parse** | **pass** | goose installs on the runner and validates against the host's own parser |
+| Markdown lint | fail | The documented corpus backlog: 172 line-length, 12 inline HTML, 10 bare URLs |
+| Prose lint | fail | Environment defect, see below |
+
+**Five of seven classes pass in CI.** The recipe parse class passing matters most: it proves the
+host's real parser runs on a runner at no LLM cost, which is the strongest check in the set.
+
+### Four runs, three defects, all mine
+
+Each failure was in the pipeline rather than in the code it checks, and each was found by running it:
+
+1. **`errata-ai/vale-action` cannot be used to place a binary.** It lints as its primary function and
+   exited 2 before the style package was synced; `fail_on_error: false` did not prevent it. Vale is
+   now installed by downloading the pinned release.
+2. **A pre-commit hook with no `stages:` key runs in every stage.** `--hook-stage manual` therefore
+   re-ran the six classes the shared job already covered and failed the tooled job for their
+   findings. The two tool-dependent hooks are now named explicitly.
+3. **Linting immutable revisions.** The shared job failed on `MD034` inside
+   `baselines/goose/2026-07-31/`, a published revision that must not be edited. `baselines/goose/` is
+   now excluded for the same reason `.specify/` and `.claude/` are: what must not be changed must not
+   be linted.
+
+### Open: the vale vocabulary path
+
+`vale sync` writes the package to `<StylesPath>/.vale-config/styles`, while `Vocab = technical`
+searches `<StylesPath>/config/vocabularies`. The two disagree, so the vocabulary is never found in a
+clean checkout.
+
+**It passes locally only because an earlier sync left the directory behind**, and that directory is
+gitignored — so the local pass proves nothing about a fresh environment. This is precisely the class
+of defect a cold CI run exists to expose, and it stayed hidden until the sync output stopped being
+discarded.
+
+**Revisit**: set `Vocab` to the path the package actually populates, or point `StylesPath` at it.
+Requires one more measurement against a clean checkout, not a guess.
+
+### Consequence for T027
+
+Job names are now known: `shared / Static CI Tests` and `Tooled Checks`. Neither may become a
+required context yet — both currently fail, and a required check that fails on every pull request
+from day one teaches contributors to ignore checks.
