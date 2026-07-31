@@ -54,12 +54,12 @@ successor in Phase 5 is `2026-08-02`.
 
 **Purpose**: The procedure, its version, and the record formats the new revision must conform to
 
-- [ ] T001 Write `baselines/MAINTENANCE.md` implementing `contracts/drift-detection.md`: the two staleness rules, the URL-to-source-path mapping, the cadence table, and the prohibition on `ETag`/`Last-Modified` (`FR-008`)
-- [ ] T002 Create `baselines/VERSION.md` initialised to `0.1.0`, documenting MAJOR/MINOR/PATCH semantics for the maintenance procedure and stating that this axis is independent of both the repository and any baseline revision (Constitution Principle II) ⟵
-- [ ] T003 [P] Define the source record format in `baselines/SOURCE-FORMAT.md` per `data-model.md` "Source Record": every field, which are conditional on `class`, and why an `authoritative` record without `url` or an `observed` record without `method` is invalid (`FR-001`, `FR-003`, `FR-004`, `FR-011`)
-- [ ] T004 [P] Define the `conflicts_with` and `resolution` fields in `baselines/SOURCE-FORMAT.md`, stating that a record naming a contradiction without a resolution is invalid, and that a resolution says which record governs *for which purpose* rather than which one wins (`FR-005`) ⟵
-- [ ] T005 [P] Define the statement `version_range` field in `baselines/SOURCE-FORMAT.md`: an unversioned claim about version-specific behaviour is invalid, not merely imprecise (`FR-010`, `SC-003`) ⟵
-- [ ] T006 [P] Define the verification record format in `baselines/SOURCE-FORMAT.md`, stating that `verification.md` is append-only inside a published revision and that this is the single permitted edit (`FR-009`)
+- [X] T001 Write `baselines/MAINTENANCE.md` implementing `contracts/drift-detection.md`: the two staleness rules, the URL-to-source-path mapping, the cadence table, and the prohibition on `ETag`/`Last-Modified` (`FR-008`)
+- [X] T002 Create `baselines/VERSION.md` initialised to `0.1.0`, documenting MAJOR/MINOR/PATCH semantics for the maintenance procedure and stating that this axis is independent of both the repository and any baseline revision (Constitution Principle II) ⟵
+- [X] T003 [P] Define the source record format in `baselines/SOURCE-FORMAT.md` per `data-model.md` "Source Record": every field, which are conditional on `class`, and why an `authoritative` record without `url` or an `observed` record without `method` is invalid (`FR-001`, `FR-003`, `FR-004`, `FR-011`)
+- [X] T004 [P] Define the `conflicts_with` and `resolution` fields in `baselines/SOURCE-FORMAT.md`, stating that a record naming a contradiction without a resolution is invalid, and that a resolution says which record governs *for which purpose* rather than which one wins (`FR-005`) ⟵
+- [X] T005 [P] Define the statement `version_range` field in `baselines/SOURCE-FORMAT.md`: an unversioned claim about version-specific behaviour is invalid, not merely imprecise (`FR-010`, `SC-003`) ⟵
+- [X] T006 [P] Define the verification record format in `baselines/SOURCE-FORMAT.md`, stating that `verification.md` is append-only inside a published revision and that this is the single permitted edit (`FR-009`)
 
 ---
 
@@ -69,14 +69,14 @@ successor in Phase 5 is `2026-08-02`.
 
 **⚠️ CRITICAL**: `2026-07-31b` cannot be amended. This phase creates `2026-08-01` as its successor.
 
-- [ ] T007 Create `baselines/goose/2026-08-01/` and copy `criterion-format.md` from `2026-07-31b` unchanged, so the revision carries its own schema copy
-- [ ] T008 Resolve the documentation source path for each authoritative record, mapping `https://goose-docs.ai/docs/<path>/` to `documentation/docs/<path>.md`, recording any URL whose mapping cannot be confirmed as having no `source_path` (`FR-008`)
-- [ ] T009 Query the current commit for each resolved source path via `gh api "repos/aaif-goose/goose/commits?path=<path>&per_page=1"` and record the SHA (`FR-008`)
-- [ ] T010 Write `baselines/goose/2026-08-01/sources.md` carrying all eight records from `2026-07-31b` plus `source_path` and `source_commit` for every authoritative one, and `method` plus `host_version` for every observed one (`FR-001`, `FR-008`)
-- [ ] T011 Record the known contradiction in `baselines/goose/2026-08-01/sources.md`: `S-001` states at least one of `instructions`/`prompt` is required, while `S-003` measured that neither is enforced and `S-008` measured that headless runs need `prompt`. Set `conflicts_with` and a `resolution` stating the documentation governs loading and the measurements govern running (`FR-005`, `SC-007`) ⟵
-- [ ] T012 [P] Write `baselines/goose/2026-08-01/ruleset.md` carrying the ten criteria from `2026-07-31b` unchanged in substance, each with a `version_range`, plus a "What changed" section stating that only source records gained drift anchors and version ranges (`FR-010`, `FR-013`, `SC-003`) ⟵
-- [ ] T013 [P] Write `baselines/goose/2026-08-01/coverage.md` carrying the six declared gaps with their trigger conditions, and `goose_version: v1.45.0` (`FR-006`)
-- [ ] T014 Create `baselines/goose/2026-08-01/verification.md` with one initial record per source: date, result `unchanged`, and the observed commit where applicable (`FR-009`)
+- [X] T007 Create `baselines/goose/2026-08-01/` and copy `criterion-format.md` from `2026-07-31b` unchanged, so the revision carries its own schema copy
+- [X] T008 Resolve the documentation source path for each authoritative record, mapping `https://goose-docs.ai/docs/<path>/` to `documentation/docs/<path>.md`, recording any URL whose mapping cannot be confirmed as having no `source_path` (`FR-008`)
+- [X] T009 Query the current commit for each resolved source path via `gh api "repos/aaif-goose/goose/commits?path=<path>&per_page=1"` and record the SHA (`FR-008`)
+- [X] T010 Write `baselines/goose/2026-08-01/sources.md` carrying all eight records from `2026-07-31b` plus `source_path` and `source_commit` for every authoritative one, and `method` plus `host_version` for every observed one (`FR-001`, `FR-008`)
+- [X] T011 Record the known contradiction in `baselines/goose/2026-08-01/sources.md`: `S-001` states at least one of `instructions`/`prompt` is required, while `S-003` measured that neither is enforced and `S-008` measured that headless runs need `prompt`. Set `conflicts_with` and a `resolution` stating the documentation governs loading and the measurements govern running (`FR-005`, `SC-007`) ⟵
+- [X] T012 [P] Write `baselines/goose/2026-08-01/ruleset.md` carrying the ten criteria from `2026-07-31b` unchanged in substance, each with a `version_range`, plus a "What changed" section stating that only source records gained drift anchors and version ranges (`FR-010`, `FR-013`, `SC-003`) ⟵
+- [X] T013 [P] Write `baselines/goose/2026-08-01/coverage.md` carrying the six declared gaps with their trigger conditions, and `goose_version: v1.45.0` (`FR-006`)
+- [X] T014 Create `baselines/goose/2026-08-01/verification.md` with one initial record per source: date, result `unchanged`, and the observed commit where applicable (`FR-009`)
 
 **Checkpoint**: A revision exists whose every authoritative record can be drift-checked, whose statements are version-scoped, and whose one known contradiction is visible.
 
@@ -88,12 +88,12 @@ successor in Phase 5 is `2026-08-02`.
 
 **Independent Test**: Count criteria and count sourced criteria in a revision; they must be equal, and every named source must resolve to a record.
 
-- [ ] T015 [US1] Write the completeness check into `baselines/MAINTENANCE.md`: every criterion names a `source`, every named source exists in that revision's `sources.md`, and every version-specific claim carries a `version_range` (`SC-001`, `SC-003`)
-- [ ] T016 [US1] Run that check against `baselines/goose/2026-08-01/` and record the counts in its `verification.md` (`SC-001`)
-- [ ] T017 [US1] Run the same check against `2026-07-31` and `2026-07-31b` and record the result; a failure there is a defect in a published revision and must be **reported, not corrected** (`SC-001`)
-- [ ] T018 [P] [US1] Add a "deliberately not included" section to `baselines/goose/2026-08-01/ruleset.md` listing every candidate rule rejected for lacking an admissible source, with the reason (`FR-002`, quickstart Scenario 2)
-- [ ] T019 [US1] Verify wording against evidence class: every criterion whose source is `observed` reads as an observation naming the host version, never as a documented requirement. Applies to `R-002` and `R-010` (`FR-004`, quickstart Scenario 3)
-- [ ] T020 [US1] Verify the contradiction from T011 is visible to a reader of the revision alone, and that neither side was suppressed in favour of the other (`FR-005`, `SC-007`) ⟵
+- [X] T015 [US1] Write the completeness check into `baselines/MAINTENANCE.md`: every criterion names a `source`, every named source exists in that revision's `sources.md`, and every version-specific claim carries a `version_range` (`SC-001`, `SC-003`)
+- [X] T016 [US1] Run that check against `baselines/goose/2026-08-01/` and record the counts in its `verification.md` (`SC-001`)
+- [X] T017 [US1] Run the same check against `2026-07-31` and `2026-07-31b` and record the result; a failure there is a defect in a published revision and must be **reported, not corrected** (`SC-001`)
+- [X] T018 [P] [US1] Add a "deliberately not included" section to `baselines/goose/2026-08-01/ruleset.md` listing every candidate rule rejected for lacking an admissible source, with the reason (`FR-002`, quickstart Scenario 2)
+- [X] T019 [US1] Verify wording against evidence class: every criterion whose source is `observed` reads as an observation naming the host version, never as a documented requirement. Applies to `R-002` and `R-010` (`FR-004`, quickstart Scenario 3)
+- [X] T020 [US1] Verify the contradiction from T011 is visible to a reader of the revision alone, and that neither side was suppressed in favour of the other (`FR-005`, `SC-007`) ⟵
 
 **Checkpoint**: US1 is independently testable. The base provably contains no unsourced statement.
 
