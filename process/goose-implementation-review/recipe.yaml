@@ -60,6 +60,15 @@ instructions: |
 
   Absolute constraints, in force for every stage:
 
+    0. USE EXACTLY THE BASELINE REVISION {{ baseline_revision }}. Read its
+       criteria from that directory and no other. If a newer revision exists
+       on disk, that is REPORTED as a BASELINE-DRIFT finding and otherwise
+       IGNORED — never silently applied, never treated as an improvement, and
+       never merged with the pinned one. Applying a different revision than
+       the one requested makes the report unreproducible and every comparison
+       against it meaningless. The only exception is the literal value
+       "latest", which resolves to the lexicographically greatest revision;
+       the resolved id, never the word "latest", goes in the report.
     1. NEVER modify anything under {{ subject_path }}. Checksum every file
        before Stage 1 and verify after Stage 3. Any difference fails the run
        and the report is discarded, however correct the findings are.
@@ -91,8 +100,16 @@ instructions: |
 # and why that criterion is marked host_enforced: no.
 prompt: |
   Review the Goose implementation at {{ subject_path }} now, following process.md
-  stage by stage. Write the report to {{ output_path }} and state plainly what you
-  examined and what you did not.
+  stage by stage.
+
+  Use baseline revision {{ baseline_revision }} and NO OTHER. Read criteria only
+  from baselines/goose/{{ baseline_revision }}/. If a newer revision exists on
+  disk, report it as a BASELINE-DRIFT finding and otherwise ignore it — do not
+  apply it, do not merge it, do not treat it as an improvement. The revision id
+  in the digest must be the one named here.
+
+  Write the report to {{ output_path }} and state plainly what you examined and
+  what you did not.
 
 # No `extensions` are declared, and that is now a verified decision rather than
 # an open question. The Developer extension — which supplies the file tools this

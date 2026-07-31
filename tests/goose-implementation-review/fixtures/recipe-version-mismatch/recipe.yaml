@@ -1,0 +1,41 @@
+# FIXTURE — declares a Goose version outside the baseline's stated range.
+#
+# Exercises the version-mismatch path in process.md Stage 3b: the review must emit
+# ONE finding identified BASELINE-VERSION-MISMATCH and continue, rather than
+# translating the mismatch into a flood of per-criterion deviations.
+#
+# The recipe is otherwise CONFORMANT against the 2026-07-31b criteria, so any
+# additional finding indicates the mismatch leaked into criterion evaluation.
+#
+# Note: `goose_version` below is NOT a documented recipe field. It is a marker this
+# fixture uses to state intent, since no documented way to pin a recipe to a host
+# version was found. A review may treat its absence as "version unknown" — which is
+# itself worth reporting rather than assuming a match.
+
+version: "1.0.0"
+title: "Legacy Audit Helper"
+description: "Audits a project against an older Goose release's conventions"
+
+parameters:
+  - key: project_path
+    input_type: string
+    requirement: required
+    description: "Project to audit"
+
+  - key: strictness
+    input_type: select
+    requirement: optional
+    default: "normal"
+    description: "How strictly to apply the conventions"
+    options:
+      - "normal"
+      - "pedantic"
+
+instructions: |
+  Audit the project at {{ project_path }} with {{ strictness }} strictness.
+
+prompt: |
+  Audit {{ project_path }} now and report findings.
+
+# Intent marker, not a documented field — see the header note.
+goose_version: "0.9.0"

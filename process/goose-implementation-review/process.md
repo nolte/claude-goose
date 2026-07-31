@@ -148,6 +148,96 @@ treated as a pass is worse than no review at all.
 
 ---
 
+## Stage 3b — Baseline currency
+
+**Precondition**: Stage 0 resolved a baseline revision.
+
+**Action**: Three checks, each independent of the others.
+
+### Pinning
+
+`baseline_revision` selects a directory under `baselines/goose/`. The value `latest` resolves to the
+**lexicographically greatest** directory name — revision ids are chosen so that this ordering is
+also chronological. The resolved id is recorded in the report header and in the digest; `latest` is
+never printed as if it were an identity.
+
+**A run pins one revision and keeps it.** The baseline is never re-resolved mid-review, even if a
+newer revision appears while the review is running.
+
+**This has failed in practice and is not a formality.** A review asked to use `2026-07-31` reported
+`baseline=2026-07-31b` and produced findings from criteria that exist only in the newer revision. It
+had run the drift check, seen a newer revision, and applied it — reasonably, if the goal were the
+best possible answer. It is not. The goal is an answer that means what its header says.
+
+A run that silently upgrades its baseline is worse than one that reports an outdated finding: every
+report becomes unreproducible, and comparing two reports stops being meaningful because neither
+states which yardstick it truly used.
+
+**Verification for this rule**: the revision id in the digest must equal the requested
+`baseline_revision`, or its resolution when `latest` was requested. A mismatch invalidates the run.
+
+### Version mismatch
+
+Compare the subject's declared Goose version, where it states one, against the `goose_version` the
+baseline declares.
+
+Outside the baseline's range, emit **one** finding — `outcome: judgment call`, severity `advisory`,
+identity `BASELINE-VERSION-MISMATCH` — stating both versions, and continue the review.
+
+**Do not translate the mismatch into per-criterion findings.** Criteria written for one version may
+be silent, wrong, or inapplicable for another; reporting each as a deviation would bury the single
+fact that matters under a flood of derived noise.
+
+### Revision drift — a purely local check
+
+**Scope, stated precisely because an earlier wording was ambiguous enough to stall a run:** this
+check looks **only at the baselines directory on disk**. It answers one question — is there a
+revision directory sorting after the pinned one? Nothing is fetched. Nothing is compared against
+upstream documentation.
+
+```sh
+ls baselines/goose/ | sort | tail -1     # the greatest available revision
+```
+
+If that differs from the pinned revision, emit one finding — `outcome: judgment call`, severity
+`advisory`, identity `BASELINE-DRIFT` — naming both. **Never apply the newer revision.** Silently
+switching yardsticks mid-review would make the report irreproducible and its comparisons
+meaningless.
+
+**Not this check's job**: whether upstream documentation has changed since a baseline was compiled.
+That is real and important, but it is `002-qa-documentation-base`'s responsibility, performed when a
+baseline is authored — not during a review. A review measures against a pinned revision; verifying
+that the revision still reflects upstream is a separate activity with a separate cadence.
+
+Conflating the two is what stalled a run: an agent reading "upstream drift" reasonably went looking
+for upstream, found no defined location, and explored instead of deciding.
+
+### Offline
+
+The revision-drift check reads the local filesystem and therefore always works. This branch covers
+the case where the baselines directory itself is unreachable — a bad path, a permissions failure, a
+missing mount.
+
+Two outcomes are permitted, and no others:
+
+1. **Proceed against the pinned baseline** and emit one finding — `outcome: undecided`, severity
+   `advisory`, identity `BASELINE-DRIFT-UNKNOWN` — stating that currency could not be checked.
+2. **Refuse the run** and write no report.
+
+**A review that cannot check currency must say so.** What is forbidden is reporting a clean drift
+check that never happened, or omitting the subject silently. The criteria themselves need no
+network — they come from the pinned revision on disk — so offline review remains fully possible.
+
+**Output**: Zero or more of the three findings above; the resolved revision id.
+
+**Complete when**: All three checks have run or been recorded as unavailable.
+
+**Verification**: The report names a concrete revision id, never `latest`. If drift could not be
+checked, a `BASELINE-DRIFT-UNKNOWN` finding is present — its absence would assert a check that did
+not occur.
+
+---
+
 ## Stage 4 — Read-only verification
 
 **Precondition**: Stages 1–3 complete.

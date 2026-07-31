@@ -3,7 +3,7 @@
 Recorded outcomes of fixture and quickstart runs. **A scenario absent from this file has not been
 run.** Nothing here is inferred from reading code; every entry records something that was executed.
 
-**Status as of 2026-07-31: eleven full reviews executed. Quickstart scenarios 1, 2, 3, 6 and 8 pass; scenario 9 remains untested (see O-10).**
+**Status as of 2026-07-31: sixteen full reviews executed. Quickstart scenarios 1, 2, 3, 6 and 8 pass; scenario 9 untested (O-10), offline branch untested (T037).**
 
 ## Environment
 
@@ -242,6 +242,40 @@ what threatened `FR-005`. Every failure came from the *specification* being ambi
 correct executions could differ. Writing a scripted checker first would have hard-coded one arbitrary
 answer to each of these four questions without anyone noticing the questions existed.
 
+### O-12 — `prompt` outweighs `instructions` in practice — RESOLVED 2026-07-31
+
+A run pinned to `2026-07-31` reported `baseline=2026-07-31b` and produced findings from criteria
+that exist only in the newer revision. The pin was ignored.
+
+**It was not a delivery problem.** `--render-recipe` confirmed the value arrived and that
+`instructions` contained, verbatim: "USE EXACTLY THE BASELINE REVISION 2026-07-31." Strengthening
+that wording changed nothing — a second run repeated the violation.
+
+**The difference was placement.** The `prompt` said only "follow process.md stage by stage" and never
+mentioned the baseline. `process.md` documents that `latest` resolves to the greatest revision, so an
+agent working from the prompt reasonably resolved a baseline itself and picked the newest. Naming the
+pin in the `prompt` fixed it on the first attempt: pin honoured, `BASELINE-DRIFT` reported, no
+newer-revision criteria leaked.
+
+**Generalizable, and it should become a criterion.** For this host and provider, a constraint that
+must hold belongs in `prompt`, not only in `instructions`. `instructions` reads as background;
+`prompt` reads as the task. This is the third finding in the same family:
+
+| Finding | What it showed |
+|---|---|
+| `R-002` | The parser accepts a recipe with neither key |
+| `R-010` (O-7) | A headless run fails without `prompt`, though validation passes |
+| **O-12** | **Even with both present, a constraint only in `instructions` may be overridden** |
+
+Together they say the two fields are not interchangeable in any practical sense, while the
+documentation treats them as alternatives ("at least one of"). A candidate criterion for the next
+revision: *constraints that must not be violated appear in `prompt`.* Its evidence class would be
+`observed` — no consulted document states this.
+
+**Also worth noting**: the agent's substitution was not careless. Applying the newest available
+criteria is defensible if the goal is the best possible answer. It is not: the goal is a report that
+means what its header says. That intent has to be stated, not assumed.
+
 ### O-9 — The fixture contradicted its own header comment
 
 The first review reported that `recipe-with-deviations` declared an `R-006 nonsense_type` defect in
@@ -344,3 +378,45 @@ digest is a real failure. Independently verify the subject hash with
 
 `FR-005` and `SC-002` are satisfied for this subject. Eleven full reviews were run in total; every
 one left its subject byte-identical.
+
+## Offline procedure (T032)
+
+Verifies process.md Stage 3b's offline branch: a review that cannot check baseline currency must say
+so, and must never report a drift check it did not perform.
+
+```sh
+# Deny network access for the run, e.g. with unshare, a firewall rule, or by
+# pointing the drift check at an unreachable location.
+unshare -rn env GOOSE_PROVIDER=claude-acp GOOSE_MODEL=default \
+  goose run --no-session --recipe process/goose-implementation-review/recipe.yaml \
+    --params subject_path="$SUBJ" --params output_path=/tmp/offline.md
+```
+
+**Caveat**: with the `claude-acp` provider the agent itself needs the network, so a fully offline run
+cannot be performed this way — the provider fails before the review starts. Verifying the offline
+branch in isolation requires either a local provider or a stubbed drift check. **Not yet performed**;
+recorded so the gap is visible rather than assumed away.
+
+**Two acceptable outcomes**, and no others:
+
+1. Proceed against the pinned baseline and emit a `BASELINE-DRIFT-UNKNOWN` finding
+   (`undecided`, `advisory`) stating currency could not be checked.
+2. Refuse the run and write no report.
+
+Reporting a clean drift check that never ran is a failure, as is omitting the subject silently. The
+criteria themselves need no network — they come from the pinned revision on disk — so offline review
+remains possible in principle.
+
+### Runs 12–16 — baseline pinning, mismatch and drift (2026-07-31)
+
+| Run | Result |
+|---|---|
+| version-mismatch fixture, attempt 1 | **Timed out.** "Upstream drift" was ambiguous: no upstream location is defined for baselines, so the agent explored instead of deciding. Scoped the check to the local filesystem |
+| version-mismatch fixture, attempt 2 | **PASS.** `baseline=2026-07-31b` honoured; exactly one `BASELINE-VERSION-MISMATCH` finding, no per-criterion flood |
+| drift, attempt 1 (pin `2026-07-31`) | **FAIL.** Reported `2026-07-31b`; `R-010` leaked |
+| drift, attempt 2 (wording hardened in `instructions`) | **FAIL.** Identical violation |
+| **drift, attempt 3 (pin named in `prompt`)** | **PASS.** Pin honoured, `BASELINE-DRIFT` reported, no newer-revision criteria leaked. See O-12 |
+
+**Not verified**: the offline branch (T037). It is implemented in Stage 3b but cannot be exercised
+with the `claude-acp` provider, which needs the network before the review starts. Verifying it in
+isolation requires a local provider or a stubbed drift check.
