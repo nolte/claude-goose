@@ -191,3 +191,51 @@ a deliberate operator action, not something this feature should perform silently
 
 **Revisit when**: the default branch is `develop`. At that point the pre-sync baseline above becomes
 measurable exactly as quickstart Scenario 4b describes.
+
+## Scenario 4b: measured and passed (2026-07-31)
+
+The default branch was switched to `develop` by hand, breaking the bootstrap circularity recorded
+above. Touching `.github/settings.yml` then triggered the sync, which completed within ten seconds.
+
+| Setting | Before | Expected | Measured | |
+|---|---|---|---|---|
+| `default_branch` | `main` | `develop` | `develop` | ✓ |
+| `allow_merge_commit` | `true` | `false` | `false` | ✓ |
+| `allow_rebase_merge` | `true` | `false` | `false` | ✓ |
+| `allow_squash_merge` | `true` | `true` | `true` | ✓ |
+| `delete_branch_on_merge` | `false` | `true` | `true` | ✓ |
+
+26 labels also arrived from the commons. **The Settings App demonstrably acts on this repository** —
+established by effect, not by reading an installation page. That distinction was the whole point of
+writing the scenario this way.
+
+### A protection block of no-ops is not applied
+
+The first sync did everything above **and left `develop` unprotected**. Both mechanisms agreed:
+classic protection returned 404, and the only ruleset covers `refs/heads/main`.
+
+The cause was the block itself. `contexts: []` together with `required_approving_review_count: 0`
+amounts to requiring nothing, and GitHub does not create a protection consisting entirely of no-ops.
+
+The empty `contexts` list was correct and **stays**: a required context that no workflow produces
+blocks every pull request forever. What was added are rules that bite without inventing a phantom
+check — `required_linear_history`, `allow_force_pushes: false`, `allow_deletions: false`. Measured
+after the second sync: all three active.
+
+**The trap generalises.** A settings file can report success, apply most of itself, and silently skip
+a branch entry that reduces to nothing. Verifying "the sync ran" is not the same as verifying "the
+protection exists" — only the second question was worth asking, and asking the first would have
+produced a confident, wrong answer.
+
+Review and status-check requirements follow in `T027`, once the workflow that emits those checks
+exists.
+
+### Protection state after both syncs
+
+| Branch | Mechanism | Rules |
+|---|---|---|
+| `main` | Repository ruleset `default-branch-protection` | `pull_request`, `deletion`, `non_fast_forward`, `required_linear_history` |
+| `develop` | Classic protection, from `.github/settings.yml` | `required_linear_history`, no force pushes, no deletions |
+
+Two branches, two different mechanisms, deliberately. A check for "is this branch protected?" must
+query both, or it will report `main` as unprotected while a ruleset actively rejects pushes to it.
