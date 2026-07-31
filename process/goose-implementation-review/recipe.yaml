@@ -108,6 +108,11 @@ prompt: |
   apply it, do not merge it, do not treat it as an improvement. The revision id
   in the digest must be the one named here.
 
+  Prior report to compare against: {{ compare_to }}
+  If that value is non-empty, run Stage 6: read that report's DIGEST block and
+  classify every finding as new, resolved or unchanged, with a cause of subject
+  or baseline. If it is empty, skip Stage 6 entirely and emit no delta fields.
+
   Write the report to {{ output_path }} and state plainly what you examined and
   what you did not.
 

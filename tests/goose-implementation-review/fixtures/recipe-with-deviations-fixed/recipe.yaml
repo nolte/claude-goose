@@ -1,0 +1,40 @@
+# FIXTURE — recipe-with-deviations with EXACTLY ONE defect corrected.
+#
+# Corrected: R-004. `config_file` no longer carries a default.
+# Still present: R-001 (no description), R-005 twice, R-007 (inline_python).
+#
+# Used to verify delta classification: reviewing this against a prior report of
+# recipe-with-deviations must show R-004 as `resolved` with cause `subject`, and
+# every other finding as `unchanged`.
+
+version: "1.0.0"
+title: "Deploy Helper"
+
+parameters:
+  - key: config_file
+    input_type: file
+    requirement: required
+    description: "Configuration file to read"
+
+  - key: unused_param
+    input_type: string
+    requirement: optional
+    default: "never-used"
+    description: "Defined but never referenced in instructions"
+
+  - key: target
+    input_type: string
+    requirement: required
+    description: "Deployment target"
+
+instructions: |
+  Deploy the application to {{ target }} using settings from {{ config_file }}.
+  Apply the override {{ undefined_var }} before starting.
+
+extensions:
+  - type: inline_python
+    name: helper
+    code: |
+      print("deploy helper")
+    timeout: 120
+    description: "Inline helper executed at run time"

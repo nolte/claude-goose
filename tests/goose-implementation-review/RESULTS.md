@@ -3,7 +3,7 @@
 Recorded outcomes of fixture and quickstart runs. **A scenario absent from this file has not been
 run.** Nothing here is inferred from reading code; every entry records something that was executed.
 
-**Status as of 2026-07-31: sixteen full reviews executed. Quickstart scenarios 1, 2, 3, 6 and 8 pass; scenario 9 untested (O-10), offline branch untested (T037).**
+**Status as of 2026-07-31: twenty-two full reviews executed. Quickstart scenarios 1, 2, 3, 4, 5, 6, 7 and 8 pass; scenario 9 untested (O-10), offline branch untested (T037).**
 
 ## Environment
 
@@ -420,3 +420,25 @@ remains possible in principle.
 **Not verified**: the offline branch (T037). It is implemented in Stage 3b but cannot be exercised
 with the `claude-acp` provider, which needs the network before the review starts. Verifying it in
 isolation requires a local provider or a stubbed drift check.
+
+### Runs 17–22 — US3 portability and US4 delta (2026-07-31)
+
+| Run | Result |
+|---|---|
+| **Foreign repo 1** (`automation/nightly-sync.yaml`, conformant) | **PASS.** Ran from inside an unrelated git repo with `process/` and `baselines/` copied verbatim. Subject unchanged; both copied trees byte-identical to source afterwards |
+| **Foreign repo 2** (`recipes/tag-release.yaml`, two planted defects) | **PASS.** Found `R-004` (file parameter default) and `R-010` (no `prompt`) plus `R-007` and the extension gap. `R-010` is the one the host does not catch |
+| Delta, attempt 1 | **FAIL.** "No prior report. Stage 6 did not run" — `compare_to` was named only in `instructions` |
+| **Delta, attempt 2** (`compare_to` named in `prompt`) | **PASS.** `R-004` classified `resolved` with cause `subject`; the other six `unchanged`. Matches `expected/delta-subject-change.md` |
+| **Delta, baseline cause** (unchanged subject, newer revision) | **PASS.** `GAP-EXT-INTERNALS` and `BASELINE-DRIFT` both `resolved` with cause **`baseline`**, with the report stating "nothing below is a fix" |
+
+**`SC-004` is satisfied**: the unmodified process produced valid reports in two different
+repositories.
+
+**O-12 confirmed independently.** The delta failure was the same defect as the pinning failure, in a
+different parameter: `compare_to` was present in `instructions` and ignored; naming it in `prompt`
+fixed it on the first attempt. Two independent reproductions of the same rule — for this host and
+provider, a constraint that must hold belongs in `prompt`.
+
+**Minor deviation, not corrected**: findings classified `unchanged` also carry a `cause`, though
+Stage 6 specifies a cause only for changed findings. Harmless and redundant rather than wrong;
+recorded so the next reader knows it was noticed.

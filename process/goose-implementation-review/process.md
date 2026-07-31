@@ -289,6 +289,45 @@ merely warned about.
 
 ---
 
+## Stage 6 — Delta against a prior report
+
+**Precondition**: `compare_to` is non-empty and names a readable report. When empty, skip this stage
+entirely and emit no delta fields.
+
+**Action**: Compare **digests**, not prose. The digest exists so this comparison is mechanical.
+
+1. Parse the prior report's `DIGEST v1` block: its `baseline=`, `subject=`, and finding lines.
+2. Parse this run's digest.
+3. Match findings by the pair `(identity, location)` — the first two fields. A finding is
+   `unchanged` if that pair appears in both, `resolved` if only in the prior, `new` if only in this
+   one.
+4. Assign a cause to every `new` and `resolved` finding.
+
+### Assigning cause
+
+| Prior vs. current | Cause |
+|---|---|
+| `baseline=` identical, `subject=` differs | `subject` — the material changed |
+| `baseline=` differs, `subject=` identical | `baseline` — the yardstick changed |
+| both differ | Report each finding's cause as `undetermined` and say why |
+| both identical | Neither changed. Any delta is a **reproducibility failure**, not a delta |
+
+The last row matters. Identical baseline and identical subject must yield identical findings
+(`FR-005`). If a delta appears there, do not report it as a change — report it as a contradiction
+and say the run is not reproducible.
+
+**A finding that vanished because the baseline changed is not a fix.** Crediting a baseline change to
+the subject would attribute work nobody did. This is why both hashes live in the digest header.
+
+**Output**: Each finding carrying `delta_status` and, for changed ones, `delta_cause`.
+
+**Complete when**: Every finding in either digest has been classified.
+
+**Verification**: The counts reconcile — `unchanged + resolved` equals the prior digest's finding
+count, and `unchanged + new` equals this run's. A finding in neither tally was dropped.
+
+---
+
 ## Invariants across all stages
 
 - The subject is never written to.

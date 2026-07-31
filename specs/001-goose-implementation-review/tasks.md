@@ -135,9 +135,9 @@ of this tree — it arrives as the `subject_path` parameter.
 
 ### Implementation for User Story 3
 
-- [ ] T043 [US3] Remove every subject-specific and repository-specific value from `process/goose-implementation-review/`, converting each into a declared parameter with a documented default (`FR-009`)
-- [ ] T044 [US3] Document required inputs and their defaults in `process/goose-implementation-review/README.md`, so a foreign consumer can run the process without reading its internals
-- [ ] T045 [US3] Execute the portability check from T041 against two unrelated repositories and record both runs in `tests/goose-implementation-review/PORTABILITY.md` (`SC-004` requires at least two)
+- [X] T043 [US3] Remove every subject-specific and repository-specific value from `process/goose-implementation-review/`, converting each into a declared parameter with a documented default (`FR-009`)
+- [X] T044 [US3] Document required inputs and their defaults in `process/goose-implementation-review/README.md`, so a foreign consumer can run the process without reading its internals
+- [X] T045 [US3] Execute the portability check from T041 against two unrelated repositories and record both runs in `tests/goose-implementation-review/PORTABILITY.md` (`SC-004` requires at least two)
 
 **Checkpoint**: The process is reusable, satisfying the project's central non-negotiable.
 
@@ -151,15 +151,15 @@ of this tree — it arrives as the `subject_path` parameter.
 
 ### Tests for User Story 4
 
-- [ ] T046 [P] [US4] Create fixture `tests/goose-implementation-review/fixtures/recipe-with-deviations-fixed/recipe.yaml` — T012 with exactly one deviation corrected
-- [ ] T047 [P] [US4] Write golden file `tests/goose-implementation-review/expected/delta-subject-change.md` with the expected delta classification for the T012 → T046 transition
+- [X] T046 [P] [US4] Create fixture `tests/goose-implementation-review/fixtures/recipe-with-deviations-fixed/recipe.yaml` — T012 with exactly one deviation corrected
+- [X] T047 [P] [US4] Write golden file `tests/goose-implementation-review/expected/delta-subject-change.md` with the expected delta classification for the T012 → T046 transition
 
 ### Implementation for User Story 4
 
-- [ ] T048 [US4] Implement the `compare_to` parameter in `process/goose-implementation-review/recipe.yaml` per `contracts/recipe-interface.md`, defaulting to empty
-- [ ] T049 [US4] Implement delta classification in `process/goose-implementation-review/process.md`: each finding marked `new`, `resolved`, or `unchanged` against the prior report (`FR-012`)
-- [ ] T050 [US4] Implement cause attribution in `process/goose-implementation-review/process.md`, distinguishing `subject` from `baseline` so a finding that vanished due to a baseline change is never reported as a fix
-- [ ] T051 [US4] Verify T047, then repeat against the second revision from T038 with the subject unchanged, confirming cause reads `baseline`
+- [X] T048 [US4] Implement the `compare_to` parameter in `process/goose-implementation-review/recipe.yaml` per `contracts/recipe-interface.md`, defaulting to empty
+- [X] T049 [US4] Implement delta classification in `process/goose-implementation-review/process.md`: each finding marked `new`, `resolved`, or `unchanged` against the prior report (`FR-012`)
+- [X] T050 [US4] Implement cause attribution in `process/goose-implementation-review/process.md`, distinguishing `subject` from `baseline` so a finding that vanished due to a baseline change is never reported as a fix
+- [X] T051 [US4] Verify T047, then repeat against the second revision from T038 with the subject unchanged, confirming cause reads `baseline`
 
 **Checkpoint**: The review becomes an improvement loop rather than a single verdict.
 

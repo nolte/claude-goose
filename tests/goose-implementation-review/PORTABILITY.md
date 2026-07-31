@@ -69,5 +69,9 @@ movable; two prove it is not accidentally shaped by the first host.
 | Date | Check | Target | Outcome |
 |---|---|---|---|
 | 2026-07-31 | Static guard | `process/`, `baselines/` | See below |
-| — | Foreign repo #1 | — | Not yet run (T045). Goose is available; this is outstanding work, not a blocker |
-| — | Foreign repo #2 | — | Not yet run (T045) |
+| 2026-07-31 | Foreign repo #1 | unrelated git repo, conformant recipe | **PASS.** Ran from inside it with both trees copied verbatim. Subject unchanged; copied trees byte-identical to source afterwards |
+| 2026-07-31 | Foreign repo #2 | unrelated git repo, two planted defects | **PASS.** Found `R-004` and `R-010` plus `R-007` and the extension gap |
+
+**`SC-004` satisfied**: two different repositories, no edits to `process/` or `baselines/` between
+or during runs. Neither copied tree differed from its source after the runs, so the process did not
+modify itself either.
