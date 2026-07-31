@@ -14,7 +14,7 @@ asserts about Goose.
 |---|---|---|
 | `text` | yes | The assertion, worded within the limits of its evidence class |
 | `source_ref` | yes | Which Source Record backs it (`FR-001`). **Structurally mandatory** |
-| `version_range` | conditional | Required when the behaviour is version-specific (`FR-010`) |
+| `version_range` | conditional | Required when the behaviour is version-specific (`FR-010`). `SC-003` sets this at 100%: an unversioned claim about versioned behaviour is invalid, not merely imprecise |
 
 **Validation**: A statement without `source_ref` cannot be expressed. This is the structural
 enforcement of Constitution Principle VI — not a review checklist item, a schema constraint.
@@ -38,9 +38,20 @@ Where a statement comes from, precise enough to follow without searching (`FR-00
 | `host_version` | yes | The Goose version this record applies to |
 | `consulted` | yes | Date |
 | `quote` | recommended | The passage relied upon, verbatim, so a reader need not hunt |
+| `conflicts_with` | conditional | Other record ids this one contradicts. Required whenever a contradiction is known |
+| `resolution` | conditional | Required when `conflicts_with` is set: how the contradiction was handled, and which record governs for which purpose |
 
 **Validation**: An `authoritative` record without `url` is invalid; an `observed` record without
-`method` is invalid. Both would be unverifiable by a third party, defeating `US2`.
+`method` is invalid. Both would be unverifiable by a third party, defeating `US2`. A record with
+`conflicts_with` but no `resolution` is invalid — naming a contradiction without saying how it was
+handled leaves the reader worse off than not naming it.
+
+**Contradictions are recorded, never resolved away** (`FR-005`, `SC-007`). This is not hypothetical:
+the shipped base contains one. `S-001` states "At least one of `instructions` or `prompt` must be
+present"; `S-003` measured that a recipe with neither is accepted, and `S-008` measured that a
+headless run needs `prompt` regardless. Documentation and behaviour disagree, and both readings are
+true of their own scope — loading versus running. Suppressing either would hide the single most
+valuable thing the base knows.
 
 **Two staleness rules, by class**:
 
