@@ -6,9 +6,15 @@
 # was only partly read — the failure this fixture exists to catch.
 #
 # "Too large" is not a fixed number of lines; it depends on the reviewing agent's
-# context budget. This fixture is sized well beyond a comfortable single pass so the
-# behaviour is reachable regardless of that budget. If a future agent reviews it
-# entirely in one pass, enlarge the fixture rather than deleting the scenario.
+# context budget.
+#
+# STATUS 2026-07-31: THIS FIXTURE DOES NOT CURRENTLY DO ITS JOB. A real review read
+# all 397 lines / 10,897 bytes in a single pass and omitted nothing for size, so the
+# partial-coverage path went unexercised. See O-10 in ../../RESULTS.md. Enlarging it
+# to out-size a modern context window would mean committing megabytes of generated
+# YAML, and would need redoing as models grow; declaring a coverage limit as a
+# process input is the likelier fix. Do not read a passing run against this fixture
+# as evidence that partial coverage works.
 #
 # The recipe is otherwise CONFORMANT: any finding here should concern coverage,
 # not correctness.

@@ -3,7 +3,7 @@
 Recorded outcomes of fixture and quickstart runs. **A scenario absent from this file has not been
 run.** Nothing here is inferred from reading code; every entry records something that was executed.
 
-**Status as of 2026-07-31: four full reviews executed. Quickstart scenarios 1, 2, 6 and 8 pass.**
+**Status as of 2026-07-31: five full reviews executed. Quickstart scenarios 1, 2, 6 and 8 pass; scenario 9 remains untested (see O-10).**
 
 ## Environment
 
@@ -189,6 +189,35 @@ decided against a probe says so.
 parser's verdict on a given file is reproducible, but the sequence of probes an agent constructs to
 get there is not guaranteed to be. `plan.md` Complexity Tracking was corrected accordingly.
 
+### O-10 — The oversized fixture is not oversized
+
+The `recipe-oversized` run was meant to exercise the partial-coverage path. It did not. At 397 lines
+and 10,897 bytes the file was read in one pass, in full; nothing was omitted for size. The reviewing
+agent reported this plainly rather than claiming the scenario had been exercised.
+
+**Quickstart Scenario 9 (a partial review says so) therefore remains untested**, and `T027` is not
+complete despite all three of its runs having happened. The defect is in the test material, not in
+the process.
+
+The run was not wasted — it confirmed correct behavior for a different case. The subject references
+60 sub-recipe files that do not exist, and the report classified them as `not examined` with the
+reason "absent from the subject tree", explicitly declining to report them as passing. It also
+produced one `undecided` finding for `sub_recipes` correctness, from the declared baseline gap.
+
+**Options, none yet chosen:**
+
+1. **Enlarge the fixture** until it genuinely exceeds a review pass. With current context windows
+   that means megabytes of generated YAML committed to the repository — and it would need
+   re-enlarging as models grow.
+2. **Make coverage limits a declared input**, e.g. a maximum number of files or bytes per pass. The
+   partial-coverage path then becomes testable with a small fixture and a small limit, and the
+   behaviour stops depending on the reviewing model's capacity.
+3. **Drop the scenario** and accept that partial coverage is unverified.
+
+Option 2 looks right: it makes the criterion testable by construction rather than by out-sizing
+whatever model runs the review, which is a race the fixture cannot win. It is an operator decision,
+not one to take silently.
+
 ### O-9 — The fixture contradicted its own header comment
 
 The first review reported that `recipe-with-deviations` declared an `R-006 nonsense_type` defect in
@@ -198,7 +227,7 @@ the comment or the golden file.
 The reviewing agent judged **the file, not the comment**, and said so. Both were corrected. Worth
 recording because the review caught a defect in its own test material on its first outing.
 
-## Verification log
+## Verification log — parse-level checks
 
 | Date | What was run | Outcome |
 |---|---|---|
@@ -247,3 +276,15 @@ fixture, not by the process misbehaving.
 | 9 — Partial coverage | T027 (oversized) | A run against `recipe-oversized` |
 | 12 — Citations hold for a stranger | T029 | A second reader; cannot be self-certified |
 | 13 — Time to triaged findings | T054 | A timed run against `reference-recipe` |
+
+### Run 5 — `recipe-oversized` (2026-07-31)
+
+| | |
+|---|---|
+| Result | Ran successfully; **did not** exercise the intended scenario. See O-10 |
+| Findings | One `undecided` — `sub_recipes` correctness, from a declared baseline gap |
+| Coverage | 60 referenced sub-recipe files reported as `not examined`, reason: absent from the subject tree |
+| T024 read-only | **PASS** — sha256 before/after identical |
+
+**Quickstart Scenario 9 remains untested.** T027 stays open for that reason, even though all three
+of its runs were performed.
