@@ -134,7 +134,7 @@ values must flip; if they do not, the mechanism is not acting here (quickstart S
 - [X] T038 [US3] Record in `OMISSIONS.md` that propagation will not start under the default token, with its revisit condition — `FR-024` requires the incompleteness to be visible (`FR-024`, `FR-030`)
 - [X] T039 [US3] Declare in `OMISSIONS.md` that the repository has no version-bearing files, so nothing is treated as authoritative for a version (`FR-025`)
 - [X] T040 [US3] Verify refusal 1: dispatch publish for a tag with no drafter-produced draft (`FR-020`, `SC-010`)
-- [ ] T041 [US3] Verify refusal 2: dispatch publish for a hand-crafted tag and confirm no tag is created or rewritten (`FR-021`, `SC-010`)
+- [X] T041 [US3] Verify refusal 2: dispatch publish for a hand-crafted tag and confirm no tag is created or rewritten (`FR-021`, `SC-010`) — verified with `dry_run: false`: step `Resolve draft` failed with ``No draft release with tag 'v9.9.9'``; remote tag count stayed 0 and the v0.1.0 draft was untouched
 - [ ] T042 [US3] Verify refusal 3: dispatch publish while required checks on `develop` are red (`SC-010`)
 - [X] T043 [US3] Verify `dry_run: true` evaluates every condition and leaves the release a draft (`FR-022`, `SC-009`) — verified: run 30688793039, `success`, release stayed `isDraft: true`
 - [X] T044 [US3] Verify the run surfaces the target tag, the triggering user, and the run identity (`FR-023`) — verified: run identity, actor `nolte`, and tag surfaced; `run-name` added so the tag shows in the run list
