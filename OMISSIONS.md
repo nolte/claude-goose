@@ -40,7 +40,7 @@ exists to close.
 
 | Obligation | How it is discharged | Why not a scan |
 |---|---|---|
-| Dependency vulnerabilities | Stage position — `dependency-review.yml` runs on every pull request | It runs, but has nothing to find: no manifest declares a shipped dependency |
+| Dependency vulnerabilities | Stage position — `dependency-review.yml` runs on every pull request | Nothing to find: no manifest declares a shipped dependency. It was not even running until 2026-08-01 — see the correction below |
 | License policy | **By record, here** | Nothing is distributed as a package, so no license compatibility question arises. The only third-party inputs are CI tools, which are never redistributed |
 | Code-security review | **Out-of-pipeline practice** | The owning design frames it as an operator-invoked pass over the whole codebase and declares neither a stage nor a cadence. The governing pipeline spec explicitly says a stage must not be demanded where the owning spec declares none |
 
@@ -51,6 +51,37 @@ the point.
 **Revisit when**: the repository ships something installable. All three answers change at once —
 a manifest appears, licenses start propagating to consumers, and the code-security pass acquires
 code to review.
+
+### Correction: dependency review was wired but not running (2026-08-01)
+
+The row above originally read "It runs, but has nothing to find". **That was false**, and it was
+false on the day it was written. The check had never completed a single run:
+
+```text
+##[error]Dependency review is not supported on this repository.
+Please ensure that Dependency graph is enabled
+```
+
+The dependency graph was disabled on this repository, so the action exited before examining
+anything. Every pull request would have carried a red `review / Review` — the check is not one of the
+two required contexts, so it never blocked a merge and its failure was easy to overlook.
+
+**Found by opening a pull request, not by reading the file.** `T046` created the workflow and was
+marked complete because the file existed and was correctly written. Nothing had confirmed that it
+*worked*, and "the workflow exists" was silently treated as "the obligation is discharged". The
+distinction between a wired check and a functioning one is the same distinction this file draws
+everywhere else, and it was missed at exactly the point where it was being asserted.
+
+**Fixed** by enabling the dependency graph (`PUT /repos/…/vulnerability-alerts`, confirmed 204).
+
+**Note what this does and does not buy.** The check now runs and passes, but it passes *vacuously* —
+there is still no manifest for it to examine. Its value is conditional: it will do real work on the
+day this repository ships something installable, and until then a green `review / Review` means only
+that the action started successfully.
+
+**Revisit when**: the setting should live in a declared file rather than an API call. It is currently
+repository state that no committed artifact reproduces, which contradicts the spirit of `FR-014`.
+Neither the Probot settings schema nor the portfolio commons covers `security_and_analysis` today.
 
 ## Delivery guarantees that do not apply
 
