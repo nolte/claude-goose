@@ -114,7 +114,7 @@ values must flip; if they do not, the mechanism is not acting here (quickstart S
 - [X] T029 [US2] Create `.github/workflows/automerge.yml` calling the shared automerge workflow pinned at `@v1.1.26` (`FR-016`, `FR-028`)
 - [ ] T030 [US2] Verify protection is restored after deletion through the platform UI (`SC-007`)
 - [X] T031 [US2] Verify a direct push to the release-presentation branch is rejected (`SC-008`)
-- [ ] T032 [US2] Verify an approved pull request with green required checks merges without a manual click (`SC-006`)
+- [X] T032 [US2] Verify an approved pull request with green required checks merges without a manual click (`SC-006`) — verified on PR #1: labels `documentation` + `automerge` set, both required contexts green, then `pascalgn/automerge-action` reported `PR successfully merged!` and deleted the branch, with no manual click. Note the precondition: the action skips with `required label missing: automerge`
 
 **Checkpoint**: Branch behaviour survives a UI edit, which is what "as code" has to mean.
 
@@ -138,7 +138,7 @@ values must flip; if they do not, the mechanism is not acting here (quickstart S
 - [X] T042 [US3] Verify refusal 3: dispatch publish while required checks on `develop` are red (`SC-010`) — **result: this refusal does not exist.** `reusable-release-publish.yml@v1.1.26` emits 15 `::error::` guards; the 4 that can stop a run all concern the draft, and no `gh` call in the file reads `check-runs` or `commits/{sha}/status`. Recorded in OMISSIONS.md, "The publish does not read CI status"; the false claim in the workflow comment is corrected
 - [X] T043 [US3] Verify `dry_run: true` evaluates every condition and leaves the release a draft (`FR-022`, `SC-009`) — verified: run 30688793039, `success`, release stayed `isDraft: true`
 - [X] T044 [US3] Verify the run surfaces the target tag, the triggering user, and the run identity (`FR-023`) — verified: run identity, actor `nolte`, and tag surfaced; `run-name` added so the tag shows in the run list
-- [ ] T045 [US3] Publish a real release and confirm no release-editing command was run against it (`SC-009`, `SC-011`)
+- [X] T045 [US3] Publish a real release and confirm no release-editing command was run against it (`SC-009`, `SC-011`) — **published 2026-08-01**: `v0.1.0`, run 30699050234, `isDraft` false, tag created (0 tags before). `SC-011` holds — the release body came from the drafter and no `gh release edit` touched it beyond the `--draft=false` flip. The run still ended red: its final step probes for `release-cd-refresh-master.yml` by filename and 404'd, and the cascade it started then failed on `target_branch: master`. Both fixed in PR #2
 
 **Checkpoint**: The release chain runs end to end, and refuses in every case it should.
 
