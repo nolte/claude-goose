@@ -484,6 +484,36 @@ exists.
 Two branches, two different mechanisms, deliberately. A check for "is this branch protected?" must
 query both, or it will report `main` as unprotected while a ruleset actively rejects pushes to it.
 
+### Protection is restored, not merely created (`SC-007`, 2026-08-01)
+
+**A file that creates protection once and a file that restores it are indistinguishable until the
+rule is deleted.** Every measurement before this one confirmed only the first property, because
+protection had never been absent after the file existed.
+
+So it was deleted on purpose. `DELETE /repos/…/branches/develop/protection` succeeded and the
+endpoint then returned `Branch not protected` (404) — `develop` was genuinely unguarded, not
+apparently so. Touching `.github/settings.yml` through PR #4 brought it back **within 20 seconds of
+the merge**, with every captured field identical to the pre-deletion baseline:
+
+| Field | Before | After |
+|---|---|---|
+| `required_status_checks.contexts` | `shared / Static CI Tests`, `Tooled Checks` | same |
+| `strict` | `true` | `true` |
+| `required_linear_history` | `true` | `true` |
+| `allow_force_pushes` | `false` | `false` |
+| `allow_deletions` | `false` | `false` |
+| `enforce_admins` | `false` | `false` |
+| `required_pull_request_reviews` | `null` | `null` |
+
+Seven of seven identical. `SC-007` holds.
+
+**The window was deliberate and bounded.** `develop` was unprotected for one merge. That is the only
+way to observe the property, and the alternative — asserting restoration because the file looks
+right — is the failure mode this repository has already recorded twice.
+
+**Revisit when**: the `develop` entry changes shape. A restored protection proves this file governs
+the branch; it does not prove any future edit to it will be applied.
+
 ## Gate in CI: status after the first four runs (2026-07-31)
 
 The gate now runs on every push and pull request to `develop`, in two jobs.
