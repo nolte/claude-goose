@@ -12,10 +12,16 @@ run-name: >-
 # Draft → Published, and nothing else (FR-019). workflow_dispatch only: a
 # release must never happen as a side effect of a merge.
 #
-# The shared workflow refuses in three cases (SC-010):
-#   1. no open drafter-produced draft exists for the tag  (FR-020)
-#   2. the tag was hand-crafted rather than drafter-made  (FR-021)
-#   3. required checks on the integration branch are red
+# The shared workflow refuses on the draft's state, and on nothing else. Its
+# four guards, all in the `Resolve draft` step (SC-010):
+#   1. no open draft exists at all                        (FR-020)
+#   2. no open draft carries the requested tag            (FR-021)
+#   3. several drafts carry it — the state is corrupt
+#   4. the draft's target SHA is unreachable from develop
+#
+# It does NOT check whether required status checks are green. An earlier
+# version of this comment claimed it did; that was an unsourced assertion and
+# is corrected here. See OMISSIONS.md, "The publish does not read CI status".
 on:
   workflow_dispatch:
     inputs:

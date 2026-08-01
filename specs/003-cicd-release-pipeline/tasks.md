@@ -135,7 +135,7 @@ values must flip; if they do not, the mechanism is not acting here (quickstart S
 - [X] T039 [US3] Declare in `OMISSIONS.md` that the repository has no version-bearing files, so nothing is treated as authoritative for a version (`FR-025`)
 - [X] T040 [US3] Verify refusal 1: dispatch publish for a tag with no drafter-produced draft (`FR-020`, `SC-010`)
 - [X] T041 [US3] Verify refusal 2: dispatch publish for a hand-crafted tag and confirm no tag is created or rewritten (`FR-021`, `SC-010`) — verified with `dry_run: false`: step `Resolve draft` failed with ``No draft release with tag 'v9.9.9'``; remote tag count stayed 0 and the v0.1.0 draft was untouched
-- [ ] T042 [US3] Verify refusal 3: dispatch publish while required checks on `develop` are red (`SC-010`)
+- [X] T042 [US3] Verify refusal 3: dispatch publish while required checks on `develop` are red (`SC-010`) — **result: this refusal does not exist.** `reusable-release-publish.yml@v1.1.26` emits 15 `::error::` guards; the 4 that can stop a run all concern the draft, and no `gh` call in the file reads `check-runs` or `commits/{sha}/status`. Recorded in OMISSIONS.md, "The publish does not read CI status"; the false claim in the workflow comment is corrected
 - [X] T043 [US3] Verify `dry_run: true` evaluates every condition and leaves the release a draft (`FR-022`, `SC-009`) — verified: run 30688793039, `success`, release stayed `isDraft: true`
 - [X] T044 [US3] Verify the run surfaces the target tag, the triggering user, and the run identity (`FR-023`) — verified: run identity, actor `nolte`, and tag surfaced; `run-name` added so the tag shows in the run list
 - [ ] T045 [US3] Publish a real release and confirm no release-editing command was run against it (`SC-009`, `SC-011`)

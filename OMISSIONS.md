@@ -52,6 +52,45 @@ incompleteness to be visible, which is what this entry is for.
 
 **Revisit when**: a portfolio App identity is available and configured as `PORTFOLIO_APP_ID`.
 
+### The publish does not read CI status
+
+**`SC-010`'s third refusal does not exist.** The spec, and until now a comment in
+`.github/workflows/release-publish.yml`, said a publish is refused when required checks on the
+integration branch are red. `reusable-release-publish.yml@v1.1.26` does not check this.
+
+Established by enumerating the workflow, not by inference. It emits fifteen `::error::` guards; the
+four that can stop a run before publication all sit in the `Resolve draft` step and all concern the
+draft:
+
+| Line | Guard |
+|---|---|
+| 129 | no open draft exists |
+| 137 | no open draft carries the requested tag |
+| 143 | several drafts carry it — state is corrupt |
+| 155 | the draft's target SHA is unreachable from `origin/develop` |
+
+The remaining eleven concern version-bearing files, the HACS asset, and a post-publish sanity check.
+Every `gh api`, `gh release`, and `gh run` call in the file was listed as well: none reads
+`check-runs`, `commits/{sha}/status`, or any equivalent.
+
+**What still protects a release.** Branch protection requires both contexts before a merge into
+`develop`, so red code does not normally reach the branch a draft targets. That guard is real but
+weaker in two ways: it is enforced at merge time rather than publish time, and it is bypassable by an
+administrator — this repository's own history contains four such bypasses, each reported by the
+remote as `Bypassed rule violations for refs/heads/develop`.
+
+Note also that the draft targets `refs/heads/develop`, a moving ref, not a fixed SHA. What gets
+published is whatever the branch points at when the publish runs.
+
+**Not verified experimentally.** Doing so requires making a required check red on `develop` on
+purpose. The attempt was made and stopped, correctly, as an action that should be agreed rather than
+performed unannounced. The code evidence above is complete on its own: a guard that is absent from
+the file cannot fire.
+
+**Revisit when**: `gh-plumbing` adds a status check to the publish, or this repository stops relying
+on merge-time protection alone. The fix belongs upstream — a consumer cannot add a guard to a
+workflow it only calls.
+
 ### External link reachability
 
 The internal link class checks relative paths and intra-document anchors. **External URLs are not
