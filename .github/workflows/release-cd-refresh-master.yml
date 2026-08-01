@@ -1,0 +1,51 @@
+---
+name: Release Propagate
+
+# Brings the release-presentation branch in line with the published release
+# (FR-024). `main` is written by this workflow and by nothing else; a direct
+# human push is rejected by the repository ruleset.
+#
+# IT DOES START on `release: published`, measured 2026-08-01. An earlier comment
+# here said it could not, because the release event is emitted under the default
+# token and that token does not cascade. That reasoning was sound but its premise
+# expired: the publish now runs under the portfolio App, and an App-authored
+# release event does trigger downstream workflows. OMISSIONS.md is corrected.
+#
+# THE FILENAME IS LOAD-BEARING. The publish workflow's final step probes for a
+# run of `release-cd-refresh-master.yml` by that exact name. Named anything else
+# -- it was `release-propagate.yml` -- the probe 404s and fails an otherwise
+# successful publish after the release has already been flipped. The name follows
+# the upstream convention; it does not describe this repository, whose
+# presentation branch is `main`.
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to fast-forward the presentation branch to."
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-propagate
+  cancel-in-progress: false
+
+jobs:
+  propagate:
+    uses: nolte/gh-plumbing/.github/workflows/reusable-release-cd-refresh-master.yml@v1.1.26
+    with:
+      from_branch: ${{ inputs.tag || github.event.release.tag_name }}
+      # REQUIRED HERE. The shared workflow defaults this to `master`, and a
+      # repository whose presentation branch is `main` gets
+      # `POST /merges: 404 - Base does not exist` -- an error naming the API
+      # call rather than the wrong branch, so it reads like a permissions
+      # problem. Measured on the v0.1.0 publish.
+      target_branch: main
+      app-id: ${{ vars.PORTFOLIO_APP_ID }}
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}
+      app-private-key: ${{ secrets.PORTFOLIO_APP_PRIVATE_KEY }}

@@ -25,7 +25,7 @@ The pre-merge sequence the governing design names is checkout → provision → 
 | Dependency review | **runs**, by record | No dependency manifest for shipped deliverables; the check toolchain is a pipeline input, not a product dependency (`FR-029`) | The repository ships something installable |
 | License policy | **omitted**, by record | See "Supply-chain obligations" below | The repository ships something installable |
 | Code-security review | **out-of-pipeline practice** | See "Supply-chain obligations" below | — |
-| Release propagation | **runs, expected not to complete** | See below | An App identity becomes available |
+| Release propagation | **runs**, cascade measured 2026-08-01 | The App identity landed, so `release: published` now triggers it; see below | — |
 | Package / build | **omitted** | Nothing is compiled or packaged. The deliverables are Markdown and YAML | The repository ships a build artifact |
 | Provenance / attestation | **omitted** | No artifact is produced, so there is nothing to attest. See "Delivery guarantees that do not apply" | The repository ships a build artifact |
 | Documentation delivery | **omitted** | No documentation site exists | A site is added |
@@ -125,16 +125,37 @@ Claiming "fully pinned" would be an unsourced assertion of exactly the kind this
 **Revisit when**: `gh-plumbing` pins its internal references. The fix belongs there, not here —
 vendoring the workflows to control the graph would fork mechanics that exist to be shared.
 
-### Release propagation completing
+### Release propagation completing — RESOLVED 2026-08-01
 
-The release event is emitted under the workflow's default token, which by platform design does not
-trigger further workflow runs. The propagation that aligns the release-presentation branch therefore
-**will not start**.
+**This omission no longer applies.** Its revisit condition — a portfolio App identity configured as
+`PORTFOLIO_APP_ID` — was met, and the first real publish measured the difference: the
+`release: published` event **did** cascade, starting the propagation workflow 17 seconds after the
+flip. The old text below is kept because the reasoning was correct for the token it described.
 
-This is a known platform constraint, not a defect to debug. `FR-024` requires the resulting
-incompleteness to be visible, which is what this entry is for.
+> The release event is emitted under the workflow's default token, which by platform design does not
+> trigger further workflow runs. The propagation that aligns the release-presentation branch
+> therefore **will not start**.
 
-**Revisit when**: a portfolio App identity is available and configured as `PORTFOLIO_APP_ID`.
+The cascade started and then **failed**, for a reason unrelated to the omission: the shared workflow
+defaults `target_branch` to `master`, and this repository's presentation branch is `main`. The API
+answered `POST /repos/nolte/claude-goose/merges: 404 - Base does not exist`, an error that names the
+call rather than the wrong branch and so reads like a permissions failure. Fixed by passing
+`target_branch: main` explicitly.
+
+**Two further findings from the same publish**, both about names rather than logic:
+
+- The final step of the publish probes for a run of `release-cd-refresh-master.yml` **by that exact
+  filename**. This repository called its caller `release-propagate.yml`, so the probe 404'd and
+  failed the publish *after* the release had already been flipped to published — a red run over a
+  successful release, which is worse than either outcome alone. The file is now named to the upstream
+  convention even though this repository has no `master`.
+- The drafter's `autolabeler` never runs on pull requests: `release-drafter.yml` triggers only on
+  `push` to `develop`. A pull request therefore reaches the changelog without a category unless a label is
+  applied by hand. `v0.1.0` needed `documentation` set manually.
+
+**Revisit when**: `gh-plumbing` derives the presentation branch from the repository's own default
+instead of assuming `master`, or probes for the propagation workflow by the reusable it calls rather
+than by filename.
 
 ### The publish does not read CI status
 
