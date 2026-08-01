@@ -77,3 +77,13 @@ repos:
         language: system
         pass_filenames: false
         files: \.md$
+
+      - id: manifest-integrity
+        name: manifest integrity class (FR-033)
+        # `always_run`, unlike every class above. The others react to a changed
+        # file; this one must notice an edit to any of the 20 vendored files,
+        # and naming them here would duplicate the manifest it exists to read.
+        entry: ./scripts/check-manifest-integrity.sh
+        language: system
+        pass_filenames: false
+        always_run: true

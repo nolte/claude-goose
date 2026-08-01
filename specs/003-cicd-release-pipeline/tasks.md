@@ -108,9 +108,9 @@ values must flip; if they do not, the mechanism is not acting here (quickstart S
 
 **Independent Test**: Delete a protection rule through the UI; it returns on the next sync.
 
-- [ ] T026 [US2] Push `.github/settings.yml` to the default branch and confirm the App acts: `default_branch` becomes `develop`, `allow_merge_commit` and `allow_rebase_merge` become `false` (`FR-014`, quickstart Scenario 4b)
+- [X] T026 [US2] Push `.github/settings.yml` to the default branch and confirm the App acts: `default_branch` becomes `develop`, `allow_merge_commit` and `allow_rebase_merge` become `false` (`FR-014`, quickstart Scenario 4b) — verified live 2026-08-01: `default_branch: develop`, `allow_merge_commit: false`, `allow_rebase_merge: false`, `allow_squash_merge: true`, `delete_branch_on_merge: true`
 - [X] T027 [US2] Declare the seven static-gate checks as required status contexts on `develop` in `.github/settings.yml` — the commons leaves these empty by policy, so they are satisfied here (`FR-015`)
-- [ ] T028 [US2] Declare the feature-branch prefixes the governing branching model requires (`FR-017`)
+- [X] T028 [US2] Declare the feature-branch prefixes the governing branching model requires (`FR-017`) — declared in `CLAUDE.md` (`feat/`, `fix/`, `docs/`, `chore/`, `exp/`); `OMISSIONS.md` records that nothing enforces them, since a declaration and an enforced rule read alike from outside
 - [X] T029 [US2] Create `.github/workflows/automerge.yml` calling the shared automerge workflow pinned at `@v1.1.26` (`FR-016`, `FR-028`)
 - [ ] T030 [US2] Verify protection is restored after deletion through the platform UI (`SC-007`)
 - [X] T031 [US2] Verify a direct push to the release-presentation branch is rejected (`SC-008`)
@@ -146,14 +146,14 @@ values must flip; if they do not, the mechanism is not acting here (quickstart S
 
 ## Phase 6: Polish & Cross-Cutting Concerns
 
-- [X] T046 [P] Create `.github/workflows/dependency-review.yml` calling the shared dependency-review workflow at `@v1.1.26` (`FR-029`)
+- [X] T046 [P] Create `.github/workflows/dependency-review.yml` calling the shared dependency-review workflow at `@v1.1.26` (`FR-029`) — **the file was correct and the check was dead.** Marked complete on the file's existence; the first pull request showed it had never completed a run (`Dependency review is not supported on this repository` — the dependency graph was disabled). Enabled 2026-08-01, now green, though it passes vacuously since no manifest exists. Recorded in `OMISSIONS.md`
 - [X] T047 [P] Record in `OMISSIONS.md` how each supply-chain obligation is discharged — by record rather than by a scan with findings, since the repository ships no dependency manifest (`FR-029`, `FR-030`)
 - [X] T048 [P] Verify every workflow declares an explicit minimum permission set (`FR-026`)
 - [X] T049 [P] Verify no definition in this repository contains a floating reference: `grep -rn 'uses:.*@\(develop\|main\|master\)$' .github/` returns nothing (`SC-013`)
-- [ ] T050 Verify every stage the governing design names is answerable from `OMISSIONS.md` as "runs" or "omitted, because … revisit when …" (`FR-030`, `SC-012`)
-- [ ] T051 Verify portability: copy the added artifacts into a second repository and run `task ci` without editing any of them (`FR-032`, `SC-014`)
-- [ ] T052 Verify no file hashed in `.specify/integrations/*.json` was hand-edited (`FR-033`)
-- [ ] T053 Update `CLAUDE.md` with the gate entry point, the pinned shared-workflow version, and the rule that checks live in `.pre-commit-config.yaml` rather than inline in workflows
+- [X] T050 Verify every stage the governing design names is answerable from `OMISSIONS.md` as "runs" or "omitted, because … revisit when …" (`FR-030`, `SC-012`) — **found five gaps and closed them**: the test stage, license policy, code-security review, provenance, and the artifact-securing mapping had no entry at all. `FR-029` names three supply-chain obligations; only one was recorded. Also added checkout/provision rows and named the golden-file reconciliation and the Principle V self-review as out-of-pipeline practices (`FR-031`)
+- [X] T051 Verify portability: copy the added artifacts into a second repository and run `task ci` without editing any of them (`FR-032`, `SC-014`) — measured in a fresh repo with a different layout: five classes pass, the two recipe classes skip because their `files:` pattern matches nothing, no body edited. One finding: omitting `.vale/config/vocabularies/project/accept.txt` yields an obscure `E100 [vocab] Runtime error`. Recorded in `OMISSIONS.md`
+- [X] T052 Verify no file hashed in `.specify/integrations/*.json` was hand-edited (`FR-033`) — verified by recomputing SHA256 over all 20 manifest entries (10 in `claude.manifest.json`, 10 in `speckit.manifest.json`): zero drift, zero missing. Made permanent rather than a one-off: added the `manifest-integrity` gate class (`scripts/check_manifest_integrity.py`), the only hook with `always_run: true`, and demonstrated it failing on a deliberately edited vendored file per `FR-010`/`SC-002`. Now also a standing check class — `manifest-integrity` runs `always_run: true` in the gate, so this is enforced continuously rather than verified once, and demonstrated failing on a deliberately edited vendored file as `FR-010`/`SC-002` require of every class
+- [X] T053 Update `CLAUDE.md` with the gate entry point, the pinned shared-workflow version, and the rule that checks live in `.pre-commit-config.yaml` rather than inline in workflows — added a "CI/CD, branches, and releases" section; also corrected the now-false claim "There is no build or lint step"
 
 ---
 
