@@ -341,10 +341,11 @@ properly — parsing the YAML instead of grepping it — shows the inputs are
 `tag, dry_run, app-id, asset-filename, auto-align`. The empty output was a failure of my command,
 not evidence of absence, and I treated it as evidence. The input has been restored.
 
-**Next step**: the failure is at workflow level rather than inside a job, so the remaining candidates
-are the caller's own syntax or a permissions/visibility condition on the reusable call. It needs the
-run's raw annotation, which the API did not surface through the endpoints tried here.
-
+**Superseded (2026-08-01)**: the guess in this paragraph was also wrong. It named the caller's syntax
+or a permissions condition as the remaining candidates; the cause was a duplicated concurrency group.
+The first half of the sentence was right and load-bearing — the failure *is* at workflow level rather
+than inside a job — which is exactly why a concurrency deadlock fits and a permissions error does
+not. See "The publish dry run: resolved".
 
 ## Correction: the portfolio App identity does exist (2026-07-31)
 
