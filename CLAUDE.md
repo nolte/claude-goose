@@ -82,10 +82,59 @@ code: no README, no dependency manifest, no compiled language. The Spec Kit scaf
 
 Consequences for any work here:
 
-- **There is no build or lint step.** The deliverables are Markdown and YAML. Verification is: `goose run --explain` for parse-level checks, and full review runs reconciled against golden files under `tests/goose-implementation-review/expected/`.
+- **There is no build step, but there is a lint step.** Nothing is compiled or packaged; the deliverables are Markdown and YAML. Since feature `003` they are gated statically — run `task ci` (see below). Beyond the gate, verification is full review runs reconciled against golden files under `tests/goose-implementation-review/expected/`, which need a model and therefore stay out of CI.
 - **Verify a change to the process by re-running the self-review** — the process reviewing its own directory. It must produce no findings. This is a release condition from Constitution Principle V, not a nicety.
 - The constitution **is** ratified (v1.0.0), so the *Constitution Check* gate in every `plan.md` is live rather than vacuous. `plan-template.md:43` resolves its gates from that file at runtime; do not hard-code them into the template.
 - Two known template inconsistencies are recorded in the constitution's Sync Impact Report: `spec-template.md:3` says "Feature Branch" although state is not branch-derived, and `tasks-template.md:12` calls tests OPTIONAL where Principle III requires a verification step per stage. Both are upstream-owned — fix via `.specify/templates/overrides/` if they bite.
+
+## CI/CD, branches, and releases (shipped, feature 003)
+
+**Run the gate before pushing — it is one command:**
+
+```sh
+task ci
+```
+
+That is the entire contract. CI runs `task ci` and nothing else, so a green run locally and a green
+run in CI mean the same thing (`SC-004`).
+
+**Never define a check inline in a workflow.** The checks live in `.pre-commit-config.yaml`; the
+Taskfile invokes them and the workflow invokes the Taskfile. A check written directly into a workflow
+cannot be run before pushing, which is precisely what the gate exists to prevent. Two hooks — `prose`
+and `recipe-parse` — need Vale and Goose and are pinned to the `manual` stage, so they run in the
+tooled CI job; a hook with no `stages:` key runs in *every* stage and will silently duplicate work.
+
+Eight check classes: format, YAML parse + lint, Markdown lint, prose, recipe schema, recipe parse
+(`goose run --explain`, the host's real parser at no LLM cost), internal links, and manifest
+integrity (recomputes SHA256 over the 20 files the `specify` CLI vendored, so a hand-edit to any of
+them fails the gate rather than being noticed later). Two contexts are declared as required on
+`develop`: `shared / Static CI Tests` and `Tooled Checks`.
+
+**Everything under `.github/workflows/` is a thin wrapper** around a shared workflow from
+`nolte/gh-plumbing`, pinned at **`@v1.1.26`**. Do not copy shared logic here to patch it — the fix
+belongs upstream. Note the pinning limit: those workflows call *each other* with `@develop`, so the
+guarantee stops at this repository's boundary. `OMISSIONS.md` states that rather than claiming
+"fully pinned".
+
+**Branch prefixes** (from the governing branching model — branch names and Conventional-Commits
+types are deliberately the same tokens, so no translation is needed):
+
+| Prefix | Use |
+|---|---|
+| `feat/` | A new capability |
+| `fix/` | A correction to shipped behaviour |
+| `docs/` | Documentation only |
+| `chore/` | Maintenance carrying no behaviour change |
+| `exp/` | Bounded, throwaway exploration — `exp/YYYY-WW-<theme>` or `exp/NNN-<theme>` |
+
+All of them target `develop`. **`main` is written only by release propagation** — a direct push is
+rejected by a repository ruleset, not by `.github/settings.yml`. A check for "is `main` protected?"
+must query rulesets *and* classic protection, or it reports 404 and concludes "unprotected" while
+pushes are actively being refused.
+
+**`OMISSIONS.md` is not optional reading.** It records every stage this pipeline does *not* run and
+why, plus several measured corrections to claims that turned out to be wrong. Before concluding that
+something is missing, check whether it is missing on purpose.
 
 ## The SDD workflow
 

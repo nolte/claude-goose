@@ -9,18 +9,71 @@ forgotten, which is why this file lists things that do not happen rather than on
 
 ## Stages
 
+The pre-merge sequence the governing design names is checkout → provision → static analysis → test
+→ package → supply-chain scan. Every one of those appears below, including the ones that do not run.
+
 | Stage | Status | Reason | Revisit when |
 |---|---|---|---|
+| Checkout | **runs** | — | — |
+| Provision | **runs** | The pinned toolchain, installed per job from `requirements-ci.txt` | — |
 | Static verification | **runs** | — | — |
+| Test (executing tiers) | **omitted** | Nothing here executes. The deliverables are Markdown and YAML, and the static tier is not the foundation *under* a test suite — it is the whole suite. An executing tier would need a program to run | The repository ships code that runs |
 | Branch protection as code | **runs** | — | — |
 | Release drafting | **runs** | — | — |
 | Release publishing | **runs** | — | — |
 | Merge automation | **runs** | — | — |
 | Dependency review | **runs**, by record | No dependency manifest for shipped deliverables; the check toolchain is a pipeline input, not a product dependency (`FR-029`) | The repository ships something installable |
+| License policy | **omitted**, by record | See "Supply-chain obligations" below | The repository ships something installable |
+| Code-security review | **out-of-pipeline practice** | See "Supply-chain obligations" below | — |
 | Release propagation | **runs, expected not to complete** | See below | An App identity becomes available |
 | Package / build | **omitted** | Nothing is compiled or packaged. The deliverables are Markdown and YAML | The repository ships a build artifact |
+| Provenance / attestation | **omitted** | No artifact is produced, so there is nothing to attest. See "Delivery guarantees that do not apply" | The repository ships a build artifact |
 | Documentation delivery | **omitted** | No documentation site exists | A site is added |
 | Container publishing | **omitted** | No container is produced | A container becomes a deliverable |
+
+## Supply-chain obligations (`FR-029`)
+
+The governing design names **three** obligations and requires each to have either a position in the
+stage sequence, a declared cadence, or a recorded out-of-pipeline practice. Only the first was
+recorded until now; the other two were neither run nor declared, which is the exact gap this file
+exists to close.
+
+| Obligation | How it is discharged | Why not a scan |
+|---|---|---|
+| Dependency vulnerabilities | Stage position — `dependency-review.yml` runs on every pull request | It runs, but has nothing to find: no manifest declares a shipped dependency |
+| License policy | **By record, here** | Nothing is distributed as a package, so no license compatibility question arises. The only third-party inputs are CI tools, which are never redistributed |
+| Code-security review | **Out-of-pipeline practice** | The owning design frames it as an operator-invoked pass over the whole codebase and declares neither a stage nor a cadence. The governing pipeline spec explicitly says a stage must not be demanded where the owning spec declares none |
+
+**The distinction that matters**: "runs and finds nothing" and "never looked" produce the same empty
+output. Dependency review is the first; license and code-security are the second, and saying so is
+the point.
+
+**Revisit when**: the repository ships something installable. All three answers change at once —
+a manifest appears, licenses start propagating to consumers, and the code-security pass acquires
+code to review.
+
+## Delivery guarantees that do not apply
+
+The delivery design requires a mapping from every shipped artifact class to a stage that secures it,
+plus provenance, immutability, and a rollback path over artifact versions.
+
+**This repository ships no artifact class.** The mapping is therefore empty rather than incomplete,
+and the following are not applicable rather than missing:
+
+| Guarantee | Status |
+|---|---|
+| Artifact-to-securing-stage mapping | Empty — no artifact class exists to map |
+| Provenance / signed attestation | Not applicable — nothing is built to attest |
+| Immutability of a version reference | Satisfied trivially — the tag is the only version reference, and `FR-021` forbids rewriting it |
+| Rollback by selecting an earlier version | Not applicable — nothing is consumed that could be rolled back to |
+| Environment promotion | Deliberately absent; the governing design marks it optional |
+
+**An empty mapping is a finding, not an oversight.** The design treats an artifact class with no
+securing stage as a defect; it does not treat a project with no artifact classes as one. The
+distinction is worth stating because the two look identical in a table.
+
+**Revisit when**: anything here becomes installable, downloadable, or deployable. At that moment the
+mapping stops being empty and every row above needs a real answer.
 
 ## Guarantees this pipeline does not make
 
@@ -91,6 +144,21 @@ the file cannot fire.
 on merge-time protection alone. The fix belongs upstream — a consumer cannot add a guard to a
 workflow it only calls.
 
+### Branch-prefix conformance
+
+The five prefixes the governing branching model requires — `feat/`, `fix/`, `docs/`, `chore/`,
+`exp/` — are **declared** in `CLAUDE.md` and satisfy `FR-017`, which asks for a declaration.
+
+**Nothing enforces them.** No hook checks a branch name and no required context inspects one, so a
+branch named anything at all can open a pull request. `.github/settings.yml` has no field for this,
+and a pre-commit hook would guard only the machine that happens to run it.
+
+Recorded because a declared convention with no enforcement reads, from the outside, exactly like an
+enforced one. `FR-017` is met; the stronger property nobody promised is not.
+
+**Revisit when**: a shared pull-request linter enters `gh-plumbing`. The rule belongs there — every
+consumer needs the same check, and `FR-028` forbids solving it locally.
+
 ### External link reachability
 
 The internal link class checks relative paths and intra-document anchors. **External URLs are not
@@ -109,13 +177,68 @@ The gate runs `goose run --explain`, which exercises the host's real parser at n
 The gate therefore proves the review recipe still *parses*. It does not prove the review's *findings*
 are still correct.
 
-**Revisit when**: a provider makes full runs cheap enough to gate on.
+Two further practices sit outside the gate for the same reason, and are named here rather than left
+to be inferred from the one above (`FR-031`):
+
+| Practice | Why it cannot be a stage | Who runs it |
+|---|---|---|
+| Golden-file reconciliation against `tests/goose-implementation-review/expected/` | Needs a full review run to produce a report to reconcile | An operator, before changing the process |
+| The self-review that Principle V makes a release condition — the process reviewing its own directory, which must produce no findings | Needs a model. A workflow cannot decide it | An operator, before a release |
+
+**The self-review is a release condition that nothing enforces.** No gate can check it, and the
+publish workflow does not read it. It holds because an operator runs it, which is a weaker guarantee
+than a check and is recorded as such.
+
+**Revisit when**: a provider makes full runs cheap enough to gate on. All three change status at the
+same moment.
 
 ### Version-bearing files
 
 The repository declares that it has **none** (`FR-025`). No file in the working tree states a release
 version, nothing needs bumping, and no file may be treated as authoritative for one. The tag is the
 version.
+
+## Portability: measured in a second repository (2026-08-01)
+
+`SC-014` asks that the artifacts work in another repository after changing only declared inputs.
+Tested by doing it: a fresh `git init`, a different layout (`docs/`, `config/`, no `process/` tree,
+no Goose recipe), and the artifact set copied in unedited.
+
+| Class | Verdict in the foreign repository |
+|---|---|
+| Format (3 hooks) | pass |
+| YAML parse + lint | pass |
+| Markdown lint | pass |
+| Internal links | pass |
+| Prose | pass |
+| Recipe schema | **skipped** — no files matched |
+| Recipe parse | **skipped** — no files matched |
+
+**No artifact body was edited.** `SC-014` holds.
+
+**The two recipe classes hard-code a path and it does not matter.** Their `entry:` names
+`process/goose-implementation-review/recipe.yaml` directly. In a repository without that file the
+`files:` pattern matches nothing and the hook *skips* rather than failing — the path degrades into a
+no-op instead of an error. Worth recording because reading the config suggests otherwise: a
+hard-coded path looks like a portability defect and measurement showed it is not.
+
+### The one thing that does break
+
+Copying `.vale.ini` without `.vale/config/vocabularies/project/accept.txt` fails with:
+
+```text
+E100 [vocab] Runtime error
+'project' vocabulary not found; searched: …/.vale/config/vocabularies/project
+```
+
+That file is **part of the artifact set**, not incidental repository content — it is the one thing
+under `.vale/` that `.gitignore` deliberately keeps tracked while everything else there is synced
+from the pinned package. An adopter who copies the config but not the vocabulary gets a runtime error
+naming a path rather than a missing file, which is a poor signal for a simple omission.
+
+**Revisit when**: someone adopts these artifacts. The mitigation is documentation, not code — the
+error is Vale's and a wrapper that pre-checks the directory would duplicate what the error already
+says, less accurately.
 
 ## Pre-sync baseline (`FR-014`)
 
