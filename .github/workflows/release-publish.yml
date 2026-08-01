@@ -24,13 +24,18 @@ on:
 permissions:
   contents: write
 
-# NEVER cancelled in flight (FR-027). A cancelled publish can leave a release
-# half-transitioned, and the recovery is manual -- exactly the hand-editing
-# this chain exists to avoid.
-concurrency:
-  group: release-publish
-  cancel-in-progress: false
-
+# NO `concurrency:` BLOCK HERE, DELIBERATELY -- and it must stay that way.
+#
+# FR-027 (a publish is never cancelled in flight) is satisfied, but by the
+# called workflow, not by this one: reusable-release-publish.yml declares
+# `group: release-publish` with `cancel-in-progress: false` itself.
+#
+# Declaring the same group here deadlocks the run. Concurrency groups are
+# scoped to the repository, not to a single workflow, so this caller would
+# hold `release-publish` while the job it starts queues for that very group.
+# The run then dies before any job is created: zero jobs, no annotation, no
+# log -- a failure that looks like a missing secret or a bad input and is
+# neither. Four dispatches were spent on that misreading.
 jobs:
   publish:
     uses: nolte/gh-plumbing/.github/workflows/reusable-release-publish.yml@v1.1.26
