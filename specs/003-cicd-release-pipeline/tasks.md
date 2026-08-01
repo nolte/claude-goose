@@ -146,7 +146,7 @@ values must flip; if they do not, the mechanism is not acting here (quickstart S
 
 ## Phase 6: Polish & Cross-Cutting Concerns
 
-- [X] T046 [P] Create `.github/workflows/dependency-review.yml` calling the shared dependency-review workflow at `@v1.1.26` (`FR-029`)
+- [X] T046 [P] Create `.github/workflows/dependency-review.yml` calling the shared dependency-review workflow at `@v1.1.26` (`FR-029`) — **the file was correct and the check was dead.** Marked complete on the file's existence; the first pull request showed it had never completed a run (`Dependency review is not supported on this repository` — the dependency graph was disabled). Enabled 2026-08-01, now green, though it passes vacuously since no manifest exists. Recorded in `OMISSIONS.md`
 - [X] T047 [P] Record in `OMISSIONS.md` how each supply-chain obligation is discharged — by record rather than by a scan with findings, since the repository ships no dependency manifest (`FR-029`, `FR-030`)
 - [X] T048 [P] Verify every workflow declares an explicit minimum permission set (`FR-026`)
 - [X] T049 [P] Verify no definition in this repository contains a floating reference: `grep -rn 'uses:.*@\(develop\|main\|master\)$' .github/` returns nothing (`SC-013`)
