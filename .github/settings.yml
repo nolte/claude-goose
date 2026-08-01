@@ -17,7 +17,9 @@
 # Branch entries merge by `name`, so declaring only `develop` here leaves any
 # inherited entry for other branches intact.
 
-# Last propagation: 2026-07-31 — third sync: required contexts declared. The first applied repository
+# Last propagation: 2026-08-01 — fourth sync: SC-007. Protection on develop was deleted through the
+# API on purpose, to check that this file restores it rather than merely having created it once.
+# Previously 2026-07-31 — third sync: required contexts declared. The first applied repository
 # settings and labels but left develop unprotected; see the branches block for
 # why. Touch this line to force a re-merge of the commons.
 
