@@ -94,7 +94,11 @@ specs/003-cicd-release-pipeline/
 │   ├── static-gate.yml        # FR-001…FR-010: the required checks, on every PR to develop
 │   ├── release-drafter.yml    # FR-018: draft accumulation on develop
 │   ├── release-publish.yml    # FR-019…FR-023: deliberate Draft → Published
-│   ├── release-propagate.yml  # FR-024: align the release-presentation branch
+│   ├── release-cd-refresh-master.yml  # FR-024: align the release-presentation branch. Named to
+│   │                          #   the upstream convention, NOT to the branch: the shared publish
+│   │                          #   workflow probes for this file BY FILENAME after publishing, so
+│   │                          #   a locally chosen name (originally `release-propagate.yml`) makes
+│   │                          #   the publish run report failure after a successful release
 │   ├── automerge.yml          # FR-016: merge when approved and green
 │   └── dependency-review.yml  # FR-029: supply-chain obligation
 ├── settings.yml               # FR-013…FR-015, FR-017: extends the portfolio commons; declares
@@ -105,7 +109,15 @@ specs/003-cicd-release-pipeline/
 Taskfile.yml                   # FR-008: the single entry point the pipeline invokes
 .pre-commit-config.yaml        # the static checks, runnable locally and in CI
 .vale.ini                      # FR-005: prose rules, consumed from nolte/vale-style
+.markdownlint.yaml             # FR-002: which structural rules apply, and which are disabled
+.yamllint.yml                  # FR-001: the YAML style ruleset
 requirements-ci.txt            # FR-012: pinned check-tool versions
+scripts/                       # FR-003, FR-004, FR-006, FR-033: the classes with no upstream hook
+.vale/config/vocabularies/
+└── project/accept.txt         # FR-005: the ONLY tracked file under .vale/ — everything else there
+                               #   is synced from the pinned package. Copying .vale.ini without it
+                               #   fails with `E100 [vocab] Runtime error`, which names a path
+                               #   rather than the missing file (measured, T051)
 OMISSIONS.md                   # FR-030: every declared stage this repository does not run, and why
 ```
 

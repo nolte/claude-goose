@@ -167,18 +167,33 @@ a `pull_request` rule and **no bypass actors**, so an API merge is refused no ma
 same rule that satisfies `SC-008` — measured earlier by a rejected direct push — also refuses the
 workflow whose entire purpose is to write that branch.
 
-**Two requirements of this feature are in direct conflict**, and no configuration satisfies both as
-written:
+**Correction (2026-08-01): the conflict is narrower than stated below.** The original claim — that no
+configuration satisfies both requirements as written — was too strong, and it was refuted by reading
+the two requirements more carefully rather than by any new measurement. `SC-008` is scoped to a
+*human* push, and `FR-013` requires only that the release automation writes `main`. A **declared**
+bypass actor therefore satisfies both **as written**, and that is the model the governing spec
+prescribes: `release-automation` §Version-bearing file alignment names a bypass actor for its primary
+path and states the rule as *"the bypass is declared, not stolen"*.
+
+What is missing is the entry on the ruleset, not a resolution to the wording. The two requirements,
+for reference:
 
 | | |
 |---|---|
 | `FR-024` | `main` is brought in line with the published release by the propagation workflow |
 | `SC-008` | a direct push to `main` is rejected |
 
-Resolving it is an operator decision about repository security, not a defect to fix in a file. The
-options are to add the portfolio App as a bypass actor on the ruleset, to have the propagation open a
-pull request instead of merging, or to accept that `main` lags and record it here. **Left open
-deliberately**; `main` currently sits at an older commit than `v0.1.0`.
+Resolving it is an operator decision about repository security, not a defect to fix in a file. Three
+options, and per the correction above they are **not** equally good:
+
+| Option | Assessment |
+|---|---|
+| Add the portfolio App as a bypass actor on the ruleset | **Preferred.** Satisfies `FR-024` and `SC-008` as written, needs no upstream change, and is the model `release-automation` prescribes |
+| Have the propagation open a pull request instead of merging | Needs an upstream change — the shared workflow merges through the API and has no pull-request mode — and sits awkwardly with `branching-model`, under which `main` is written only by release automation |
+| Accept that `main` lags | Contradicts the `branching-model` MUST that `main` reflects the most recently published release. Acceptable only as an interim state, which is what it currently is |
+
+**Left open deliberately**; `main` currently sits at an older commit than `v0.1.0`. The preference
+above is a recommendation, not a decision — writing to a branch ruleset is the operator's call.
 
 **Revisit when**: that decision is made. Note that the shared workflow merges through the API and has
 no pull-request mode, so two of the three options need an upstream change.
