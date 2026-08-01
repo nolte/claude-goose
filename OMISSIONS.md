@@ -153,6 +153,36 @@ call rather than the wrong branch and so reads like a permissions failure. Fixed
   `push` to `develop`. A pull request therefore reaches the changelog without a category unless a label is
   applied by hand. `v0.1.0` needed `documentation` set manually.
 
+### The propagation cannot reach `main`, by design
+
+With `target_branch: main` corrected, the propagation gets one step further and stops again:
+
+```text
+403 - Resource not accessible by integration
+POST /repos/nolte/claude-goose/merges
+```
+
+This is not a token defect. The `default-branch-protection` **ruleset** on `refs/heads/main` carries
+a `pull_request` rule and **no bypass actors**, so an API merge is refused no matter who asks. The
+same rule that satisfies `SC-008` — measured earlier by a rejected direct push — also refuses the
+workflow whose entire purpose is to write that branch.
+
+**Two requirements of this feature are in direct conflict**, and no configuration satisfies both as
+written:
+
+| | |
+|---|---|
+| `FR-024` | `main` is brought in line with the published release by the propagation workflow |
+| `SC-008` | a direct push to `main` is rejected |
+
+Resolving it is an operator decision about repository security, not a defect to fix in a file. The
+options are to add the portfolio App as a bypass actor on the ruleset, to have the propagation open a
+pull request instead of merging, or to accept that `main` lags and record it here. **Left open
+deliberately**; `main` currently sits at an older commit than `v0.1.0`.
+
+**Revisit when**: that decision is made. Note that the shared workflow merges through the API and has
+no pull-request mode, so two of the three options need an upstream change.
+
 **Revisit when**: `gh-plumbing` derives the presentation branch from the repository's own default
 instead of assuming `master`, or probes for the propagation workflow by the reusable it calls rather
 than by filename.
