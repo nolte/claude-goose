@@ -217,11 +217,15 @@ commit.
 - **FR-013**: The repository MUST designate `develop` as the integration branch that all work targets
   by pull request, and `main` as a release-presentation branch that only the release automation
   writes to.
-- **FR-014**: Branch-protection rules, required status checks, and repository merge settings MUST be
-  declared as a committed file and synchronized from it. They MUST NOT be configured only through the
-  hosting platform's user interface.
-- **FR-015**: The static-gate checks of FR-001 through FR-006 MUST be declared as required status
-  checks on the integration branch.
+- **FR-014**: Branch-protection rules, required status checks, repository merge settings, and
+  repository security settings MUST be declared as a committed file and synchronized from it. They
+  MUST NOT be configured only through the hosting platform's user interface. Where a setting has no
+  representation in the declaration mechanism, that gap MUST be recorded rather than left as
+  undeclared repository state — the dependency graph is the current case (`OMISSIONS.md`).
+- **FR-015**: Every static-gate check of FR-001 through FR-006 MUST be covered by a required status
+  check on the integration branch. The mapping need not be one-to-one — a shared workflow emits one
+  status context per job, so a single context may cover several checks — provided no check sits
+  outside every required context.
 - **FR-016**: The repository MUST provide merge automation so that an approved pull request with all
   required checks green merges without a manual merge action, using the repository's declared merge
   strategy.
@@ -302,10 +306,10 @@ commit.
 
 ### Measurable Outcomes
 
-- **SC-001**: Every pull request receives a pass/fail verdict on all seven static check classes, and
+- **SC-001**: Every pull request receives a pass/fail verdict on all eight static check classes, and
   a contributor can name the failing class from the check names alone without opening a log.
 - **SC-002**: A contributor who introduces one defect per check class sees exactly the corresponding
-  check fail and every other check pass — seven of seven classes are individually falsifiable.
+  check fail and every other check pass — eight of eight classes are individually falsifiable.
 - **SC-003**: The same commit produces the same verdict on two consecutive runs, including one run
   with caching disabled.
 - **SC-004**: A contributor running the repository's gate entry point on a fresh workstation obtains
@@ -320,8 +324,12 @@ commit.
 - **SC-008**: A direct human push to the release-presentation branch is rejected.
 - **SC-009**: A release is published without any operator running a release-editing command against
   the tag, and the last released version is reproducible from the run history alone.
-- **SC-010**: The publish operation refuses, with an actionable message, in each of its three refusal
-  cases: no draft, several drafts with no target named, and a failed precondition.
+- **SC-010**: The publish operation refuses, with an actionable message, in each of its two refusal
+  cases: no draft carrying the requested tag, and several drafts open with no target named.
+  ~~and a failed precondition~~ — **superseded 2026-08-01**: that third case does not exist. The
+  shared publish workflow reads no CI status at all, established by enumerating its fifteen guards
+  rather than inferred (`OMISSIONS.md` § "The publish does not read CI status"). What protects a
+  release instead is merge-time branch protection, which is weaker and administrator-bypassable.
 - **SC-011**: After a successful publication, the release-presentation branch points at the released
   commit, or the run reports the release as incomplete — never neither.
 - **SC-012**: For every stage and obligation the governing pipeline design names, this repository can
@@ -344,11 +352,15 @@ commit.
   at a release tag of `nolte/gh-plumbing`; the shared implementations named by the governing specs
   (drafting, publishing, propagation, merge automation, pre-commit, prose linting, dependency review)
   are assumed to exist there and to keep their declared input contracts.
-- **No portfolio App identity is available initially.** The release event will therefore be emitted
-  under the workflow's default token, which does not start the propagation run. This is a known
-  platform constraint owned by the portfolio's workflow-health process, not a defect of this feature;
-  FR-024 requires the resulting incompleteness to be visible, and the primary remedy is a
-  portfolio-level change outside this repository.
+- **A portfolio App identity is available.** ~~No portfolio App identity is available initially. The
+  release event will therefore be emitted under the workflow's default token, which does not start
+  the propagation run.~~ **Superseded 2026-08-01 by measurement**: `PORTFOLIO_APP_ID` and
+  `PORTFOLIO_APP_PRIVATE_KEY` are both present on this repository, and PR #1 was merged under
+  `app/nolte-portfolio-app`. The struck-through text is retained rather than deleted because FR-024's
+  rationale was built on it. The `GITHUB_TOKEN` cascade constraint it invoked is real, but does not
+  apply here. What actually stops the propagation is the `main` ruleset, recorded in `OMISSIONS.md`
+  § "The propagation cannot reach `main`, by design". FR-024 still requires the resulting
+  incompleteness to be visible.
 - **The repository ships no build artifact and has no dependency manifest for its deliverables.** The
   package stage is therefore omitted (FR-030) and the supply-chain obligations are discharged by
   record rather than by a scan with findings (FR-029). A pinned requirements file may exist for the
