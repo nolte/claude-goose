@@ -1,6 +1,14 @@
 ---
 name: Release Publish
 
+# The tag and the person dispatching are part of the run's identity (FR-023),
+# so they belong in the run list rather than only in the log. Without this,
+# every run in the list reads `Release Publish` and the tag can only be
+# recovered by opening the run.
+run-name: >-
+  Publish ${{ inputs.tag }}${{ inputs.dry_run && ' (dry run)' || '' }}
+  — dispatched by @${{ github.actor }}
+
 # Draft → Published, and nothing else (FR-019). workflow_dispatch only: a
 # release must never happen as a side effect of a merge.
 #

@@ -136,8 +136,8 @@ values must flip; if they do not, the mechanism is not acting here (quickstart S
 - [X] T040 [US3] Verify refusal 1: dispatch publish for a tag with no drafter-produced draft (`FR-020`, `SC-010`)
 - [ ] T041 [US3] Verify refusal 2: dispatch publish for a hand-crafted tag and confirm no tag is created or rewritten (`FR-021`, `SC-010`)
 - [ ] T042 [US3] Verify refusal 3: dispatch publish while required checks on `develop` are red (`SC-010`)
-- [ ] T043 [US3] Verify `dry_run: true` evaluates every condition and leaves the release a draft (`FR-022`, `SC-009`)
-- [ ] T044 [US3] Verify the run surfaces the target tag, the triggering user, and the run identity (`FR-023`)
+- [X] T043 [US3] Verify `dry_run: true` evaluates every condition and leaves the release a draft (`FR-022`, `SC-009`) — verified: run 30688793039, `success`, release stayed `isDraft: true`
+- [X] T044 [US3] Verify the run surfaces the target tag, the triggering user, and the run identity (`FR-023`) — verified: run identity, actor `nolte`, and tag surfaced; `run-name` added so the tag shows in the run list
 - [ ] T045 [US3] Publish a real release and confirm no release-editing command was run against it (`SC-009`, `SC-011`)
 
 **Checkpoint**: The release chain runs end to end, and refuses in every case it should.

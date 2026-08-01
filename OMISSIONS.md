@@ -369,7 +369,34 @@ assumption. With an App identity available, the `release: published` cascade may
 "expected not to complete" note may be obsolete. That is a measurement to take, not a conclusion to
 draw here.
 
-## The publish dry run: what is ruled out, and what is not
+## The publish dry run: resolved (2026-08-01)
+
+**Cause: this caller declared the same concurrency group as the workflow it calls.**
+
+`reusable-release-publish.yml` sets `concurrency: group: release-publish` itself. Concurrency groups
+are scoped to the repository, not to a single workflow, so a caller that declares the same group
+holds it while the job it spawns queues for it. The run cannot make progress and is terminated before
+any job exists.
+
+That explains every symptom exactly: zero jobs, no annotation, no log, and a `failure` conclusion
+reached in seconds. The fix is one deletion — `.github/workflows/release-publish.yml` no longer
+declares concurrency, and carries a comment saying why it must not.
+
+`FR-027` (a publish is never cancelled in flight) still holds. It is satisfied by the called
+workflow, which sets `cancel-in-progress: false`, not by the caller.
+
+**Verified after the fix**: dispatch of `v0.1.0` with `dry_run: true` completed `success` with one
+job. The log shows `Draft 'v0.1.0' resolved at 786af6c (reachable from origin/develop)`, and the
+release remained `isDraft: true`.
+
+**How it was found.** Not by reasoning about my own file — six measurements against it had already
+come back clean. By diffing against `claude-home-assistant`, the portfolio repository whose last
+publish run succeeded. Its caller has no concurrency block. The general lesson is in the table below:
+every one of my hypotheses was about something being *absent* (a missing secret, a missing input, a
+missing workflow), while the defect was something *present* that should not have been. A comparison
+against a working instance finds that class of defect; inspecting the broken one does not.
+
+### What was ruled out first
 
 Four dispatches, all failing with **zero jobs started and no annotation**. The release correctly
 stays a draft each time, so nothing has been published in error.
@@ -385,10 +412,7 @@ Ruled out by measurement:
 | The App secret is missing | It exists |
 | The caller differs structurally from the working original | Identical apart from the ref |
 
-**Not established.** The failure is at workflow level, before job creation, and GitHub surfaces no
-annotation through the API endpoints tried. The remaining candidates are a permissions mismatch
-between caller and reusable, or a condition inside the reusable's own job-level `if:`.
-
-Recorded as open rather than guessed at. Three of the hypotheses above were wrong and two of them led
-me to change working files — which is why the next step should be reading the run's annotation in the
-web UI, where GitHub does display startup errors, rather than another round of edit-and-dispatch.
+Every entry above is a correct measurement and a useless one: each confirmed that a thing which
+*could* have been missing was in fact present. Three of the hypotheses were wrong outright, and two
+of them led me to change working files, which had to be reverted. The cost of that approach is
+recorded here so the next comparable failure starts with a diff against something that works.
