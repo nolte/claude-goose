@@ -162,10 +162,15 @@ With `target_branch: main` corrected, the propagation gets one step further and 
 POST /repos/nolte/claude-goose/merges
 ```
 
-This is not a token defect. The `default-branch-protection` **ruleset** on `refs/heads/main` carries
-a `pull_request` rule and **no bypass actors**, so an API merge is refused no matter who asks. The
-same rule that satisfies `SC-008` — measured earlier by a rejected direct push — also refuses the
-workflow whose entire purpose is to write that branch.
+~~This is not a token defect. The `default-branch-protection` **ruleset** on `refs/heads/main` carries
+a `pull_request` rule and **no bypass actors**, so an API merge is refused no matter who asks.~~
+
+**Superseded 2026-08-02 — the bypass was added and changed nothing.** The paragraph above named a
+cause and, below, a preferred remedy. The remedy was carried out and the failure is byte-identical.
+See §"The bypass is configured and the merge still fails".
+
+The same rule that satisfies `SC-008` — measured earlier by a rejected direct push — does refuse a
+human writing that branch. Whether it is what refuses the *workflow* is no longer established.
 
 **Correction (2026-08-01): the conflict is narrower than stated below.** The original claim — that no
 configuration satisfies both requirements as written — was too strong, and it was refuted by reading
@@ -188,12 +193,55 @@ options, and per the correction above they are **not** equally good:
 
 | Option | Assessment |
 |---|---|
-| Add the portfolio App as a bypass actor on the ruleset | **Preferred.** Satisfies `FR-024` and `SC-008` as written, needs no upstream change, and is the model `release-automation` prescribes |
+| Add the portfolio App as a bypass actor on the ruleset | ~~**Preferred.**~~ **Tried 2026-08-02, and it does not work.** Still correct in principle — it satisfies `FR-024` and `SC-008` as written — but it is not sufficient on its own. Left configured; see below |
 | Have the propagation open a pull request instead of merging | Needs an upstream change — the shared workflow merges through the API and has no pull-request mode — and sits awkwardly with `branching-model`, under which `main` is written only by release automation |
 | Accept that `main` lags | Contradicts the `branching-model` MUST that `main` reflects the most recently published release. Acceptable only as an interim state, which is what it currently is |
 
-**Left open deliberately**; `main` currently sits at an older commit than `v0.1.0`. The preference
-above is a recommendation, not a decision — writing to a branch ruleset is the operator's call.
+**Left open deliberately**; `main` currently sits at an older commit than `v0.1.0`.
+
+### The bypass is configured and the merge still fails (2026-08-02)
+
+The recommended remedy was applied. `default-branch-protection` now carries a bypass actor, confirmed
+both through the API and in the repository's Rules UI, which resolves it by name:
+
+```json
+{"actor_id": 3784868, "actor_type": "Integration", "bypass_mode": "always"}
+```
+
+Two propagation runs after that change fail with **exactly** the earlier error:
+
+```text
+POST /repos/nolte/claude-goose/merges: 403 - Resource not accessible by integration
+```
+
+**Four causes are excluded by measurement, not by argument:**
+
+| Hypothesis | How it was excluded |
+|---|---|
+| No bypass actor | It is present; the Rules UI shows `nolte-portfolio-app`, *Always allow*, target `main` |
+| Wrong `actor_id` kind (App ID vs installation ID) | GitHub resolves `3784868` to the App by name, so the App ID is what the field wants |
+| The App lacks `contents: write` | It published `v0.1.0` and created that tag — `author=nolte-portfolio-app[bot]` |
+| The merge runs under `GITHUB_TOKEN` | The `Mint App installation token` step reports `success`, and the shared workflow wires `github_token: ${{ steps.app-token.outputs.token \|\| secrets.token }}` |
+
+**No working reference exists to compare against.** Every other ruleset in the portfolio has
+`bypass_actors: []`, and `claude-shared` — whose propagation succeeds — has **no ruleset on `main` at
+all**. Its success proves only that an unguarded branch accepts the merge. This repository is the
+first in the portfolio to combine a governed `main` with a running propagation, so the technique that
+found the last three defects (diff against a working instance) has nothing to diff against.
+
+**The experiment that would settle it, deliberately not run**: set the ruleset to
+`enforcement: disabled`, dispatch once, restore. If the merge then succeeds, the ruleset blocks
+despite a correct bypass and the finding belongs upstream; if it still returns 403, the ruleset is
+uninvolved and the bypass is merely harmless. **Work on the release process was paused by operator
+decision before this was run.**
+
+**The bypass stays configured.** Removing it would discard a change that is correct in principle and
+would have to be redone. It is recorded here because it is otherwise undeclared repository state that
+no committed artifact reproduces — the same gap as the dependency graph, and `FR-014` now names that
+class of gap explicitly.
+
+**Revisit when**: work on the release process resumes. Start with the disabled-enforcement
+experiment; every cheaper hypothesis is already spent.
 
 **Revisit when**: that decision is made. Note that the shared workflow merges through the API and has
 no pull-request mode, so two of the three options need an upstream change.
