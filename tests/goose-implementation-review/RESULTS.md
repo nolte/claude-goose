@@ -480,3 +480,90 @@ itself: it wrote the citations and is no witness to whether they carry.
 Preparing the sample surfaced a defect in the sample itself — the first draft named sources only
 descriptively and forced the checker to look each up, contradicting the criterion under test. Every
 row now carries its URL and quoted rule.
+
+## Feature 005 — recipe lifecycle skills (2026-09-24)
+
+Runs of the four `nolte-goose` skills, per `specs/005-recipe-lifecycle-skills/quickstart.md`. Every
+skill run below went through a **nested headless session**: `claude --print --permission-mode
+dontAsk --allowedTools <list> --max-turns <n>` started from the Bash tool of the authoring session,
+with the plugin installed from the working copy (`claude plugin marketplace add <path>`, then
+`claude plugin install nolte-goose@nolte-goose`). Claude Code CLI **2.1.282**; Goose **1.45.0**;
+`nolte-shared` **v0.1.11** (installed at project scope, status disabled — see run 2). The model the
+nested sessions resolved to was not captured; the CLI's default at that version.
+
+**Environment finding, recorded once**: the plugin cache is a copy of the working tree labelled with
+the HEAD commit hash. `claude plugin update` reports "already at the latest version" while HEAD is
+unchanged, so uncommitted edits under `skills/` reach the installed plugin only after `uninstall`
+plus `install`. Runs 3–6 used a cache taken after the four `SKILL.md` files were complete; runs 7–8
+used a fresh install.
+
+### Run 1 — SC-004: normative voice in `recipe-audit`
+
+`grep -nE 'NEVER|MUST|USE EXACTLY|Never|must' skills/recipe-audit/SKILL.md` — three hits, lines
+112–114, all under "Hard rules" and all governing the skill's own behaviour (never edit the subject,
+never retry, never paraphrase the digest). Zero hits state a rule of the review. **Pass.**
+
+### Run 2 — scenario 3, fail-closed (FR-009, SC-006)
+
+Scratch directory, prompt `/nolte-goose:recipe-requirements-elicit`, tools `Read Glob Grep`,
+14 seconds. Output was the fail-closed message verbatim (names `nolte-shared:requirements-elicit`,
+`v0.1.11`, the marketplace) followed by a German explanation; no file written. **Pass**, with a
+caveat on the condition: `claude plugin disable nolte-shared` failed with "not found in any
+editable settings scope", so the absence was not produced by the command. It was real nonetheless:
+`claude plugin list` shows `nolte-shared@nolte-shared` at scope `project`, status disabled, and a
+tool-less probe session listed only the four `nolte-goose:` skills. Why the interactive authoring
+session sees `nolte-shared` skills while a nested session does not was not investigated.
+
+### Runs 3–5 — `recipe-plan` (FR-004, FR-018, FR-019, FR-020, SC-005)
+
+| Run | Input | Tools | Time | Outcome |
+|---|---|---|---|---|
+| 3 | `project/recipes/baseline-drift-check/requirements.md`, hand-written, `confirmed` | `Read Write Glob Grep Bash(ls:*)` | 3:00 | `plan.md` written, `State: ready`, 8 elements, all ten criteria of `2026-08-02` listed once, coverage total both ways. **Two author notes** flagged defects in the requirement artifact: result vocabulary (`unchanged`/`changed`/`unknown`) does not match `SOURCE-FORMAT.md` (`unchanged`/`drifted`/`unreachable`); `R-007` does not cover a `builtin` extension, so the artifact's expectation of a judgment-call finding was wrong |
+| 4 | scenario 9 step 1: copy with `State: draft` and one open point | same | — | Stopped, listed the open point, wrote no `plan.md`. **Pass** (FR-004) |
+| 5 | scenario 9 step 3: copy whose `baselines_dir` became `sources_file`, optional, imports a file, with a default | same | — | `plan.md` written with `State: blocked`; conflicts table names R-2 against `R-004` together with `R-003`, offers the two resolutions, narrows nothing. **Pass** (FR-020) |
+
+Run 3's two notes were handled as the data model's state machine prescribes: the requirement
+artifacts were revised (vocabulary; `R-007` row) and `recipe-plan` re-run (1:32). The second plan is
+`ready`, 8 elements, `R-007` `by construction` with the reason, `GAP-EXT-SEMANTICS` the only `risk`.
+This is the first friction found by dogfooding here, and it was a defect in the hand-written input,
+not in the skill.
+
+### Runs 6–7 — `recipe-implement` (FR-021, FR-022, FR-023, FR-024)
+
+| Run | Input | Tools | Time | Outcome |
+|---|---|---|---|---|
+| 6 | the `ready` plan | `Read Write Glob Grep Bash(goose:*) Bash(ls:*) Bash(mkdir:*)` | 1:23 | `recipes/baseline-drift-check/recipe.yaml` written: provenance block with slug, `2026-08-02`, `0.1.0`, `1.0.0`; a `# P-<n> ← R-<m>` comment on every element; `goose run --recipe … --explain` accepted it (re-checked from the authoring session: no `Error:` line). The skill reported the eight-row traceability table. **Pass** |
+| 7 | scenario 9 step 4: copy of the plan with P-6 changed to `type: plugin` | same | — | Recipe written, parser rejected it; the skill quoted the parser's line verbatim (`Error: extensions[0].type: unknown variant 'plugin', expected one of …`, backticks in the original), left the file for inspection, did not edit the plan, and returned the decision to the author. **Pass** (FR-022) |
+
+Run 6 noted that its first Bash attempt was refused and the parser call then permitted; the check
+ran. Not investigated further; the `Bash(goose:*)` pattern was in the allowed list.
+
+### Run 8 — frontmatter validator (research R8)
+
+`scripts/validate_skills.py` from claude-shared tag `v0.1.11`, run from a mirrored layout
+(`<scratch>/scripts/validate_skills.py` with `<scratch>/skills` → this repository's `skills/`),
+because the script resolves targets against its own parent's parent. 4 artifacts; **0 Critical**,
+4 Warning, 1 Suggestion — detailed on the "Validator" line of `skills/README.md`. FR-008: none of
+the four names appears in any `skills/` listing of that tag.
+
+### Not run, and why
+
+| Scenario | Skill | Blocked by |
+|---|---|---|
+| 1 — audit through the skill vs. the binding (T012–T014) | `recipe-audit` | Feature 004 US1: `bindings/claude-code/run.sh` is uncommitted and has no recorded run |
+| 2 — real elicitation (T021) | `recipe-requirements-elicit` | claude-shared #665: the delegation target cannot run in a consumer |
+| 5 — first audit of the lifecycle recipe (T029) | `recipe-audit` | Transitively, feature 004 US1 |
+| 8 — second reader draws the boundary (T034) | all | Needs a reader who did not author the skills; cannot be self-certified |
+
+### Release condition (T037)
+
+| Skill | Recorded real run | Status |
+|---|---|---|
+| `recipe-audit` | none | **blocked** (feature 004 US1) |
+| `recipe-requirements-elicit` | run 2 (fail-closed path only) | **blocked** for the elicitation path (claude-shared #665) |
+| `recipe-plan` | runs 3–5 plus the re-run | recorded |
+| `recipe-implement` | runs 6–7 | recorded |
+| full lifecycle | phases 2–3 recorded; phase 1 hand-written; phase 4 not run | **incomplete** |
+
+**Not released.** `skills/VERSION.md` stays at 0.1.0. Two of four skills have a recorded real run;
+the lifecycle run lacks its audit. Both blocks are outside this feature and named above.

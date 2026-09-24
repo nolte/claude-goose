@@ -79,6 +79,27 @@ criteria are decided by it, so this is the cheapest first check on any recipe. T
 the first defect, which is why the review builds neutralized copies of the subject to reach the
 remaining criteria.
 
+### Develop a recipe with the plugin
+
+The repository is also a Claude Code plugin, `nolte-goose`, with one skill per phase of a recipe's
+life. It requires Goose, the Claude Code CLI and the `nolte-shared` plugin.
+
+```sh
+claude plugin marketplace add nolte/claude-goose
+claude plugin install nolte-goose@nolte-goose
+```
+
+- `/nolte-goose:recipe-requirements-elicit` captures what the recipe must do, delegating the
+  interview to `nolte-shared:requirements-elicit` and adding the recipe-specific questions.
+- `/nolte-goose:recipe-plan` maps every requirement to a recipe element and decides every baseline
+  criterion before anything is written.
+- `/nolte-goose:recipe-implement` writes the recipe from the plan and validates it with Goose's
+  parser.
+- `/nolte-goose:recipe-audit` runs the review above through its Claude Code binding and returns
+  the report; it adds no rule of its own.
+
+`skills/README.md` records what each skill delegates and what it adds.
+
 ### Work on the process itself (dogfooding)
 
 ```sh
@@ -123,6 +144,8 @@ changed yardstick.
 baselines/
   MAINTENANCE.md, SOURCE-FORMAT.md, VERSION.md   # how a revision is kept current and grown
   goose/<revision>/                              # immutable, source-backed criteria per Goose version
+.claude-plugin/                                  # plugin and marketplace manifests
+skills/                                          # the four lifecycle skills, README and VERSION.md
 process/goose-implementation-review/
   process.md                                     # the stages, with preconditions and verification
   recipe.yaml                                    # the Goose entry point
