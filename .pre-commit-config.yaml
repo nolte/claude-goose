@@ -78,6 +78,19 @@ repos:
         pass_filenames: false
         files: \.md$
 
+      - id: portability
+        name: portability class
+        # `always_run` for the same reason as manifest-integrity below: it scans
+        # two whole trees rather than reacting to one file type, and the thing
+        # most likely to leak an absolute path is a shell script, not a document.
+        # Default stage, so it fails on a workstation before a push — this guard
+        # spent its first release as a procedure someone had to remember, and
+        # every time it was actually run it found something.
+        entry: ./scripts/check-portability.sh
+        language: system
+        pass_filenames: false
+        always_run: true
+
       - id: manifest-integrity
         name: manifest integrity class (FR-033)
         # `always_run`, unlike every class above. The others react to a changed

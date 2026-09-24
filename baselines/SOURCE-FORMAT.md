@@ -4,7 +4,11 @@ Applies across all revisions. Unlike `criterion-format.md`, which travels **insi
 because criteria are interpreted against the schema in force when they were published, this file
 describes how records are written and is shared.
 
-Governed by `specs/002-qa-documentation-base/data-model.md`, which is normative where the two differ.
+**This file is the authoritative statement of these formats.** It travels with `baselines/` and needs
+nothing outside it: a reader holding a copied baseline revision has everything required to interpret
+the records in it. An earlier version deferred to a document in this project's specification tree,
+which a consumer never receives — and which therefore told them the file in their hands was not the
+one that counts.
 
 ## Source Record
 
