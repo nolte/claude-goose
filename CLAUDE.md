@@ -87,6 +87,18 @@ Consequences for any work here:
 - The constitution **is** ratified (v1.0.0), so the *Constitution Check* gate in every `plan.md` is live rather than vacuous. `plan-template.md:43` resolves its gates from that file at runtime; do not hard-code them into the template.
 - Two known template inconsistencies are recorded in the constitution's Sync Impact Report: `spec-template.md:3` says "Feature Branch" although state is not branch-derived, and `tasks-template.md:12` calls tests OPTIONAL where Principle III requires a verification step per stage. Both are upstream-owned — fix via `.specify/templates/overrides/` if they bite.
 
+## The recipe lifecycle plugin (feature 005, authored)
+
+The repository is a Claude Code plugin, `nolte-goose` (`.claude-plugin/`, `skills/`), with four
+skills: `recipe-requirements-elicit`, `recipe-plan`, `recipe-implement`, `recipe-audit`. Each owns one
+phase and carries only what is Goose-specific; generic work is delegated to `nolte-shared` and the
+skill fails closed when that plugin is absent. `recipe-audit` invokes
+`process/goose-implementation-review/bindings/claude-code/run.sh` and adds nothing normative — a skill
+that performed the review from `process.md` would be an authored third binding. `plugin.json`
+deliberately has no `version`; the lifecycle's own semver is `skills/VERSION.md`. `skills/README.md`
+holds the delimitation record and the upstream dependencies. Runs are recorded in
+`tests/goose-implementation-review/RESULTS.md` under "Feature 005".
+
 ## CI/CD, branches, and releases (shipped, feature 003)
 
 **Run the gate before pushing — it is one command:**

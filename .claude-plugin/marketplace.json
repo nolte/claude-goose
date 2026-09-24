@@ -1,0 +1,12 @@
+{
+  "name": "nolte-goose",
+  "owner": { "name": "nolte" },
+  "metadata": { "description": "Goose recipe lifecycle skills and the review process they audit against." },
+  "plugins": [
+    {
+      "name": "nolte-goose",
+      "source": ".",
+      "description": "Goose recipe lifecycle: requirements, plan, implementation and audit against a pinned, source-backed baseline. Requires Goose 1.45.0 and the nolte-shared plugin."
+    }
+  ]
+}
