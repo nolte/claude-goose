@@ -267,4 +267,3 @@ bumps the version.
 - **`report-template.md` now requires the `Host` header** while the Goose recipe, the golden
   files and `VERSION.md` have not followed (`T024`–`T032`). Until then the shipped process is
   internally inconsistent; the tasks that reconcile it are the open ones above
-
