@@ -44,13 +44,11 @@ dimension names and criterion ids verbatim.
 
 ## Precondition — the delegation target
 
-Before anything else, invoke the shared skill:
-
-```text
-Skill(skill="nolte-shared:requirements-elicit")
-```
-
-If the invocation is refused because the skill name is unknown, stop and reply exactly:
+Before anything else, check that `nolte-shared:requirements-elicit` is among the skills available in
+this session (the available-skills listing names installed plugin skills by their namespaced name).
+Do not invoke it to find out: invoking a skill runs it, and the interview must start exactly once,
+in step 2 below, after the baseline revision is resolved. If it is not listed — or if the single
+invocation in step 2 is refused because the name is unknown — stop and reply exactly:
 
 ```text
 recipe-requirements-elicit needs nolte-shared:requirements-elicit, which is not installed.
@@ -71,8 +69,9 @@ plugin exists to avoid.
    concrete id; the word `latest` never appears in an artifact. Read `lifecycle_version` from
    `${CLAUDE_PLUGIN_ROOT}/skills/VERSION.md` and `review_process_version` from
    `${CLAUDE_PLUGIN_ROOT}/process/goose-implementation-review/VERSION.md`.
-2. **Run the delegated interview** (`nolte-shared:requirements-elicit`, operation `elicit`) for the
-   recipe as the bounded context. It writes `project/requirements/<slug>.md`. Use the same `<slug>`
+2. **Run the delegated interview** — the one and only invocation,
+   `Skill(skill="nolte-shared:requirements-elicit")`, operation `elicit` — for the recipe as the
+   bounded context. It writes `project/requirements/<slug>.md`. Use the same `<slug>`
    for this skill's artifact. Do not ask any generic question through this skill's own text.
 3. **Ask the recipe question set** in `references/recipe-question-set.md`: inputs, host
    capabilities, execution mode, output shape, prohibited behaviour. One question or one tightly

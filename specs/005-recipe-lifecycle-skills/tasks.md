@@ -219,8 +219,9 @@ while they stand is "authored, gated, two runs pending", and the README says so.
 ## Notes
 
 - **Blocks**: feature 004 US1 not shipped — hit 2026-09-24 at T008/T011: `run.sh` and `run.sh.tmpl`
-  exist uncommitted in the working tree, `RESULTS` records no run through them, 004 `T016`–`T023`
-  are unchecked. T012–T014 and T029 stay open. Upstream claude-shared fix for `requirements-elicit`
+  are rendered and committed (004 `T016`–`T018` done, `render-bindings.sh --check` passes), but
+  `RESULTS` records no run through the binding and 004 `T019`–`T023` are unchecked; the pre-merge
+  reviews of PR #8 found the binding's tool allow list denies the Stage 0 manifest command. T012–T014 and T029 stay open. Upstream claude-shared fix for `requirements-elicit`
   not released — hit 2026-09-24 at T019/T020; T021 stays open
 - T018 measured: `claude plugin disable nolte-shared` failed ("not found in any editable settings scope");
   `claude plugin list` shows `nolte-shared@nolte-shared` at scope `project`, status disabled, and a

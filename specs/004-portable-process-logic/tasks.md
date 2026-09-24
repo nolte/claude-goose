@@ -67,9 +67,9 @@ demonstrated on its own.
 `tests/goose-implementation-review/fixtures/recipe-with-deviations` pinned to `2026-07-31b` and get a
 report carrying `Host: claude-code`, a coverage statement and a `Criteria Applied` table.
 
-- [ ] T016 [US1] Write `process/goose-implementation-review/bindings/claude-code/run.sh.tmpl`: the host's own shape, the `BEGIN GENERATED` / `END GENERATED` marker pairs for constraints and inputs, and a marked host-specific-notes section
-- [ ] T017 [US1] Render `process/goose-implementation-review/bindings/claude-code/run.sh` with `tools/render-bindings.sh claude-code` and commit the generated file
-- [ ] T018 [US1] Verify the rendered `process/goose-implementation-review/bindings/claude-code/run.sh` declares all five contract inputs with matching requiredness and defaults, and introduces none of its own (invocation-contract obligations 1 and 2)
+- [X] T016 [US1] Write `process/goose-implementation-review/bindings/claude-code/run.sh.tmpl`: the host's own shape, the `BEGIN GENERATED` / `END GENERATED` marker pairs for constraints and inputs, and a marked host-specific-notes section
+- [X] T017 [US1] Render `process/goose-implementation-review/bindings/claude-code/run.sh` with `tools/render-bindings.sh claude-code` and commit the generated file
+- [X] T018 [US1] Verify the rendered `process/goose-implementation-review/bindings/claude-code/run.sh` declares all five contract inputs with matching requiredness and defaults, and introduces none of its own (invocation-contract obligations 1 and 2)
 - [ ] T019 [US1] Run a real review through `process/goose-implementation-review/bindings/claude-code/run.sh` over `tests/goose-implementation-review/fixtures/recipe-with-deviations`, baseline `2026-07-31b`, output `./review-claude.md` (FR-015, FR-016)
 - [ ] T020 [US1] Verify `./review-claude.md` carries `Host: claude-code`, the coverage statement and the `Criteria Applied` table, and that every finding names a criterion, a location and a source (FR-007, US1 acceptance 1 and 4)
 - [ ] T021 [US1] Verify the digest in `./review-claude.md` reads `baseline=2026-07-31b` and that no criterion from a later revision appears — the `O-12` regression check, asked of the second host for the first time
@@ -238,3 +238,33 @@ not block the release; an unexplained one does.
 - Commit after each task or logical group
 - Two of the three golden files carry a `DIGEST v1` block and are reconciled on it alone, never as whole reports (`O-11`). `delta-subject-change.md` is a classification table and is compared as such
 - Nothing in Phase 2 may hard-code a path into this repository; T015 exists to catch exactly that
+
+## Follow-ups from the pre-merge reviews of PR #8 (2026-09-25)
+
+Recorded here because each concerns this feature's open phases, not feature 005. None is fixed by
+that PR; each is a task for phase 3 or 4 and must be resolved before `T019` is attempted or `T031`
+bumps the version.
+
+- **Tool allow list of the Claude Code binding.** Claude Code refuses `find … -exec` and `-delete`
+  under a `Bash(find *)` rule, so the Stage 0 manifest command is denied in the headless run; and
+  `Bash(sort:*)` is a prefix rule that admits GNU `sort`'s program-executing option, which a
+  prompt-injected subject could reach with no approval step. Rework `run.sh.tmpl`: compute the
+  manifest in the shell before and after the `claude` call and pass it in the prompt, so the model
+  needs no `Bash` at all (`CLAUDE_TOOLS` becomes `Read Glob Grep Write`). Then re-render
+- **The subject is not added via `--add-dir`**, so a subject outside the working directory cannot be
+  read; and only precondition 1 of the contract is checked before the run starts (`T019` will hit
+  this if the subject is not under cwd)
+- **`resolve()` uses `awk -v`**, which processes backslash escapes, and maps an unknown placeholder
+  to the empty string instead of failing. A path with a backslash is mangled; a typo in a
+  placeholder name yields a vacuous constraint
+- **`render-bindings.sh` ignores `status=`**, so a constraint marked `superseded` is still spliced
+  into every binding. Implement the status filter before the first constraint is retired
+- **The `HOST-SPECIFIC` prompt-tail region restates report rules** in lowercase and passes the
+  lexical check while violating obligation 5. Move that instruction into a carried constraint or a
+  generated region
+- **`render-bindings.sh --check` is not yet a gate class** (`T028`); until it is, the header of
+  `run.sh` claims a gate that does not exist. `T028` closes it
+- **`report-template.md` now requires the `Host` header** while the Goose recipe, the golden
+  files and `VERSION.md` have not followed (`T024`–`T032`). Until then the shipped process is
+  internally inconsistent; the tasks that reconcile it are the open ones above
+

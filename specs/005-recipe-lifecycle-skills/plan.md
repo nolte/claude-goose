@@ -169,7 +169,7 @@ consumer would.
 
 | This feature | Depends on | State on 2026-09-24 |
 |---|---|---|
-| US1 (`recipe-audit`) | Feature 004 User Story 1: `bindings/claude-code/run.sh` rendered, run for real, recorded (`T016`–`T023`) | Open; `run.sh` exists uncommitted, no run recorded |
+| US1 (`recipe-audit`) | Feature 004 User Story 1: `bindings/claude-code/run.sh` rendered, run for real, recorded (`T016`–`T023`) | Rendered and committed (`T016`–`T018`); no run recorded (`T019`–`T023` open) |
 | US2 (`recipe-requirements-elicit`) dogfooding | An upstream claude-shared release in which `requirements-elicit` runs in a consumer (research `R5`), pinned here | Not started |
 | US3, US4 | US2's artifact, which may be hand-written for the first run (spec `FR-002`) | Unblocked |
 

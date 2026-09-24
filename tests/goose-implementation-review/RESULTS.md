@@ -550,7 +550,7 @@ the four names appears in any `skills/` listing of that tag.
 
 | Scenario | Skill | Blocked by |
 |---|---|---|
-| 1 — audit through the skill vs. the binding (T012–T014) | `recipe-audit` | Feature 004 US1: `bindings/claude-code/run.sh` is uncommitted and has no recorded run |
+| 1 — audit through the skill vs. the binding (T012–T014) | `recipe-audit` | Feature 004 US1: `bindings/claude-code/run.sh` is committed with this feature and `render-bindings.sh --check` confirms it matches its sources, but it has no recorded run; the pre-merge reviews also found that its `Bash(find:*)` allow rule cannot admit the Stage 0 manifest command (`find … -exec sha256sum`), so a run through it will fail until 004 phase 3 reworks the tool list |
 | 2 — real elicitation (T021) | `recipe-requirements-elicit` | claude-shared #665: the delegation target cannot run in a consumer |
 | 5 — first audit of the lifecycle recipe (T029) | `recipe-audit` | Transitively, feature 004 US1 |
 | 8 — second reader draws the boundary (T034) | all | Needs a reader who did not author the skills; cannot be self-certified |

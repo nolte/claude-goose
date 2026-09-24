@@ -174,4 +174,5 @@ Early stage, in use by its author. The review process is released at 1.0.0 after
 including a self-review with no findings and runs in two unrelated repositories. Four baseline
 revisions exist; `2026-08-02` is the latest and targets Goose v1.45.0. Work in progress is the
 split of the process into host-neutral artifacts plus generated host bindings, so a review can run
-without Goose; until that ships, the Goose recipe above is the only supported entry point.
+without Goose. The Claude Code binding and the `recipe-audit` skill that invokes it are authored
+but have no recorded run yet; until they do, the Goose recipe above is the released entry point.

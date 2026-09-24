@@ -35,7 +35,7 @@ if hits=$(grep -rIn --exclude-dir=.git -- 'claude-goose' "${trees[@]}" 2>/dev/nu
 fi
 
 # 2. No absolute paths into a developer's machine.
-if hits=$(grep -rInE --exclude-dir=.git -- '(/home/|/Users/|[A-Za-z]:\\\\)' "${trees[@]}" 2>/dev/null); then
+if hits=$(grep -rInE --exclude-dir=.git -- '(/home/|/Users/|[A-Za-z]:\\)' "${trees[@]}" 2>/dev/null); then
   note "absolute path leaked into a reusable tree"
   echo "$hits" | sed 's/^/        /' >&2
 fi

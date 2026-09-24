@@ -48,19 +48,20 @@ repos:
     hooks:
       - id: recipe-schema
         name: recipe schema class
-        entry: ./scripts/check-recipe-schema.sh process/goose-implementation-review/recipe.yaml
+        # Every Goose recipe in the repository: the process's own and any recipe
+        # the lifecycle plugin produces under recipes/. The scripts take one
+        # path each, so the loop feeds them one file at a time.
+        entry: bash -c 'for f in "$@"; do ./scripts/check-recipe-schema.sh "$f" || exit 1; done' --
         language: system
-        pass_filenames: false
-        files: ^process/goose-implementation-review/recipe\.yaml$
+        files: ^(process/goose-implementation-review/(bindings/goose/)?recipe|recipes/[^/]+/recipe)\.yaml$
 
       - id: recipe-parse
         name: recipe parse class (goose --explain)
         # Needs the goose binary; runs in the tooled CI job, not the shared one.
         stages: [manual]
-        entry: ./scripts/check-recipe-parse.sh process/goose-implementation-review/recipe.yaml
+        entry: bash -c 'for f in "$@"; do ./scripts/check-recipe-parse.sh "$f" || exit 1; done' --
         language: system
-        pass_filenames: false
-        files: ^process/goose-implementation-review/recipe\.yaml$
+        files: ^(process/goose-implementation-review/(bindings/goose/)?recipe|recipes/[^/]+/recipe)\.yaml$
 
       - id: prose
         name: prose lint class (vale)
