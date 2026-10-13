@@ -178,7 +178,11 @@ Baselines directory: $BASELINES_DIR"
 
 # What this host is allowed to do during the run. The tool list is narrow on
 # purpose: reading, searching, the shell commands the manifest stage needs, and
-# writing the report.
+# writing the report. The `xargs` rule names its whole command: a bare `xargs`
+# would let the run execute anything, which is not what the manifest needs. The
+# `goose` rule names its whole invocation too, `--explain` included: that parses
+# a recipe, it does not run one, and the criteria the baseline delegates to the
+# host are decided by it. Without `--explain`, or chained, the call is refused.
 #
 # Worth recording for anyone comparing the two shipped bindings: under this host
 # the read-only promise has partial technical backing, because the tool list is
@@ -186,7 +190,7 @@ Baselines directory: $BASELINES_DIR"
 # the report is written with the same Write tool that could reach the subject —
 # so the process keeps its own re-checksum stage as the mechanism that actually
 # catches a violation.
-CLAUDE_TOOLS="Read Glob Grep Write Bash(find:*) Bash(sha256sum:*) Bash(ls:*) Bash(sort:*) Bash(wc:*)"
+CLAUDE_TOOLS="Read Glob Grep Write Bash(find:*) Bash(sha256sum:*) Bash(ls:*) Bash(sort:*) Bash(wc:*) Bash(xargs -r -0 sha256sum:*) Bash(goose run --recipe * --explain)"
 
 command -v claude >/dev/null 2>&1 || {
   printf 'run.sh: the claude CLI is not on PATH\n' >&2
@@ -198,10 +202,27 @@ command -v claude >/dev/null 2>&1 || {
 # after them is swallowed as one more value and the run dies with "Input must be
 # provided either through stdin or as a prompt argument". Measured here, on
 # CLI 2.1.221. Stdin is the documented second form and has no such ambiguity.
+STARTED=$(mktemp) || {
+  printf 'run.sh: could not create a temporary file\n' >&2
+  exit 2
+}
 printf '%s\n' "$PROMPT" | claude \
   --print \
   --permission-mode dontAsk \
   --allowedTools "$CLAUDE_TOOLS" \
   --add-dir "$PROC_DIR" \
   --add-dir "$BASELINES_DIR"
+status=$?
+
+# A review that stops early leaves an explanation on stdout and exits 0: a
+# refused shell command ends the session without a report and without a failing
+# status. Measured, RESULTS.md, "Feature 005 — Run 9". The report file is the
+# only sign, so the binding looks for a non-empty file newer than the start.
+if [ "$status" -eq 0 ] && [ -z "$(find "$output_path" -newer "$STARTED" -size +0c 2>/dev/null)" ]; then
+  rm -f "$STARTED"
+  printf 'run.sh: the review ended without writing %s (the CLI exited 0)\n' "$output_path" >&2
+  exit 3
+fi
+rm -f "$STARTED"
+exit "$status"
 # END HOST-SPECIFIC: prompt-tail
