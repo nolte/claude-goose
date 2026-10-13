@@ -48,19 +48,20 @@ repos:
     hooks:
       - id: recipe-schema
         name: recipe schema class
-        entry: ./scripts/check-recipe-schema.sh process/goose-implementation-review/recipe.yaml
+        # Every Goose recipe in the repository: the process's own and any recipe
+        # the lifecycle plugin produces under recipes/. The scripts take one
+        # path each, so the loop feeds them one file at a time.
+        entry: bash -c 'for f in "$@"; do ./scripts/check-recipe-schema.sh "$f" || exit 1; done' --
         language: system
-        pass_filenames: false
-        files: ^process/goose-implementation-review/recipe\.yaml$
+        files: ^(process/goose-implementation-review/(bindings/goose/)?recipe|recipes/[^/]+/recipe)\.yaml$
 
       - id: recipe-parse
         name: recipe parse class (goose --explain)
         # Needs the goose binary; runs in the tooled CI job, not the shared one.
         stages: [manual]
-        entry: ./scripts/check-recipe-parse.sh process/goose-implementation-review/recipe.yaml
+        entry: bash -c 'for f in "$@"; do ./scripts/check-recipe-parse.sh "$f" || exit 1; done' --
         language: system
-        pass_filenames: false
-        files: ^process/goose-implementation-review/recipe\.yaml$
+        files: ^(process/goose-implementation-review/(bindings/goose/)?recipe|recipes/[^/]+/recipe)\.yaml$
 
       - id: prose
         name: prose lint class (vale)
@@ -77,6 +78,19 @@ repos:
         language: system
         pass_filenames: false
         files: \.md$
+
+      - id: portability
+        name: portability class
+        # `always_run` for the same reason as manifest-integrity below: it scans
+        # two whole trees rather than reacting to one file type, and the thing
+        # most likely to leak an absolute path is a shell script, not a document.
+        # Default stage, so it fails on a workstation before a push — this guard
+        # spent its first release as a procedure someone had to remember, and
+        # every time it was actually run it found something.
+        entry: ./scripts/check-portability.sh
+        language: system
+        pass_filenames: false
+        always_run: true
 
       - id: manifest-integrity
         name: manifest integrity class (FR-033)

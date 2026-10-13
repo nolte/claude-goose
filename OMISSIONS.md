@@ -343,6 +343,18 @@ The repository declares that it has **none** (`FR-025`). No file in the working 
 version, nothing needs bumping, and no file may be treated as authoritative for one. The tag is the
 version.
 
+### Skill frontmatter validation
+
+**Omitted as a gate class, run as a recorded manual step.** The four skills under `skills/` are checked
+against `spec/claude/skill-management/` with claude-shared's `scripts/validate_skills.py`, but that
+repository exposes no `.pre-commit-hooks.yaml`, so the script cannot be pinned as a hook the way every
+other class here is. Vendoring it would drift; writing a second validator would duplicate a capability
+claude-shared owns. The step is therefore run by hand from the pinned release and its result recorded
+on the "Validator" line of `skills/README.md` (feature 005, research R8).
+
+**Revisit when**: `nolte/claude-shared` publishes a pre-commit hook for the validator. The request is
+tracked as an upstream issue linked from `skills/README.md`.
+
 ## Portability: measured in a second repository (2026-08-01)
 
 `SC-014` asks that the artifacts work in another repository after changing only declared inputs.

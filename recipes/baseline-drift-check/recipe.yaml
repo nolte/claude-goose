@@ -1,0 +1,117 @@
+# nolte-goose lifecycle — slug: baseline-drift-check  baseline_revision: 2026-08-02
+# lifecycle_version: 0.1.0  review_process_version: 1.0.0
+
+# P-1 ← R4
+title: "Baseline Drift Check"
+
+# P-2 ← R4
+description: >-
+  Read-only check of one published baseline revision for source drift, comparing each recorded
+  source_commit with the current upstream commit and printing the verification.md rows for the
+  maintainer to append
+
+parameters:
+  # P-3 ← R-1, R1, R7
+  - key: revision
+    input_type: string
+    requirement: required
+    description: "Baseline revision directory name under <baselines_dir>/goose/, e.g. 2026-08-02"
+
+  # P-4 ← R-2, R1, R8
+  - key: baselines_dir
+    input_type: string
+    requirement: optional
+    default: "./baselines"
+    description: "Directory holding goose/<revision>/. A path the recipe reads under, deliberately not input_type: file"
+
+  # P-5 ← R-3, R2, R8
+  - key: repo
+    input_type: string
+    requirement: optional
+    default: "aaif-goose/goose"
+    description: "Upstream repository queried for the current commit of each source path"
+
+extensions:
+  # P-6 ← R-4, R-5
+  - type: builtin
+    name: developer
+
+# P-7 ← R-4, R-5, R1, R2, R3, R5, R6, R7
+instructions: |
+  You are a read-only drift check. You print and never write. You perform Stage 2 of
+  baselines/MAINTENANCE.md for one revision, producing rows in the shape of that revision's
+  verification.md.
+
+  1. Locate {{ baselines_dir }}/goose/{{ revision }}/sources.md. If the directory or the file does
+     not exist: print one sentence naming the missing path, print no rows, and stop.
+
+  2. Parse every record heading of the form `### S-<nnn>` in sources.md. From the table under each
+     heading take `source_path`, `source_commit` (the commit token only, without the date in
+     parentheses) and the evidence class.
+
+  3. For each record with a `source_path`, run exactly this command and nothing else:
+
+       gh api "repos/{{ repo }}/commits?path=<source_path>&per_page=1" --jq '.[0].sha'
+
+     The recorded commit is abbreviated; compare it as a prefix of the observed SHA.
+       - Equal: result `unchanged`.
+       - Different: result `drifted`.
+       - The command fails, prints nothing, prints `null` or prints no SHA: result `unreachable`,
+         with the first line of the error (or "empty response") as the reason. Then continue with
+         the next record.
+     Never retry with any other mechanism.
+
+  4. A record without `source_path`: result `unreachable`, reason `no source_path`. Its rule column
+     is `A` when its evidence class is A/direct, `B` when it is observed, matching the Rule column
+     of the existing verification.md rows.
+
+  5. Print one row per record in the column order of verification.md:
+
+       | <date> | <source id> | <rule> | <observed commit> | <result> |
+
+     The date comes from `date -u +%F`. The observed commit is abbreviated to twelve characters in
+     backticks, or `—` when unreachable. The result is in backticks; the reason is appended to the
+     result cell after a colon so the row still pastes as one line. After the rows print one summary
+     line:
+
+       unchanged: n, drifted: n, unreachable: n
+
+     `unreachable` is never counted or printed as `unchanged`.
+
+  6. Prohibited behaviour:
+     - Never write to `verification.md` or to any file.
+     - Never modify anything under {{ baselines_dir }}.
+     - Never decide drift from HTTP `ETag` or `Last-Modified` headers; only commit ids count.
+     - Never fetch or read documentation page content; only commit metadata.
+
+# P-8 ← R-1, R-2, R-3, R4, R1, R2, R3, R5, R6, R7, R8
+prompt: |
+  Check baseline revision {{ revision }} for source drift now.
+
+  Read {{ baselines_dir }}/goose/{{ revision }}/sources.md. If that directory or file does not
+  exist, print one sentence naming the missing path, print no rows, and stop.
+
+  For each record with a source_path, run exactly
+
+    gh api "repos/{{ repo }}/commits?path=<source_path>&per_page=1" --jq '.[0].sha'
+
+  and compare the recorded source_commit as a prefix of the observed SHA. Equal is `unchanged`,
+  different is `drifted`. If the command fails or returns no SHA, the result is `unreachable` with
+  the reason, and you continue with the next record. A record without source_path is `unreachable`
+  with reason `no source_path`.
+
+  Print one row per record, in this exact shape:
+
+    | <date> | <source id> | <rule> | <observed commit> | <result> |
+
+  Date from `date -u +%F`; observed commit abbreviated to twelve characters in backticks, `—` when
+  unreachable; result in backticks, reason after a colon in the same cell. Use only the three result
+  words `unchanged`, `drifted`, `unreachable`. Then print one summary line:
+
+    unchanged: n, drifted: n, unreachable: n
+
+  Prohibited, without exception:
+  - Never write to `verification.md` or to any file.
+  - Never modify anything under {{ baselines_dir }}.
+  - Never decide drift from HTTP `ETag` or `Last-Modified` headers; only commit ids count.
+  - Never fetch or read documentation page content; only commit metadata.
