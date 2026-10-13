@@ -10,6 +10,15 @@ only its author can judge is underspecified.
 Stages run in order. A stage that fails its precondition aborts the run; no partial report is ever
 written, because a partial report understates coverage without saying so.
 
+**How to work.** Look at files and directories with the file tools: read, list, search. Use the shell for
+exactly two things: the manifest of Stage 0 and Stage 4, and the host invocation of Stage 2. Do not use it to
+explore, to check what is installed, or to print versions. A host may permit only the commands this process
+needs, and it may refuse anything else without saying which part of a call it refused. A refusal of a
+command outside those two uses says nothing about those two. It is not a reason to stop, and it is not a
+reason to conclude that the manifest or the host is unavailable. Two runs that met such a refusal drew the
+wrong conclusion from it, one by stopping and one by never trying the host, and their reports differed from
+the runs that did not.
+
 ---
 
 ## Stage 0 — Preflight
@@ -28,11 +37,31 @@ identical input, which has been observed:
 
 ```sh
 # from within subject_path
-find . -type f -exec sha256sum {} \; | sort
+find . -type f -print0 | xargs -r -0 sha256sum | sort
 ```
+
+This prints exactly the lines `find . -type f -exec sha256sum {} \; | sort` prints, including none for an
+empty subject — the `-r` is what keeps `xargs` from running `sha256sum` on empty input and printing the
+hash of nothing. The two forms give the same hash. This one is specified because some hosts do not permit
+`-exec` (measured on one, `RESULTS.md`, "Feature 005 — Run 9").
+
+**Where the manifest is kept.** Keep the manifest and its hash in your working notes: the command's output
+is already in front of you. Do not write it to a file. Stage 4 runs the same command again and compares
+its output with what you noted.
+
+**One command per call.** A host may refuse a call that combines several commands when any one of them is
+not permitted, and may say only that the call was refused, not which part. A refusal of a combined call
+says nothing about its parts. Before concluding that a command is unavailable, repeat each part as its own
+call. Stop on a refusal only when the single command itself is refused.
 
 That is: one line per regular file, `<sha256><two spaces><path relative to subject_path>`, sorted by
 byte value. The manifest hash reported in the digest is the SHA-256 of that output.
+
+**When `subject_path` is a file**, there is no tree to walk. Run the same command from the file's parent
+directory on that one file: `find ./<name> -type f -print0 | xargs -r -0 sha256sum | sort`. The single line is
+`<sha256><two spaces>./<name>`, and the `./` belongs to it, as it does to every line of a directory manifest.
+Leaving it off gives a different hash for the same bytes, which has been observed: the same file reviewed
+five times produced two subject hashes, `./<name>` in three runs and `<name>` in two.
 
 **Output**: The subject manifest and its hash; the resolved baseline revision id and Goose version.
 
@@ -105,6 +134,21 @@ evaluation has produced either a finding or a recorded pass.
 recorded result was skipped, which would let an unevaluated criterion appear as a pass in the
 `Criteria Applied` table.
 
+**Delegated criteria.** A criterion whose decision procedure delegates to the host is decided by the host's
+answer to that invocation, and by nothing else. Make the invocation exactly as the criterion states it,
+`goose run --recipe <subject_path> --explain`, as the first thing you do for it: do not check beforehand that
+`goose` exists or which version it is, because a check can be refused while the invocation is permitted.
+Only the refusal or failure of the invocation itself makes the criterion `undecided`. Reading the material is not that procedure and never yields
+a pass for such a criterion. If the host accepts the recipe, every criterion delegated to it holds. If the
+host rejects it, the rejection names the first defect (see Derived probes). If the host cannot be invoked or
+its answer cannot be obtained, the outcome is `undecided` (Stage 3, 2.), naming the invocation that was
+refused or failed. Two runs over the same bytes must not differ in this: one that tried the host and was
+refused, and one that skipped it and read the file, produced different digests, which has been observed.
+
+**A criterion with no in-scope part.** When its `applies_to` matches nothing in the subject, record `pass` in
+`Criteria Applied` and say in the rationale that there is no in-scope part. The report's result values stay
+`pass`, `finding` and `undecided`; "not applicable" and "vacuous" are not results.
+
 **Wording constraint**: A finding's phrasing is bounded by its criterion's `evidence_class`. An
 `authoritative` criterion may state that something is wrong; a `second-hand` one may only state that
 something departs from common practice. Findings never exceed what their source supports.
@@ -112,6 +156,16 @@ something departs from common practice. Findings never exceed what their source 
 **Derived probes**: where a criterion delegates to the host, the host stops at the first defect, so a
 single invocation decides at most one criterion. To reach the rest, copy the subject to a scratch
 location, neutralize the defect already found, and re-check. Repeat until the parser accepts.
+
+**Making a probe.** Read the subject in full and write a new file with the file tool: every byte of the
+subject, except the one defect being neutralized. Make each further neutralization the same way, as a new
+complete file written from the previous probe. Do not copy with the shell, edit a file in place, or rebuild the
+subject from memory in a shortened form: a host may permit none of the first two, and a shortened probe is
+not the subject, so what the host says about it is not what it says about the subject. Put the probes outside
+the subject tree and name them after the output file, so that reviews running at the same time do not share
+a probe. A refusal of one way of making a probe is no reason to stop; make it the other way. Two runs
+stopped the chain at the second probe because an in-place edit was refused, and left the criteria behind it
+`undecided`, while eight made the same probe by writing the whole file and decided them.
 
 Three rules govern this:
 
@@ -136,7 +190,10 @@ Three rules govern this:
    that triggered it, severity `advisory`, sourced to the gap entry. If it does not hold, record it
    in the coverage statement as not applicable and emit nothing.
 2. **Criteria that could not be decided.** A criterion whose decision procedure could not be applied
-   emits an `undecided` finding identified by its criterion id, stating what was missing.
+   emits an `undecided` finding identified by its criterion id, severity `advisory` whatever severity the
+   criterion declares, stating what was missing. An `undecided` finding is not evidence of a deviation, and a
+   finding never exceeds what its source supports; the same subject was reported `blocking` in one run and
+   `advisory` in two others.
 
 **A gap finding names a gap id, never a criterion id.** Gaps have no criterion — substituting the
 nearest one is guesswork, and two runs will guess differently. That was observed: one run labelled a

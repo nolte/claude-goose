@@ -546,6 +546,160 @@ because the script resolves targets against its own parent's parent. 4 artifacts
 4 Warning, 1 Suggestion — detailed on the "Validator" line of `skills/README.md`. FR-008: none of
 the four names appears in any `skills/` listing of that tag.
 
+### Run 9 — why audits through the binding stop at Stage 0 (2026-10-13)
+
+Claude Code CLI **2.1.296** (the binding's own comment records 2.1.221). `bindings/claude-code/run.sh`,
+`--permission-mode dontAsk`, tool list as shipped before this entry's changes. Five audit runs over two
+one-file recipe subjects: three on `garden-context-check.yaml`, two on `crop-selection.yaml`. Two produced a
+report. Three ended with exit code `0` and **no report**: the nested review read `process.md`,
+`constraints.md`, `report-template.md` and the subject, had a Bash call refused, and stopped.
+
+**What the session logs show.** Claude Code keeps a session file for each nested run. Four were read: three
+that stopped and one that completed. Each contains exactly one refused Bash call, and in all four that call
+is a combined command that writes the manifest to a file with `tee /tmp/…`, next to commands that are
+permitted. After the refusal, three sessions concluded that Bash was unavailable and stopped, although one of
+them had a Bash call succeed earlier in the same session; one repeated the parts without `tee` and completed.
+What the sessions did after the refusal is the difference between a report and none.
+
+**Replay**, one nested session per row, with the binding's tool list and `--add-dir` options, one run each:
+
+| Command | Result |
+|---|---|
+| the manifest pipeline, `find … -print0 \| xargs -r -0 sha256sum \| sort \| sha256sum`, under `Bash(xargs -r -0 sha256sum:*)` | runs; hash equal to the `-exec` form (`bedd6220…b7066` on the subject tried) |
+| the same with `\| tee <file> \|` before the last hash | **refused**; the file is not created |
+| the same after a leading `cd <dir> &&` | runs |
+| `cat <file> \| head -5`, `wc -c <files>`, `ls <dir> \| sort \| tail -1` (with and without a `tail` rule) | run |
+| `ls … \| sort \| tail -1; <manifest>` as one combined call, no `tee` | runs |
+| `find . -type f -exec sha256sum {} \; \| sort`, the form `process.md` specified until 1.0.1 | refused. **Not** the command refused in the logged sessions |
+| `find … -print0 \| xargs -0 sha256sum` with no `xargs` rule | refused |
+| `echo <path> \| xargs touch` under `Bash(xargs:*)` | creates the file |
+| `echo <path> \| xargs touch` under `Bash(xargs -r -0 sha256sum:*)` | refused, file not created |
+
+The last two rows are why the binding names the whole `xargs` command and not `xargs`. An empty subject,
+measured locally: the `-exec` form prints 0 lines, `xargs -0` without `-r` prints 1 (the hash of empty input,
+which would defeat Stage 0's "empty manifest, abort" check), `xargs -r` prints 0.
+
+**Correction.** An earlier version of this entry, and of the `VERSION.md` row for 1.0.1, said the `-exec`
+form stopped the audits. The `-exec` form is refused, as above, but the logged stops were caused by `tee`.
+The change to the manifest command is kept, since the hash is identical and one refused form is gone, but it
+is not what made the third run complete.
+
+**Also found.**
+
+- The CLI exits `0` when the review stops early and writes no report; only the missing file shows it. The
+  binding now exits `3` in that case (a new, non-empty report file is required) and passes any other
+  non-zero status through. Checked with a stub `claude` over four cases: nothing written (3), report written
+  (0), an old report left in place and nothing new written (3), the CLI failing with 5 (5).
+- `R-001`, `R-003` and `R-005` are delegated to `goose run --recipe <file> --explain`. The binding's tool
+  list has no `goose`, so they came back `undecided` in both reports that completed and cannot be decided
+  under this binding. Whether a parse-only `--explain` may be allowed sits against `C-3`, which forbids
+  executing the subject; that is a process decision and is not made here.
+- The two completed reports classify the vacuous cases differently: for one subject `R-004` is `undecided`
+  and `R-006` to `R-009` are `not applicable`, for the other all five are `pass (vacuous)`. The subjects
+  differ, and the same subject has not been reviewed twice, so this is a difference to watch, not yet a
+  measured instability of the digest.
+
+**Changed**: `process.md` Stage 0 says the manifest is kept in the run's notes and not written to a file, and
+that a refusal of a combined call says nothing about its parts (process 1.0.1); the binding checks for the
+report. `render-bindings.sh --check` passes.
+
+**Not established**: why a session stops after the refusal in one case and repeats the parts in another (four
+sessions); whether the new Stage 0 wording stops the `tee` improvisation, which only repeated runs can show;
+each replay row is a single run.
+
+### Run 10 — the same subject reviewed repeatedly (2026-10-13)
+
+The digest is meant to be the byte-stable core of a report, so the test is whether the same bytes give the
+same digest. Two one-file subjects, `recipes/crop-selection.yaml` and `recipes/garden-context-check.yaml`,
+each reviewed repeatedly through `bindings/claude-code/run.sh`, five sessions in parallel at a time, Claude
+Code CLI 2.1.296. Compared as a hash of the `DIGEST v1` block.
+
+| Process and binding | Subject | Runs | Reports | Distinct digests |
+|---|---|---|---|---|
+| 1.0.1 | crop-selection | 5 | 5 | **5** |
+| 1.1.0 | crop-selection | 10 | 10 | 1 |
+| 1.1.0 | garden-context-check | 5 | 4 | 2 (3 and 1 among the four reports; one run wrote no report) |
+| 1.1.0 plus "How to work" | crop-selection | 12 | 12 | 1 |
+| 1.1.0 plus "How to work" | garden-context-check | 10 | 10 | 1 |
+
+(The 12 include two runs started by a loop error in the measuring script; their digests equal the other ten.)
+
+**Why the five runs under 1.0.1 differed**, from the reports and the session logs. Three causes, each shown
+by reproducing the effect:
+
+- The manifest of a single-file subject was undefined. Three runs hashed `./crop-selection.yaml` and two
+  `crop-selection.yaml`: the same bytes gave `32c20cc7…` and `ce1aa4b2…`, and both values are reproduced by
+  the two command forms.
+- Criteria that the baseline delegates to the host (`goose run --recipe <file> --explain`) were handled three
+  ways: runs that tried `goose` were refused and reported `undecided`; runs that did not try it decided the
+  same criteria by reading the file and reported nothing. The host call was not in the binding's tool list.
+- The severity of an `undecided` criterion finding was not defined: `blocking` in one run, `advisory` in two.
+
+**Under 1.1.0**, before the working-method rule, 13 of 15 runs agreed per subject. The two that did not:
+one run's first Bash call, a combined `ls -R` over two directories, was refused and it stopped (no report;
+the binding reported exit 3, as designed); one run probed `which goose; goose --version`, was refused, and
+never tried the permitted `goose run … --explain`, so it reported the delegated criteria `undecided`.
+
+**Changes**, in `process.md` (version 1.1.0, not yet released): a single-file manifest is taken from the
+parent directory as `./<name>`; a delegated criterion is decided by the host and never by reading, and is
+`undecided` only when the invocation itself fails; an `undecided` criterion finding is `advisory`; a
+criterion with no in-scope part is a `pass` that says so; the host is invoked exactly as stated and without a
+preceding check; files are looked at with the file tools and the shell is for the manifest and the host
+invocation only; a refusal of any other command is no reason to stop. The binding allows
+`Bash(goose run --recipe * --explain)`, checked with `goose` itself: the invocation runs, a call without
+`--explain` is refused, a chained call is refused. It also exits 3 when no new report was written.
+
+**Refusals did not go away.** Across the 20 sessions of the last two rows, 11 had one or more refused calls
+(11 calls in all), mostly a manifest pipeline ending in `tee /dev/stderr`, plus a few exploratory commands.
+In all 20 sessions the host invocation ran and succeeded, and all 20 wrote a report. The stability comes from
+the session recovering after a refusal, not from there being none, and the `tee` improvisation is still
+there.
+
+**Not established**: stability beyond these samples (10 to 12 runs per subject, one host, one day, one
+model, five sessions in parallel); the path where the host rejects a recipe and the review has to use
+derived probes, which Run 11 covers for one defective subject; whether a refusal can still lead a
+session to stop (it did once in 15 runs before the working-method rule, and not in 22 after it).
+
+### Run 11 — the path where the host rejects the recipe (2026-10-13)
+
+Run 10 covered subjects the host accepts. This is the other path: a decision procedure that delegates to the
+host, a rejection, and the derived probes of Stage 2 that reach the criteria behind the first defect.
+
+**Subject**: a copy of `crop-selection.yaml` with three defects, kept outside the repository: `title` removed,
+the `default` of `hardiness_zone` removed, and one unused parameter added. **Ground truth**, measured with
+`goose run --recipe <file> --explain` after each correction in turn: `missing field 'title'` (R-001), then
+`Optional parameters missing default values in the recipe: hardiness_zone` (R-003), then `Unnecessary
+parameter definitions: unused_param` (R-005); accepted once all three are corrected. A correct review reports
+three deviations, each `blocking`.
+
+| Process text | Runs | Reports | Distinct digests | Correct (3 deviations) |
+|---|---|---|---|---|
+| 1.1.0 | 10 | 10 | 3 (8, 1, 1) | 8; two left `R-005` `undecided`, one of them `R-004` as well |
+| 1.1.0 plus "Making a probe" | 10 | 10 | 1 | 10 |
+
+The digest of the correct runs is the same in both series. `R-001` and `R-003` were found, at the right
+locations, in all 20 runs.
+
+**Why two runs failed in the first series.** Both could not continue the probe chain: `cp` is not in the
+binding's tool list and the `Edit` tool was refused, so the second neutralization was never made. In that
+series every probe the ten sessions wrote was a reduced reconstruction of the recipe, 4 to 27 percent of its
+size, not a copy, and two sessions found probe files from other runs in a shared directory. The host's verdict
+on a shortened probe says little about the subject; it happened to be right for the three defects here.
+
+**What the second series did.** After the process text said how to make a probe, all ten sessions made three
+probes by writing a complete file with the file tool: the subject plus a `title` line; that plus
+`default: ""`; that minus the six lines of the unused parameter. Compared with the defective subject, every
+one of the 30 probes differs by exactly those lines and nothing else. No session used `cp`. One session called `Edit` once, was refused, and wrote the file instead.
+Seven calls were refused in all (six Bash, that one `Edit`), none of them needed for the outcome. The other
+27 error results are the host's own rejections of the probes, nine for each of the three defects.
+
+**Not established**: the difference between 8 of 10 and 10 of 10 is not statistically distinguishable at
+these sizes (two-sided Fisher exact test, p of about 0.47); the support for the rule is the mechanism, the
+refused `cp` and `Edit` and the shortened probes, together with the exact probes of the second series, and
+not the rate. One defective subject with three defects, all decided by the host; defects decided by reading
+(`R-002`, `R-007`, `R-010`) and the `judgment call` path were not tried. One host, one day, one model, five
+sessions in parallel.
+
 ### Not run, and why
 
 | Scenario | Skill | Blocked by |
