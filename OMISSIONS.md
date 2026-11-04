@@ -367,7 +367,8 @@ plans under `.audits/skill-review/` keep the finding open rather than downgrade 
 spec change may do.
 
 **Revisit when**: claude-shared's `skill-review` and `spec-driven-development` specs define a spec
-anchor for plugins that ship from another repository with a Spec Kit layout. Requested upstream.
+anchor for plugins that ship from another repository with a Spec Kit layout. Requested upstream
+in https://github.com/nolte/claude-shared/issues/696.
 
 ## Portability: measured in a second repository (2026-08-01)
 

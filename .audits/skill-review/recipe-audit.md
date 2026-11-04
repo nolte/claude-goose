@@ -112,3 +112,4 @@ Next concrete action: Autor verankert die beiden Plugin-Root-Verweise mit `${CLA
 - 2026-11-05 — W terminology — description/summary/Body nennen Rezept und Extension-Konfiguration, Body sagt „subject“ — verified: grep material ohne Treffer; Contract-Zeile bewusst wörtlich
 - 2026-11-05 — W gotchas — ## Gotchas mit Timeout 600000 ms, Exit-Codes 2/3, Plugin-Root — verified: grep ^## Gotchas trifft; Schritt 2 verweist auf Timeout
 - 2026-11-05 — I rationale — zweiter Bullet zitiert Workflow-Kriterium und Default-to-skill — verified: Rationale-Abschnitt gelesen
+- 2026-11-05 — C spec anchor — kept open: no compliant fix exists without a spec change; decision recorded in OMISSIONS.md §"Spec citation in the skills" — tracked upstream: https://github.com/nolte/claude-shared/issues/696

@@ -141,3 +141,4 @@ Next concrete action: Autor ergänzt im Body von `SKILL.md` die Zitierung der Fe
 - 2026-11-05 — W cross-plugin — Verweis „if installed“ — verified: description gelesen
 - 2026-11-05 — I VERSION.md precondition — Precondition 3 definiert den Abgleich — verified: SKILL.md Precondition 3 gelesen
 - 2026-11-05 — I README side note — skills/README.md Delimitation- und Upstream-Zeilen aktualisiert — verified: skills/README.md gelesen
+- 2026-11-05 — C spec anchor — kept open: no compliant fix exists without a spec change; decision recorded in OMISSIONS.md §"Spec citation in the skills" — tracked upstream: https://github.com/nolte/claude-shared/issues/696

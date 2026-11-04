@@ -114,3 +114,4 @@ Next concrete action: Autor stellt einen im Consumer auflösbaren Spec-Anker her
 - 2026-11-05 — I upstream status — skills/README.md: #665–#667 als closed, unreleased; Delimitation-Zeile aktualisiert — verified: skills/README.md gelesen; gh release list zeigt v0.1.11 als neuestes
 - 2026-11-05 — I VERSION.md precondition — Precondition 3 definiert den Abgleich installiert vs. Input — verified: SKILL.md Precondition 3 gelesen
 - 2026-11-05 — I README pointer — Verweis auf ${CLAUDE_PLUGIN_ROOT}/skills/README.md §Upstream dependencies — verified: grep README.md in SKILL.md
+- 2026-11-05 — C spec anchor — kept open: no compliant fix exists without a spec change; decision recorded in OMISSIONS.md §"Spec citation in the skills" — tracked upstream: https://github.com/nolte/claude-shared/issues/696
