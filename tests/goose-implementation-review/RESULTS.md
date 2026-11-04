@@ -480,3 +480,244 @@ itself: it wrote the citations and is no witness to whether they carry.
 Preparing the sample surfaced a defect in the sample itself — the first draft named sources only
 descriptively and forced the checker to look each up, contradicting the criterion under test. Every
 row now carries its URL and quoted rule.
+
+## Feature 005 — recipe lifecycle skills (2026-09-24)
+
+Runs of the four `nolte-goose` skills, per `specs/005-recipe-lifecycle-skills/quickstart.md`. Every
+skill run below went through a **nested headless session**: `claude --print --permission-mode
+dontAsk --allowedTools <list> --max-turns <n>` started from the Bash tool of the authoring session,
+with the plugin installed from the working copy (`claude plugin marketplace add <path>`, then
+`claude plugin install nolte-goose@nolte-goose`). Claude Code CLI **2.1.282**; Goose **1.45.0**;
+`nolte-shared` **v0.1.11** (installed at project scope, status disabled — see run 2). The model the
+nested sessions resolved to was not captured; the CLI's default at that version.
+
+**Environment finding, recorded once**: the plugin cache is a copy of the working tree labelled with
+the HEAD commit hash. `claude plugin update` reports "already at the latest version" while HEAD is
+unchanged, so uncommitted edits under `skills/` reach the installed plugin only after `uninstall`
+plus `install`. Runs 3–6 used a cache taken after the four `SKILL.md` files were complete; runs 7–8
+used a fresh install.
+
+### Run 1 — SC-004: normative voice in `recipe-audit`
+
+`grep -nE 'NEVER|MUST|USE EXACTLY|Never|must' skills/recipe-audit/SKILL.md` — three hits, lines
+112–114, all under "Hard rules" and all governing the skill's own behaviour (never edit the subject,
+never retry, never paraphrase the digest). Zero hits state a rule of the review. **Pass.**
+
+### Run 2 — scenario 3, fail-closed (FR-009, SC-006)
+
+Scratch directory, prompt `/nolte-goose:recipe-requirements-elicit`, tools `Read Glob Grep`,
+14 seconds. Output was the fail-closed message verbatim (names `nolte-shared:requirements-elicit`,
+`v0.1.11`, the marketplace) followed by a German explanation; no file written. **Pass**, with a
+caveat on the condition: `claude plugin disable nolte-shared` failed with "not found in any
+editable settings scope", so the absence was not produced by the command. It was real nonetheless:
+`claude plugin list` shows `nolte-shared@nolte-shared` at scope `project`, status disabled, and a
+tool-less probe session listed only the four `nolte-goose:` skills. Why the interactive authoring
+session sees `nolte-shared` skills while a nested session does not was not investigated.
+
+### Runs 3–5 — `recipe-plan` (FR-004, FR-018, FR-019, FR-020, SC-005)
+
+| Run | Input | Tools | Time | Outcome |
+|---|---|---|---|---|
+| 3 | `project/recipes/baseline-drift-check/requirements.md`, hand-written, `confirmed` | `Read Write Glob Grep Bash(ls:*)` | 3:00 | `plan.md` written, `State: ready`, 8 elements, all ten criteria of `2026-08-02` listed once, coverage total both ways. **Two author notes** flagged defects in the requirement artifact: result vocabulary (`unchanged`/`changed`/`unknown`) does not match `SOURCE-FORMAT.md` (`unchanged`/`drifted`/`unreachable`); `R-007` does not cover a `builtin` extension, so the artifact's expectation of a judgment-call finding was wrong |
+| 4 | scenario 9 step 1: copy with `State: draft` and one open point | same | — | Stopped, listed the open point, wrote no `plan.md`. **Pass** (FR-004) |
+| 5 | scenario 9 step 3: copy whose `baselines_dir` became `sources_file`, optional, imports a file, with a default | same | — | `plan.md` written with `State: blocked`; conflicts table names R-2 against `R-004` together with `R-003`, offers the two resolutions, narrows nothing. **Pass** (FR-020) |
+
+Run 3's two notes were handled as the data model's state machine prescribes: the requirement
+artifacts were revised (vocabulary; `R-007` row) and `recipe-plan` re-run (1:32). The second plan is
+`ready`, 8 elements, `R-007` `by construction` with the reason, `GAP-EXT-SEMANTICS` the only `risk`.
+This is the first friction found by dogfooding here, and it was a defect in the hand-written input,
+not in the skill.
+
+### Runs 6–7 — `recipe-implement` (FR-021, FR-022, FR-023, FR-024)
+
+| Run | Input | Tools | Time | Outcome |
+|---|---|---|---|---|
+| 6 | the `ready` plan | `Read Write Glob Grep Bash(goose:*) Bash(ls:*) Bash(mkdir:*)` | 1:23 | `recipes/baseline-drift-check/recipe.yaml` written: provenance block with slug, `2026-08-02`, `0.1.0`, `1.0.0`; a `# P-<n> ← R-<m>` comment on every element; `goose run --recipe … --explain` accepted it (re-checked from the authoring session: no `Error:` line). The skill reported the eight-row traceability table. **Pass** |
+| 7 | scenario 9 step 4: copy of the plan with P-6 changed to `type: plugin` | same | — | Recipe written, parser rejected it; the skill quoted the parser's line verbatim (`Error: extensions[0].type: unknown variant 'plugin', expected one of …`, backticks in the original), left the file for inspection, did not edit the plan, and returned the decision to the author. **Pass** (FR-022) |
+
+Run 6 noted that its first Bash attempt was refused and the parser call then permitted; the check
+ran. Not investigated further; the `Bash(goose:*)` pattern was in the allowed list.
+
+### Run 8 — frontmatter validator (research R8)
+
+`scripts/validate_skills.py` from claude-shared tag `v0.1.11`, run from a mirrored layout
+(`<scratch>/scripts/validate_skills.py` with `<scratch>/skills` → this repository's `skills/`),
+because the script resolves targets against its own parent's parent. 4 artifacts; **0 Critical**,
+4 Warning, 1 Suggestion — detailed on the "Validator" line of `skills/README.md`. FR-008: none of
+the four names appears in any `skills/` listing of that tag.
+
+### Run 9 — why audits through the binding stop at Stage 0 (2026-10-13)
+
+Claude Code CLI **2.1.296** (the binding's own comment records 2.1.221). `bindings/claude-code/run.sh`,
+`--permission-mode dontAsk`, tool list as shipped before this entry's changes. Five audit runs over two
+one-file recipe subjects: three on `garden-context-check.yaml`, two on `crop-selection.yaml`. Two produced a
+report. Three ended with exit code `0` and **no report**: the nested review read `process.md`,
+`constraints.md`, `report-template.md` and the subject, had a Bash call refused, and stopped.
+
+**What the session logs show.** Claude Code keeps a session file for each nested run. Four were read: three
+that stopped and one that completed. Each contains exactly one refused Bash call, and in all four that call
+is a combined command that writes the manifest to a file with `tee /tmp/…`, next to commands that are
+permitted. After the refusal, three sessions concluded that Bash was unavailable and stopped, although one of
+them had a Bash call succeed earlier in the same session; one repeated the parts without `tee` and completed.
+What the sessions did after the refusal is the difference between a report and none.
+
+**Replay**, one nested session per row, with the binding's tool list and `--add-dir` options, one run each:
+
+| Command | Result |
+|---|---|
+| the manifest pipeline, `find … -print0 \| xargs -r -0 sha256sum \| sort \| sha256sum`, under `Bash(xargs -r -0 sha256sum:*)` | runs; hash equal to the `-exec` form (`bedd6220…b7066` on the subject tried) |
+| the same with `\| tee <file> \|` before the last hash | **refused**; the file is not created |
+| the same after a leading `cd <dir> &&` | runs |
+| `cat <file> \| head -5`, `wc -c <files>`, `ls <dir> \| sort \| tail -1` (with and without a `tail` rule) | run |
+| `ls … \| sort \| tail -1; <manifest>` as one combined call, no `tee` | runs |
+| `find . -type f -exec sha256sum {} \; \| sort`, the form `process.md` specified until 1.0.1 | refused. **Not** the command refused in the logged sessions |
+| `find … -print0 \| xargs -0 sha256sum` with no `xargs` rule | refused |
+| `echo <path> \| xargs touch` under `Bash(xargs:*)` | creates the file |
+| `echo <path> \| xargs touch` under `Bash(xargs -r -0 sha256sum:*)` | refused, file not created |
+
+The last two rows are why the binding names the whole `xargs` command and not `xargs`. An empty subject,
+measured locally: the `-exec` form prints 0 lines, `xargs -0` without `-r` prints 1 (the hash of empty input,
+which would defeat Stage 0's "empty manifest, abort" check), `xargs -r` prints 0.
+
+**Correction.** An earlier version of this entry, and of the `VERSION.md` row for 1.0.1, said the `-exec`
+form stopped the audits. The `-exec` form is refused, as above, but the logged stops were caused by `tee`.
+The change to the manifest command is kept, since the hash is identical and one refused form is gone, but it
+is not what made the third run complete.
+
+**Also found.**
+
+- The CLI exits `0` when the review stops early and writes no report; only the missing file shows it. The
+  binding now exits `3` in that case (a new, non-empty report file is required) and passes any other
+  non-zero status through. Checked with a stub `claude` over four cases: nothing written (3), report written
+  (0), an old report left in place and nothing new written (3), the CLI failing with 5 (5).
+- `R-001`, `R-003` and `R-005` are delegated to `goose run --recipe <file> --explain`. The binding's tool
+  list has no `goose`, so they came back `undecided` in both reports that completed and cannot be decided
+  under this binding. Whether a parse-only `--explain` may be allowed sits against `C-3`, which forbids
+  executing the subject; that is a process decision and is not made here.
+- The two completed reports classify the vacuous cases differently: for one subject `R-004` is `undecided`
+  and `R-006` to `R-009` are `not applicable`, for the other all five are `pass (vacuous)`. The subjects
+  differ, and the same subject has not been reviewed twice, so this is a difference to watch, not yet a
+  measured instability of the digest.
+
+**Changed**: `process.md` Stage 0 says the manifest is kept in the run's notes and not written to a file, and
+that a refusal of a combined call says nothing about its parts (process 1.0.1); the binding checks for the
+report. `render-bindings.sh --check` passes.
+
+**Not established**: why a session stops after the refusal in one case and repeats the parts in another (four
+sessions); whether the new Stage 0 wording stops the `tee` improvisation, which only repeated runs can show;
+each replay row is a single run.
+
+### Run 10 — the same subject reviewed repeatedly (2026-10-13)
+
+The digest is meant to be the byte-stable core of a report, so the test is whether the same bytes give the
+same digest. Two one-file subjects, `recipes/crop-selection.yaml` and `recipes/garden-context-check.yaml`,
+each reviewed repeatedly through `bindings/claude-code/run.sh`, five sessions in parallel at a time, Claude
+Code CLI 2.1.296. Compared as a hash of the `DIGEST v1` block.
+
+| Process and binding | Subject | Runs | Reports | Distinct digests |
+|---|---|---|---|---|
+| 1.0.1 | crop-selection | 5 | 5 | **5** |
+| 1.1.0 | crop-selection | 10 | 10 | 1 |
+| 1.1.0 | garden-context-check | 5 | 4 | 2 (3 and 1 among the four reports; one run wrote no report) |
+| 1.1.0 plus "How to work" | crop-selection | 12 | 12 | 1 |
+| 1.1.0 plus "How to work" | garden-context-check | 10 | 10 | 1 |
+
+(The 12 include two runs started by a loop error in the measuring script; their digests equal the other ten.)
+
+**Why the five runs under 1.0.1 differed**, from the reports and the session logs. Three causes, each shown
+by reproducing the effect:
+
+- The manifest of a single-file subject was undefined. Three runs hashed `./crop-selection.yaml` and two
+  `crop-selection.yaml`: the same bytes gave `32c20cc7…` and `ce1aa4b2…`, and both values are reproduced by
+  the two command forms.
+- Criteria that the baseline delegates to the host (`goose run --recipe <file> --explain`) were handled three
+  ways: runs that tried `goose` were refused and reported `undecided`; runs that did not try it decided the
+  same criteria by reading the file and reported nothing. The host call was not in the binding's tool list.
+- The severity of an `undecided` criterion finding was not defined: `blocking` in one run, `advisory` in two.
+
+**Under 1.1.0**, before the working-method rule, 13 of 15 runs agreed per subject. The two that did not:
+one run's first Bash call, a combined `ls -R` over two directories, was refused and it stopped (no report;
+the binding reported exit 3, as designed); one run probed `which goose; goose --version`, was refused, and
+never tried the permitted `goose run … --explain`, so it reported the delegated criteria `undecided`.
+
+**Changes**, in `process.md` (version 1.1.0, not yet released): a single-file manifest is taken from the
+parent directory as `./<name>`; a delegated criterion is decided by the host and never by reading, and is
+`undecided` only when the invocation itself fails; an `undecided` criterion finding is `advisory`; a
+criterion with no in-scope part is a `pass` that says so; the host is invoked exactly as stated and without a
+preceding check; files are looked at with the file tools and the shell is for the manifest and the host
+invocation only; a refusal of any other command is no reason to stop. The binding allows
+`Bash(goose run --recipe * --explain)`, checked with `goose` itself: the invocation runs, a call without
+`--explain` is refused, a chained call is refused. It also exits 3 when no new report was written.
+
+**Refusals did not go away.** Across the 20 sessions of the last two rows, 11 had one or more refused calls
+(11 calls in all), mostly a manifest pipeline ending in `tee /dev/stderr`, plus a few exploratory commands.
+In all 20 sessions the host invocation ran and succeeded, and all 20 wrote a report. The stability comes from
+the session recovering after a refusal, not from there being none, and the `tee` improvisation is still
+there.
+
+**Not established**: stability beyond these samples (10 to 12 runs per subject, one host, one day, one
+model, five sessions in parallel); the path where the host rejects a recipe and the review has to use
+derived probes, which Run 11 covers for one defective subject; whether a refusal can still lead a
+session to stop (it did once in 15 runs before the working-method rule, and not in 22 after it).
+
+### Run 11 — the path where the host rejects the recipe (2026-10-13)
+
+Run 10 covered subjects the host accepts. This is the other path: a decision procedure that delegates to the
+host, a rejection, and the derived probes of Stage 2 that reach the criteria behind the first defect.
+
+**Subject**: a copy of `crop-selection.yaml` with three defects, kept outside the repository: `title` removed,
+the `default` of `hardiness_zone` removed, and one unused parameter added. **Ground truth**, measured with
+`goose run --recipe <file> --explain` after each correction in turn: `missing field 'title'` (R-001), then
+`Optional parameters missing default values in the recipe: hardiness_zone` (R-003), then `Unnecessary
+parameter definitions: unused_param` (R-005); accepted once all three are corrected. A correct review reports
+three deviations, each `blocking`.
+
+| Process text | Runs | Reports | Distinct digests | Correct (3 deviations) |
+|---|---|---|---|---|
+| 1.1.0 | 10 | 10 | 3 (8, 1, 1) | 8; two left `R-005` `undecided`, one of them `R-004` as well |
+| 1.1.0 plus "Making a probe" | 10 | 10 | 1 | 10 |
+
+The digest of the correct runs is the same in both series. `R-001` and `R-003` were found, at the right
+locations, in all 20 runs.
+
+**Why two runs failed in the first series.** Both could not continue the probe chain: `cp` is not in the
+binding's tool list and the `Edit` tool was refused, so the second neutralization was never made. In that
+series every probe the ten sessions wrote was a reduced reconstruction of the recipe, 4 to 27 percent of its
+size, not a copy, and two sessions found probe files from other runs in a shared directory. The host's verdict
+on a shortened probe says little about the subject; it happened to be right for the three defects here.
+
+**What the second series did.** After the process text said how to make a probe, all ten sessions made three
+probes by writing a complete file with the file tool: the subject plus a `title` line; that plus
+`default: ""`; that minus the six lines of the unused parameter. Compared with the defective subject, every
+one of the 30 probes differs by exactly those lines and nothing else. No session used `cp`. One session called `Edit` once, was refused, and wrote the file instead.
+Seven calls were refused in all (six Bash, that one `Edit`), none of them needed for the outcome. The other
+27 error results are the host's own rejections of the probes, nine for each of the three defects.
+
+**Not established**: the difference between 8 of 10 and 10 of 10 is not statistically distinguishable at
+these sizes (two-sided Fisher exact test, p of about 0.47); the support for the rule is the mechanism, the
+refused `cp` and `Edit` and the shortened probes, together with the exact probes of the second series, and
+not the rate. One defective subject with three defects, all decided by the host; defects decided by reading
+(`R-002`, `R-007`, `R-010`) and the `judgment call` path were not tried. One host, one day, one model, five
+sessions in parallel.
+
+### Not run, and why
+
+| Scenario | Skill | Blocked by |
+|---|---|---|
+| 1 — audit through the skill vs. the binding (T012–T014) | `recipe-audit` | Feature 004 US1: `bindings/claude-code/run.sh` is committed with this feature and `render-bindings.sh --check` confirms it matches its sources, but it has no recorded run; the pre-merge reviews also found that its `Bash(find:*)` allow rule cannot admit the Stage 0 manifest command (`find … -exec sha256sum`), so a run through it will fail until 004 phase 3 reworks the tool list |
+| 2 — real elicitation (T021) | `recipe-requirements-elicit` | claude-shared #665: the delegation target cannot run in a consumer |
+| 5 — first audit of the lifecycle recipe (T029) | `recipe-audit` | Transitively, feature 004 US1 |
+| 8 — second reader draws the boundary (T034) | all | Needs a reader who did not author the skills; cannot be self-certified |
+
+### Release condition (T037)
+
+| Skill | Recorded real run | Status |
+|---|---|---|
+| `recipe-audit` | none | **blocked** (feature 004 US1) |
+| `recipe-requirements-elicit` | run 2 (fail-closed path only) | **blocked** for the elicitation path (claude-shared #665) |
+| `recipe-plan` | runs 3–5 plus the re-run | recorded |
+| `recipe-implement` | runs 6–7 | recorded |
+| full lifecycle | phases 2–3 recorded; phase 1 hand-written; phase 4 not run | **incomplete** |
+
+**Not released.** `skills/VERSION.md` stays at 0.1.0. Two of four skills have a recorded real run;
+the lifecycle run lacks its audit. Both blocks are outside this feature and named above.

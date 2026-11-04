@@ -25,3 +25,7 @@ Thumbs.db
 !.vale/config/vocabularies/
 .vale/config/vocabularies/*
 !.vale/config/vocabularies/project/
+
+# Resume state of resumable skills (spec/claude/resumable-work in nolte/claude-shared):
+# machine-local checkpoints, never shared project state.
+/.resume/

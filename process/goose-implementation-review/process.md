@@ -10,6 +10,15 @@ only its author can judge is underspecified.
 Stages run in order. A stage that fails its precondition aborts the run; no partial report is ever
 written, because a partial report understates coverage without saying so.
 
+**How to work.** Look at files and directories with the file tools: read, list, search. Use the shell for
+exactly two things: the manifest of Stage 0 and Stage 4, and the host invocation of Stage 2. Do not use it to
+explore, to check what is installed, or to print versions. A host may permit only the commands this process
+needs, and it may refuse anything else without saying which part of a call it refused. A refusal of a
+command outside those two uses says nothing about those two. It is not a reason to stop, and it is not a
+reason to conclude that the manifest or the host is unavailable. Two runs that met such a refusal drew the
+wrong conclusion from it, one by stopping and one by never trying the host, and their reports differed from
+the runs that did not.
+
 ---
 
 ## Stage 0 — Preflight
@@ -28,11 +37,31 @@ identical input, which has been observed:
 
 ```sh
 # from within subject_path
-find . -type f -exec sha256sum {} \; | sort
+find . -type f -print0 | xargs -r -0 sha256sum | sort
 ```
+
+This prints exactly the lines `find . -type f -exec sha256sum {} \; | sort` prints, including none for an
+empty subject — the `-r` is what keeps `xargs` from running `sha256sum` on empty input and printing the
+hash of nothing. The two forms give the same hash. This one is specified because some hosts do not permit
+`-exec` (measured on one, `RESULTS.md`, "Feature 005 — Run 9").
+
+**Where the manifest is kept.** Keep the manifest and its hash in your working notes: the command's output
+is already in front of you. Do not write it to a file. Stage 4 runs the same command again and compares
+its output with what you noted.
+
+**One command per call.** A host may refuse a call that combines several commands when any one of them is
+not permitted, and may say only that the call was refused, not which part. A refusal of a combined call
+says nothing about its parts. Before concluding that a command is unavailable, repeat each part as its own
+call. Stop on a refusal only when the single command itself is refused.
 
 That is: one line per regular file, `<sha256><two spaces><path relative to subject_path>`, sorted by
 byte value. The manifest hash reported in the digest is the SHA-256 of that output.
+
+**When `subject_path` is a file**, there is no tree to walk. Run the same command from the file's parent
+directory on that one file: `find ./<name> -type f -print0 | xargs -r -0 sha256sum | sort`. The single line is
+`<sha256><two spaces>./<name>`, and the `./` belongs to it, as it does to every line of a directory manifest.
+Leaving it off gives a different hash for the same bytes, which has been observed: the same file reviewed
+five times produced two subject hashes, `./<name>` in three runs and `<name>` in two.
 
 **Output**: The subject manifest and its hash; the resolved baseline revision id and Goose version.
 
@@ -65,15 +94,10 @@ manifest. A file that appears in none of them is an unreported gap in coverage.
 found. Do not produce a clean report — "nothing to review" and "nothing wrong" are different claims,
 and conflating them is the failure this stage exists to prevent.
 
-**When the subject exceeds the coverage budget**: `max_bytes_per_pass` declares a byte budget for one
-pass. `0` means unlimited and is the normal operating mode.
-
-With a non-zero budget: take in-scope files in ascending path order until the budget is spent. Every
-file not taken goes in `not_examined` with the reason `coverage limit`. A single file larger than the
-whole budget is **never partially reviewed** — half a YAML document cannot be judged — and goes in
-`not_examined` with the reason `exceeds per-pass budget`.
-
-A partial review is acceptable; a partial review that reads as complete is not.
+**When the subject exceeds the coverage budget**: `C-8` in `constraints.md` states the rule — the
+order files are taken in, the reason recorded against each file not taken, and the prohibition on
+reviewing an oversized file in part. It is deliberately not restated here; half a YAML document
+cannot be judged, and half a rule cannot be relied on.
 
 **Why the budget is a declared input rather than a property of the reviewing agent.** Coverage
 limits were originally expected to arise naturally when a subject outgrew a context window. In
@@ -110,6 +134,21 @@ evaluation has produced either a finding or a recorded pass.
 recorded result was skipped, which would let an unevaluated criterion appear as a pass in the
 `Criteria Applied` table.
 
+**Delegated criteria.** A criterion whose decision procedure delegates to the host is decided by the host's
+answer to that invocation, and by nothing else. Make the invocation exactly as the criterion states it,
+`goose run --recipe <subject_path> --explain`, as the first thing you do for it: do not check beforehand that
+`goose` exists or which version it is, because a check can be refused while the invocation is permitted.
+Only the refusal or failure of the invocation itself makes the criterion `undecided`. Reading the material is not that procedure and never yields
+a pass for such a criterion. If the host accepts the recipe, every criterion delegated to it holds. If the
+host rejects it, the rejection names the first defect (see Derived probes). If the host cannot be invoked or
+its answer cannot be obtained, the outcome is `undecided` (Stage 3, 2.), naming the invocation that was
+refused or failed. Two runs over the same bytes must not differ in this: one that tried the host and was
+refused, and one that skipped it and read the file, produced different digests, which has been observed.
+
+**A criterion with no in-scope part.** When its `applies_to` matches nothing in the subject, record `pass` in
+`Criteria Applied` and say in the rationale that there is no in-scope part. The report's result values stay
+`pass`, `finding` and `undecided`; "not applicable" and "vacuous" are not results.
+
 **Wording constraint**: A finding's phrasing is bounded by its criterion's `evidence_class`. An
 `authoritative` criterion may state that something is wrong; a `second-hand` one may only state that
 something departs from common practice. Findings never exceed what their source supports.
@@ -117,6 +156,16 @@ something departs from common practice. Findings never exceed what their source 
 **Derived probes**: where a criterion delegates to the host, the host stops at the first defect, so a
 single invocation decides at most one criterion. To reach the rest, copy the subject to a scratch
 location, neutralize the defect already found, and re-check. Repeat until the parser accepts.
+
+**Making a probe.** Read the subject in full and write a new file with the file tool: every byte of the
+subject, except the one defect being neutralized. Make each further neutralization the same way, as a new
+complete file written from the previous probe. Do not copy with the shell, edit a file in place, or rebuild the
+subject from memory in a shortened form: a host may permit none of the first two, and a shortened probe is
+not the subject, so what the host says about it is not what it says about the subject. Put the probes outside
+the subject tree and name them after the output file, so that reviews running at the same time do not share
+a probe. A refusal of one way of making a probe is no reason to stop; make it the other way. Two runs
+stopped the chain at the second probe because an in-place edit was refused, and left the criteria behind it
+`undecided`, while eight made the same probe by writing the whole file and decided them.
 
 Three rules govern this:
 
@@ -141,7 +190,10 @@ Three rules govern this:
    that triggered it, severity `advisory`, sourced to the gap entry. If it does not hold, record it
    in the coverage statement as not applicable and emit nothing.
 2. **Criteria that could not be decided.** A criterion whose decision procedure could not be applied
-   emits an `undecided` finding identified by its criterion id, stating what was missing.
+   emits an `undecided` finding identified by its criterion id, severity `advisory` whatever severity the
+   criterion declares, stating what was missing. An `undecided` finding is not evidence of a deviation, and a
+   finding never exceeds what its source supports; the same subject was reported `blocking` in one run and
+   `advisory` in two others.
 
 **A gap finding names a gap id, never a criterion id.** Gaps have no criterion — substituting the
 nearest one is guesswork, and two runs will guess differently. That was observed: one run labelled a
@@ -265,12 +317,17 @@ not occur.
 discarded**, even if the findings are correct. This process is pointed at repositories it does not
 own; a review that modifies its subject has done something worse than being wrong.
 
-**Why this stage carries the whole read-only promise**: the host's Developer extension — enabled by
-default — exposes `shell`, `write` and `edit`, and can "run system commands with your user
-privileges and edit any accessible file". Nothing technically prevents a write to the subject. This
-stage is detection after the fact, not prevention. It is the only mechanism that can catch a
-violation, which is why a checksum mismatch is a hard failure rather than a warning, and why the
-report is discarded rather than annotated.
+**Why this stage carries the whole read-only promise**: an execution host able to read a subject can
+generally also write to it. Where its file tools are enabled by default and run with the operator's
+own privileges, nothing technically prevents a write, and `C-2` is then a promise the host does not
+enforce. This stage is detection after the fact, not prevention. It is the only mechanism that can
+catch a violation, which is why a checksum mismatch is a hard failure rather than a warning, and why
+the report is discarded rather than annotated.
+
+What exactly a given host exposes, and whether it can be constrained, is a property of that host. It
+is recorded in that host's binding, not here — a statement like "the file tools are on by default"
+is true of some hosts and false of others, and stating it here would make this file quietly wrong
+under half of them.
 
 ---
 
@@ -304,8 +361,8 @@ merely warned about.
 
 ## Stage 6 — Delta against a prior report
 
-**Precondition**: `compare_to` is non-empty and names a readable report. When empty, skip this stage
-entirely and emit no delta fields.
+**Precondition**: `compare_to` is non-empty and names a readable report. `C-9` in `constraints.md`
+governs what happens when it is empty, and is not restated here.
 
 **Action**: Compare **digests**, not prose. The digest exists so this comparison is mechanical.
 
@@ -325,9 +382,9 @@ entirely and emit no delta fields.
 | both differ | Report each finding's cause as `undetermined` and say why |
 | both identical | Neither changed. Any delta is a **reproducibility failure**, not a delta |
 
-The last row matters. Identical baseline and identical subject must yield identical findings
-(`FR-005`). If a delta appears there, do not report it as a change — report it as a contradiction
-and say the run is not reproducible.
+The last row matters. Identical baseline and identical subject must yield identical findings — the
+reproducibility invariant stated at the end of this file. If a delta appears there, do not report it
+as a change — report it as a contradiction and say the run is not reproducible.
 
 **A finding that vanished because the baseline changed is not a fix.** Crediting a baseline change to
 the subject would attribute work nobody did. This is why both hashes live in the digest header.
@@ -343,22 +400,31 @@ count, and `unchanged + new` equals this run's. A finding in neither tally was d
 
 ## Invariants across all stages
 
-- The subject is never written to.
-- The subject is never executed. Findings come from reading the material.
-- No stage consults upstream documentation live; criteria come from the pinned baseline revision.
-- Identical subject content plus identical baseline revision yields identical findings.
-- Nothing in this process refers to the repository it happens to live in.
+Three of these are constraints. They live in `constraints.md` and are referenced, not repeated —
+a rule that appears in two files is a rule that can end up saying two things:
 
-## Stages not yet implemented
+- The subject is never written to — `C-2`.
+- The subject is never executed; findings come from reading the material — `C-3`.
+- Criteria come from the pinned baseline revision and no other, and no stage fetches upstream
+  documentation during a review — `C-1`, with the drift check's scope stated in Stage 3b.
 
-Declared here so their absence is visible rather than discovered later:
+Two are properties of the process rather than rules a run must obey, and belong here:
 
-| Stage | Covers | Status |
-|---|---|---|
-| Baseline pinning and drift check | `FR-010` — reporting an available newer revision as its own finding | Planned, US2 |
-| Version-mismatch handling | Subject built against a Goose version outside the baseline range | Planned, US2 |
-| Offline behaviour | Upstream unreachable: proceed against the pinned baseline and say so, or refuse | Planned, US2 |
-| Delta comparison | `FR-012` — classifying findings as new, resolved, unchanged, with cause | Planned, US4 |
+- Identical subject content plus identical baseline revision yields identical findings. The digest
+  exists to make that checkable.
+- Nothing in this process refers to the repository it happens to live in, or to the execution host
+  that runs it. Host-specific facts belong to a binding.
 
-Until these exist, a report produced by this process states its baseline revision but makes no claim
-that the revision is current.
+## Implementation status
+
+Every stage described above is implemented and released.
+
+An earlier revision of this file ended with a "Stages not yet implemented" table listing baseline
+pinning, version-mismatch handling, offline behaviour and delta comparison as planned. All four are
+implemented — the first three by Stage 3b, the fourth by Stage 6 — and `VERSION.md` records them as
+shipped in `1.0.0`. Its closing sentence, that a report "makes no claim that the revision is
+current", contradicted Stage 3b's drift check outright. Both are removed rather than carried into a
+new revision: re-publishing a known-false statement is worse than never having written it.
+
+A report produced by this process states its baseline revision **and**, where a newer revision was
+present on disk at run time, says so as a finding.

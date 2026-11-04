@@ -3,6 +3,7 @@
 **Subject**: <location> (<revision, if any>)
 **Process version**: <semver from VERSION.md>
 **Baseline**: <revision_id> for Goose <goose_version>
+**Host**: <host identifier from the binding that ran>
 **Run date**: <YYYY-MM-DD>
 **Compared to**: <prior report, or "none">
 
@@ -18,8 +19,16 @@ baseline=<revision_id> process=<semver> subject=<sha256 of subject manifest>
   finding, sorted by severity (blocking first), then criterion id, then location.
   No prose, no extra spacing. With no findings, emit the two header lines only.
 
-  Everything below is explanatory and may be worded freely. FR-005 asks for
-  identical findings, not identical sentences.
+  Everything below is explanatory and may be worded freely. What must hold is
+  identical findings over identical inputs, not identical sentences.
+
+  The Host field is deliberately NOT in the digest. It belongs to the header.
+  Putting it in the digest would make any comparison of two reports from
+  different hosts report a reproducibility failure by construction, which is
+  exactly the comparison the field exists to make possible.
+
+  The digest's process= field DOES move when the process version moves. That is
+  what a MAJOR bump means here, and golden files are re-pinned when it happens.
 -->
 
 ## Coverage
@@ -60,10 +69,10 @@ baseline=<revision_id> process=<semver> subject=<sha256 of subject manifest>
 ---
 
 <!--
-  Rules this template enforces, from contracts/review-report.md:
+  Rules this template enforces:
 
   1. Every finding carries Criterion, Location and Source. Missing any one makes the report
-     invalid and it must not be published.
+     invalid and it must not be published. This is C-5 in constraints.md.
   2. Coverage is mandatory even when complete. "Not examined: none" is a claim; silence is not.
   3. Criteria Applied is mandatory even when no findings resulted.
   4. Undecided outcomes appear as findings, never as omissions, and never count as passes.

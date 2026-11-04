@@ -1,0 +1,7 @@
+{
+  "name": "nolte-goose",
+  "description": "Goose recipe lifecycle: requirements, plan, implementation and audit against a pinned, source-backed baseline. Requires Goose 1.45.0 and the nolte-shared plugin.",
+  "author": { "name": "nolte", "url": "https://github.com/nolte" },
+  "repository": "https://github.com/nolte/claude-goose",
+  "homepage": "https://github.com/nolte/claude-goose"
+}
