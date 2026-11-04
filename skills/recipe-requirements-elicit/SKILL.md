@@ -52,11 +52,13 @@ invocation in step 2 is refused because the name is unknown — stop and reply e
 
 ```text
 recipe-requirements-elicit needs nolte-shared:requirements-elicit, which is not installed.
-Install the nolte-shared plugin at v0.1.11 or later from the nolte/claude-shared marketplace.
+Install the nolte-shared plugin from the nolte/claude-shared marketplace, at a release newer than v0.1.11.
 Nothing was written.
 ```
 
-Do not conduct an interview of your own in its place, do not try an un-namespaced name, and do not
+The same reply applies when the delegated skill is installed but stops at its own precondition
+because its methodology spec is missing — that is what v0.1.11 does in a repository other than
+claude-shared. Do not conduct an interview of your own in its place, do not try an un-namespaced name, and do not
 write any file. The generic method is that skill's, and a copy of it here is the duplicate this
 plugin exists to avoid.
 
@@ -75,20 +77,24 @@ plugin exists to avoid.
    for this skill's artifact. Do not ask any generic question through this skill's own text.
 3. **Ask the recipe question set** in `references/recipe-question-set.md`: inputs, host
    capabilities, execution mode, output shape, prohibited behaviour. One question or one tightly
-   coupled group per turn. What the author cannot answer becomes an open point.
+   coupled group per turn. Before each question, check `project/requirements/<slug>.md`: what the
+   delegated interview already captured — acceptance criteria, constraints, scope boundaries — is
+   carried over and confirmed, not asked again. What the author cannot answer becomes an open point.
 4. **Run the baseline check** as that file describes: read the pinned revision's `ruleset.md` and
    `coverage.md` at run time and record, per captured requirement, the criterion or gap it meets and
    the consequence. Present each row to the author before writing — this is where a requirement
    that would fail the audit by construction is changed or knowingly kept.
 5. **Teach back the recipe profile** — inputs, capabilities, mode, output, prohibitions — in the
-   author's terms. On explicit confirmation the state is `confirmed`; otherwise `draft`.
+   author's terms. On explicit confirmation the state is `confirmed` and the `Teach-back` header
+   records the date; otherwise the state is `draft` and the header reads `none`.
 6. **Write** `project/recipes/<slug>/requirements.md` from `templates/recipe-requirements.template.md`,
    naming the generic artifact by path, with both version fields and the concrete baseline id.
    Confirm the path back to the user and say which state it is in.
 
 ### 2. `validate` — check an existing artifact
 
-Run against a given `project/recipes/<slug>/requirements.md`, hand-written or produced here:
+Named `validate`, not `audit`, to match the same operation of the delegated
+`nolte-shared:requirements-elicit`. Run against a given `project/recipes/<slug>/requirements.md`, hand-written or produced here:
 
 - [ ] The generic artifact named in the header exists
 - [ ] `baseline_revision` is a concrete id and exists under `${CLAUDE_PLUGIN_ROOT}/baselines/goose/`
@@ -100,16 +106,32 @@ Run against a given `project/recipes/<slug>/requirements.md`, hand-written or pr
 - [ ] Every input that imports a file and is optional appears in the Baseline check with the
       criterion that forbids a default on it
 - [ ] Open points are listed, or "none"
-- [ ] `State` is `confirmed` only if no open point remains and a teach-back is recorded
+- [ ] `State` is `confirmed` only if no open point remains and the `Teach-back` header carries a
+      date
 
 Report pass or fail per item. Never fix content: a missing value is the author's to supply.
 
 ## Resuming a run
 
-State is persisted to `.resume/recipe-requirements-elicit/<run-id>.yml` after the delegated
-interview completes and after each recipe dimension is confirmed, per `spec/claude/resumable-work/`
-in `nolte/claude-shared`. On re-invocation, scan that directory for `status: in_progress` runs whose
+State is persisted to `.resume/recipe-requirements-elicit/<run-id>.yml` after every successful
+approval gate — the delegated interview completing, each recipe dimension confirmed (step 3), each
+baseline-check row decided (step 4), the teach-back confirmed (step 5) — and after each named phase
+boundary, per `spec/claude/resumable-work/` in `nolte/claude-shared`. On re-invocation, scan that directory for `status: in_progress` runs whose
 inputs match and offer `resume / start-new / discard`.
+
+## Gotchas
+
+- **Check the listing; do not probe.** Invoking `nolte-shared:requirements-elicit` to see whether
+  it exists starts the interview. The available-skills listing answers the question without side
+  effects.
+- **Installed is not runnable.** At v0.1.11 the delegated skill requires its methodology spec in
+  the current repository and stops without it. Treat that stop exactly like a missing plugin.
+- **A file input imports content.** In Goose, `input_type: file` reads the file and substitutes its
+  contents; it is not a path. An author who says "the recipe takes a path" usually means a `string`
+  parameter — ask, and record the answer in the "Imports a file" column.
+- **`${CLAUDE_PLUGIN_ROOT}` points at the plugin, not at the repository being worked in.** The
+  baselines and version files are read from the plugin; the artifacts are written into the working
+  repository.
 
 ## Hard rules
 

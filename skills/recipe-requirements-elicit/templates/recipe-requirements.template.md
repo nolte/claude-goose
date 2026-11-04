@@ -6,6 +6,7 @@
 **Review process version**: {{review_process_version}}
 **Generic artifact**: project/requirements/{{slug}}.md
 **State**: {{draft | confirmed}}
+**Teach-back**: {{YYYY-MM-DD, confirmed by the author | none}}
 **Date**: {{YYYY-MM-DD}}
 
 <!--

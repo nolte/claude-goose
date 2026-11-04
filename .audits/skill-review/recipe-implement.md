@@ -19,7 +19,7 @@ specs-applied:
     revision: "4ceb6872"
 repo-revision: "7c72960fdf48ef7add4af277c4d3d7772f8ffbd7"
 created: "2026-11-04"
-status: open
+status: in-progress
 ---
 
 # Skill Review: recipe-implement
@@ -57,22 +57,22 @@ Next concrete action: Autor ergänzt im Body von `SKILL.md` die Zitierung der Fe
 
 ### Warning
 
-- [ ] [skill-management.load-trigger] Die einzige Referenzdatei wird ohne Inhalt- und Wann-Klausel geladen („Read `references/traceability-comments.md`.“); die Spec verlangt, dass jede Referenz benennt, was die Datei enthält und wann sie zu laden ist.
+- [x] [skill-management.load-trigger] Die einzige Referenzdatei wird ohne Inhalt- und Wann-Klausel geladen („Read `references/traceability-comments.md`.“); die Spec verlangt, dass jede Referenz benennt, was die Datei enthält und wann sie zu laden ist.
       Where: `skills/recipe-implement/SKILL.md:59` (Procedure Schritt 1); Rückverweis „as the reference describes“ in Zeile 66.
       Fix: Satz umformulieren zu z. B. „Read `references/traceability-comments.md` before writing, for the provenance-block format and the element-comment rules.“
       Verify: Zeile enthält den Pfad plus eine `when`/`for`-Klausel, die Provenance-Block und Element-Kommentare nennt.
 
-- [ ] [skill-management.gotchas] Kein `## Gotchas`-Abschnitt, obwohl der Skill gegen eine nicht offensichtliche Umgebung arbeitet (Goose-Parser): die nötigen Fakten stehen verstreut in Procedure Schritt 3 (Parser stoppt am ersten Defekt, Fehlererkennung über `Error:`-Präfix), und mehrere fehlen ganz — Precondition 1 prüft nur `PATH`, nicht die in `skills/README.md` §Distribution contract fixierte Version 1.45.0, gegen die das Parser-Urteil verifiziert ist; offen bleibt, ob `Error:` auf stderr landet und ob der Exit-Code ausgewertet wird; Run 6 in `RESULTS.md` hielt fest, dass der erste Bash-Aufruf trotz `Bash(goose:*)` abgelehnt wurde.
+- [x] [skill-management.gotchas] Kein `## Gotchas`-Abschnitt, obwohl der Skill gegen eine nicht offensichtliche Umgebung arbeitet (Goose-Parser): die nötigen Fakten stehen verstreut in Procedure Schritt 3 (Parser stoppt am ersten Defekt, Fehlererkennung über `Error:`-Präfix), und mehrere fehlen ganz — Precondition 1 prüft nur `PATH`, nicht die in `skills/README.md` §Distribution contract fixierte Version 1.45.0, gegen die das Parser-Urteil verifiziert ist; offen bleibt, ob `Error:` auf stderr landet und ob der Exit-Code ausgewertet wird; Run 6 in `RESULTS.md` hielt fest, dass der erste Bash-Aufruf trotz `Bash(goose:*)` abgelehnt wurde.
       Where: `skills/recipe-implement/SKILL.md:52-55`, `:75-78`; Beleg `tests/goose-implementation-review/RESULTS.md` Run 6.
       Fix: `## Gotchas` ergänzen mit: Versionsbindung 1.45.0 (`goose --version` prüfen, Abweichung melden), stdout und stderr zusammen auf `Error:` prüfen, Parser meldet nur den ersten Defekt, Hinweis auf die einmal abgelehnte Bash-Freigabe.
       Verify: Abschnitt `## Gotchas` existiert und nennt mindestens Versionsbindung und Stream-/Exit-Code-Behandlung.
 
-- [ ] [skill-management.specificity-fragility] Der Fall „Recipe existiert schon am Zielpfad“ ist nicht geregelt, obwohl `use_when` ausdrücklich das Neugenerieren nach Plan-Änderung nennt: Schritt 2 schreibt einfach, ohne Bestätigung und ohne Aussage zu Hand-Edits, und die Hard rule „Never move or rewrite a traceability comment“ steht unaufgelöst neben einer Regeneration, die jeden Kommentar neu schreibt. Für eine destruktive Operation ist die Spec-Regel „be prescriptive for fragile or sequential operations“ verfehlt.
+- [x] [skill-management.specificity-fragility] Der Fall „Recipe existiert schon am Zielpfad“ ist nicht geregelt, obwohl `use_when` ausdrücklich das Neugenerieren nach Plan-Änderung nennt: Schritt 2 schreibt einfach, ohne Bestätigung und ohne Aussage zu Hand-Edits, und die Hard rule „Never move or rewrite a traceability comment“ steht unaufgelöst neben einer Regeneration, die jeden Kommentar neu schreibt. Für eine destruktive Operation ist die Spec-Regel „be prescriptive for fragile or sequential operations“ verfehlt.
       Where: `skills/recipe-implement/SKILL.md:9` (`use_when`), `:60-68` (Procedure Schritt 2), `:96` (Hard rule).
       Fix: In Preconditions oder Schritt 2 festlegen: existiert die Datei, Diff zum Plan zeigen und vor dem Überschreiben bestätigen lassen; die Hard rule präzisieren auf „außer bei Regeneration aus einem geänderten Plan“.
       Verify: Body nennt den Existiert-schon-Fall mit genau einem Default-Verhalten; Hard rule und `use_when` widersprechen sich nicht mehr.
 
-- [ ] [skill-agent-catalog.cross-plugin-prose-conditional] Die `description` verweist unbedingt auf `nolte-engineering:fullstack-developer`, obwohl `nolte-engineering` keine deklarierte Voraussetzung des Plugins ist (`skills/README.md` §Prerequisites nennt nur `nolte-shared`); die Spec verlangt für Prosa-Verweise auf andere Plugins eine bedingte Formulierung, weil ein Consumer das Plugin evtl. nicht installiert hat. (Der Verweis auf `nolte-shared:pull-request-create` ist dagegen gedeckt, da `nolte-shared` Voraussetzung ist.)
+- [x] [skill-agent-catalog.cross-plugin-prose-conditional] Die `description` verweist unbedingt auf `nolte-engineering:fullstack-developer`, obwohl `nolte-engineering` keine deklarierte Voraussetzung des Plugins ist (`skills/README.md` §Prerequisites nennt nur `nolte-shared`); die Spec verlangt für Prosa-Verweise auf andere Plugins eine bedingte Formulierung, weil ein Consumer das Plugin evtl. nicht installiert hat. (Der Verweis auf `nolte-shared:pull-request-create` ist dagegen gedeckt, da `nolte-shared` Voraussetzung ist.)
       Where: `skills/recipe-implement/SKILL.md:3` (`description`, letzter Satz).
       Fix: zu „(`nolte-engineering:fullstack-developer`, if installed)“ umformulieren oder den Verweis auf „for code that is not a Goose recipe“ kürzen.
       Verify: `description` enthält keinen unbedingten Verweis auf ein nicht als Voraussetzung deklariertes Plugin.
@@ -111,7 +111,7 @@ Next concrete action: Autor ergänzt im Body von `SKILL.md` die Zitierung der Fe
       Fix: n/a (observation) — Spec-Erweiterung für repo-übergreifende Alternativen.
       Verify: n/a.
 
-- [ ] [skill-management.self-contained] Precondition 3 verlangt `${CLAUDE_PLUGIN_ROOT}/skills/VERSION.md` — eine Plugin-weite Datei außerhalb des Skill-Ordners —, aber kein Procedure-Schritt liest sie; `lifecycle_version` wird aus dem Plan-Header übernommen. Die Spec kennt nur skill-lokale Assets und keine Plugin-weit geteilten Dateien. Naheliegend wäre, entweder die Plan-`lifecycle_version` gegen `VERSION.md` zu prüfen (Plan unter älterer Lifecycle-Version erkannt) oder die Precondition zu streichen.
+- [x] [skill-management.self-contained] Precondition 3 verlangt `${CLAUDE_PLUGIN_ROOT}/skills/VERSION.md` — eine Plugin-weite Datei außerhalb des Skill-Ordners —, aber kein Procedure-Schritt liest sie; `lifecycle_version` wird aus dem Plan-Header übernommen. Die Spec kennt nur skill-lokale Assets und keine Plugin-weit geteilten Dateien. Naheliegend wäre, entweder die Plan-`lifecycle_version` gegen `VERSION.md` zu prüfen (Plan unter älterer Lifecycle-Version erkannt) oder die Precondition zu streichen.
       Where: `skills/recipe-implement/SKILL.md:55`.
       Fix: n/a (observation).
       Verify: n/a.
@@ -126,7 +126,7 @@ Next concrete action: Autor ergänzt im Body von `SKILL.md` die Zitierung der Fe
       Fix: n/a (observation).
       Verify: n/a.
 
-- [ ] [skill-vs-agent.duplicate-prevention] Kein Duplikat. Im Repo bilden `recipe-plan` → `recipe-implement` → `recipe-audit` eine Kette mit gegenseitigen `dont_use_when`/`see_also`. In claude-shared (alle Plugin-Roots) sind `nolte-engineering:fullstack-developer` (Code gegen erkannten Stack, nicht Goose) und `implementation-plan-author` (plant, schreibt nicht) benachbart und abgegrenzt; cross-plugin liegt ohnehin außerhalb des Duplikat-Checks. Nebenbefund, nicht dieser Skill: die `implementation-plan-author`-Description bei 6b255f00 akzeptiert jetzt „a confirmed requirements-elicit artifact with no issue“ — die `recipe-plan`-Zeile im Delimitation Record und der Upstream-Eintrag #666 in `skills/README.md` sind damit möglicherweise überholt; gehört in den Review von `recipe-plan`.
+- [x] [skill-vs-agent.duplicate-prevention] Kein Duplikat. Im Repo bilden `recipe-plan` → `recipe-implement` → `recipe-audit` eine Kette mit gegenseitigen `dont_use_when`/`see_also`. In claude-shared (alle Plugin-Roots) sind `nolte-engineering:fullstack-developer` (Code gegen erkannten Stack, nicht Goose) und `implementation-plan-author` (plant, schreibt nicht) benachbart und abgegrenzt; cross-plugin liegt ohnehin außerhalb des Duplikat-Checks. Nebenbefund, nicht dieser Skill: die `implementation-plan-author`-Description bei 6b255f00 akzeptiert jetzt „a confirmed requirements-elicit artifact with no issue“ — die `recipe-plan`-Zeile im Delimitation Record und der Upstream-Eintrag #666 in `skills/README.md` sind damit möglicherweise überholt; gehört in den Review von `recipe-plan`.
       Where: `skills/README.md` §Delimitation record, §Upstream dependencies.
       Fix: n/a (observation).
       Verify: n/a.
@@ -134,3 +134,10 @@ Next concrete action: Autor ergänzt im Body von `SKILL.md` die Zitierung der Fe
 ## Processing log
 
 <!-- Append one line per item closure: YYYY-MM-DD — <item-shorthand> — <action taken> — verified: <method> -->
+
+- 2026-11-05 — W load-trigger — Referenz mit Wann- und Wozu-Klausel — verified: Schritt 1 gelesen
+- 2026-11-05 — W gotchas — ## Gotchas: stderr+Exit 1 (gemessen Goose 1.45.0), erster Defekt, einmalige Ablehnung; Precondition 1 prüft goose --version — verified: grep ^## Gotchas trifft; Messung goose run --explain auf defektem Recipe: stderr `Error: missing field`, exit 1
+- 2026-11-05 — W existing recipe — Precondition 5: Diff zeigen und vor Überschreiben fragen; Hard rule nimmt Regeneration aus — verified: Precondition 5 und Hard rule gelesen
+- 2026-11-05 — W cross-plugin — Verweis „if installed“ — verified: description gelesen
+- 2026-11-05 — I VERSION.md precondition — Precondition 3 definiert den Abgleich — verified: SKILL.md Precondition 3 gelesen
+- 2026-11-05 — I README side note — skills/README.md Delimitation- und Upstream-Zeilen aktualisiert — verified: skills/README.md gelesen
