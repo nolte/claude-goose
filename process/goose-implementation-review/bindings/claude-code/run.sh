@@ -76,13 +76,22 @@ BASELINES_DIR="$TREE_ROOT/baselines"
 # Placeholder resolution. The contract writes its inputs as double-brace
 # placeholders; this host has no templating of its own, so the binding
 # substitutes them before the prompt reaches the model. A placeholder that
-# survived would carry the words of a constraint without its content.
+# survived would carry the words of a constraint without its content. The values
+# go in through the environment, not `awk -v`: `-v` expands backslash escapes, so
+# a path containing `\n` or `\t` would reach the model altered.
 resolve() {
-  awk -v subject_path="$subject_path" \
-    -v baseline_revision="$baseline_revision" \
-    -v output_path="$output_path" \
-    -v compare_to="$compare_to" \
-    -v max_bytes_per_pass="$max_bytes_per_pass" '
+  RB_SUBJECT_PATH="$subject_path" \
+    RB_BASELINE_REVISION="$baseline_revision" \
+    RB_OUTPUT_PATH="$output_path" \
+    RB_COMPARE_TO="$compare_to" \
+    RB_MAX_BYTES_PER_PASS="$max_bytes_per_pass" awk '
+    BEGIN {
+      subject_path = ENVIRON["RB_SUBJECT_PATH"]
+      baseline_revision = ENVIRON["RB_BASELINE_REVISION"]
+      output_path = ENVIRON["RB_OUTPUT_PATH"]
+      compare_to = ENVIRON["RB_COMPARE_TO"]
+      max_bytes_per_pass = ENVIRON["RB_MAX_BYTES_PER_PASS"]
+    }
     {
       line = $0
       while (match(line, /\{\{[ \t]*[A-Za-z_][A-Za-z0-9_]*[ \t]*\}\}/)) {

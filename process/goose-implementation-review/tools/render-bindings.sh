@@ -45,7 +45,7 @@ case "${1:-}" in
 "") ;;
 --check) CHECK=1 ;;
 -h | --help)
-  sed -n '3,25p' -- "$0" | sed 's/^# \{0,1\}//'
+  sed -n '3,21p' -- "$0" | sed 's/^# \{0,1\}//'
   exit 0
   ;;
 -*) die "unknown option: $1" ;;

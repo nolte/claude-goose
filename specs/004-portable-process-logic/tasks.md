@@ -256,7 +256,8 @@ bumps the version.
   this if the subject is not under cwd)
 - **`resolve()` uses `awk -v`**, which processes backslash escapes, and maps an unknown placeholder
   to the empty string instead of failing. A path with a backslash is mangled; a typo in a
-  placeholder name yields a vacuous constraint
+  placeholder name yields a vacuous constraint. *The escape half is fixed (2026-11-04): values now
+  reach `awk` through `ENVIRON`. The unknown-placeholder half is open*
 - **`render-bindings.sh` ignores `status=`**, so a constraint marked `superseded` is still spliced
   into every binding. Implement the status filter before the first constraint is retired
 - **The `HOST-SPECIFIC` prompt-tail region restates report rules** in lowercase and passes the
@@ -267,3 +268,23 @@ bumps the version.
 - **`report-template.md` now requires the `Host` header** while the Goose recipe, the golden
   files and `VERSION.md` have not followed (`T024`–`T032`). Until then the shipped process is
   internally inconsistent; the tasks that reconcile it are the open ones above
+
+## Follow-ups from the second pre-merge review of PR #8 (2026-11-04)
+
+Found after process 1.1.0 landed on the branch. Fixed in that PR: the `awk -v` escape handling, the
+`--help` range of `render-bindings.sh`, and two prompt gaps in `recipes/baseline-drift-check/`. Refuted
+by measurement: a missing `cd` rule (`RESULTS.md`, "Feature 005 — Run 9", a leading `cd <dir> &&`
+runs under the binding's tool list). Open, for phases 3 to 5:
+
+- **The Goose recipe does not carry the 1.1.0 constraint texts verbatim.** C-8 and C-9 appear only in
+  `prompt`, and C-2 still reads "verify after Stage 3". `render-bindings.sh` does not render this file,
+  so `--check` cannot see the drift. `T024` and `T025` close it by making the recipe a rendered binding
+- **The 1.0.1 and 1.1.0 rows of `VERSION.md` are classified MINOR/PATCH** although each changes the
+  report (the `Host` header is now mandatory, an undecided finding is now `advisory`, which moves digest
+  lines) and the golden files still read `process=0.2.0`. `report-template.md` calls a move of the
+  `process=` field a MAJOR bump. Published versions are not rewritten. `T031` must state in its 2.0.0
+  history entry that these report changes were the break, and `T032` brings the golden files up to date
+- **`run.sh` puts the constraint heredocs inside `$( … )`**, and their text contains unbalanced
+  apostrophes. Unverified: bash 3.2 in POSIX mode (macOS `/bin/sh`) may parse that construct wrongly and
+  abort before `claude` starts. Check on that shell, or have the template assemble the prompt from
+  heredocs outside a command substitution

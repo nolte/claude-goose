@@ -49,7 +49,8 @@ instructions: |
      heading take `source_path`, `source_commit` (the commit token only, without the date in
      parentheses) and the evidence class.
 
-  3. For each record with a `source_path`, run exactly this command and nothing else:
+  3. For each record with a `source_path`, look up the current commit with exactly this command
+     and no other mechanism:
 
        gh api "repos/{{ repo }}/commits?path=<source_path>&per_page=1" --jq '.[0].sha'
 
@@ -61,9 +62,11 @@ instructions: |
          the next record.
      Never retry with any other mechanism.
 
-  4. A record without `source_path`: result `unreachable`, reason `no source_path`. Its rule column
-     is `A` when its evidence class is A/direct, `B` when it is observed, matching the Rule column
-     of the existing verification.md rows.
+  4. A record without `source_path`: result `unreachable`, reason `no source_path`.
+
+     The rule column of every record, with or without `source_path`, is `A` when its evidence
+     class is A/direct and `B` when it is observed, matching the Rule column of the existing
+     verification.md rows.
 
   5. Print one row per record in the column order of verification.md:
 
@@ -96,9 +99,13 @@ prompt: |
     gh api "repos/{{ repo }}/commits?path=<source_path>&per_page=1" --jq '.[0].sha'
 
   and compare the recorded source_commit as a prefix of the observed SHA. Equal is `unchanged`,
-  different is `drifted`. If the command fails or returns no SHA, the result is `unreachable` with
-  the reason, and you continue with the next record. A record without source_path is `unreachable`
-  with reason `no source_path`.
+  different is `drifted`. If the command fails, prints nothing, prints `null` or prints no SHA, the
+  result is `unreachable` with the first line of the error (or "empty response") as the reason, and
+  you continue with the next record. Never retry with any other mechanism. A record without
+  source_path is `unreachable` with reason `no source_path`.
+
+  The <rule> column of every record is `A` when its evidence class is A/direct and `B` when it is
+  observed.
 
   Print one row per record, in this exact shape:
 
