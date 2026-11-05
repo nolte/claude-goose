@@ -116,5 +116,9 @@ Install the <plugin> plugin at <minimum release> or later from <marketplace>.
 Nothing was written.
 ```
 
+`recipe-requirements-elicit` has a second form, for a delegation target that is installed but stops
+at its own precondition because its methodology spec is missing; it is stated verbatim in that
+skill. Both forms write nothing and do nothing else.
+
 The minimum release is the one this feature was verified against and is recorded in
 `skills/README.md`; it moves only with a recorded re-verification.

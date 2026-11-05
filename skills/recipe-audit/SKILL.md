@@ -110,12 +110,16 @@ those files, not this one.
   session; one measured review took 197 seconds, and the shell tool stops a command after 120
   seconds unless told otherwise. A run cut off that way is not a failed review, and the no-retry
   rule below would turn it into one. Start it with a timeout of 600000 ms, or in the background.
-- **Read the binding's stderr, not only its exit code.** The binding's own refusals print a line
-  beginning `run.sh:` on stderr and exit `2` before any review starts. A missing option value is
-  reported by the shell (`--<name> needs a value`), and its exit code depends on which shell runs
-  `sh`. `3` means the review session ended normally but wrote no new report — a review that stopped
-  early leaves an explanation on stdout and exits `0`, so the binding checks the report file
-  itself. Every other non-zero code, a `2` included, is passed through from the host CLI.
+- **Exit code `2` alone does not say who failed.** The binding's own refusals exit `2` before any
+  review starts, but the host CLI's codes are passed through unchanged and can be `2` as well.
+  Decide by stderr: a refusal of the binding's names `run.sh` — as a `run.sh:` line, or, for a
+  missing option value, as the shell's own `<path>/run.sh: … needs a value`, which exits `2` under
+  dash and `1` under bash. A failed `cd` into the plugin tree prints only the shell's `cd` error and
+  exits `2`. `3` means the review session ended normally but wrote no new report — a review that
+  stopped early leaves an explanation on stdout and exits `0`, so the binding checks the report
+  file itself.
+- **An optional input is omitted, not passed empty.** The binding refuses an empty option value,
+  so `--compare_to ""` fails as a missing value. To get an input's default, leave the option out.
 - **`${CLAUDE_PLUGIN_ROOT}` points at the plugin, not at the repository being worked in.**
   `subject_path` and `output_path` are resolved against the current working directory; the process
   tree and the baselines are reached through the plugin root.

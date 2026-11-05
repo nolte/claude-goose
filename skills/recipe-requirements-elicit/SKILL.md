@@ -52,7 +52,8 @@ invocation in step 2 is refused because the name is unknown — stop and reply e
 
 ```text
 recipe-requirements-elicit needs nolte-shared:requirements-elicit, which is not installed.
-Install the nolte-shared plugin from the nolte/claude-shared marketplace, at a release newer than v0.1.11.
+Install the nolte-shared plugin from the nolte/claude-shared marketplace, at the minimum release
+named in this plugin's skills/README.md.
 Nothing was written.
 ```
 
@@ -63,7 +64,8 @@ reply exactly:
 ```text
 recipe-requirements-elicit needs nolte-shared:requirements-elicit, which is installed but stopped
 at its own precondition: its methodology spec is not available in this repository.
-No released version of nolte-shared ships that spec to other repositories yet (newest: v0.1.11).
+Use a nolte-shared release that ships that spec to other repositories; this plugin's
+skills/README.md names the minimum.
 Nothing was written.
 ```
 
@@ -115,9 +117,11 @@ Named `validate`, not `audit`, to match the same operation of the delegated
 - [ ] Every input that imports a file and is optional appears in the Baseline check with the
       criterion that forbids a default on it
 - [ ] Open points are listed, or "none"
-- [ ] `State` is `confirmed` only if no open point remains and, for an artifact whose
-      `Lifecycle version` is 0.2.0 or later, the `Teach-back` header carries a date. An artifact
-      written under 0.1.0 predates that header and is checked without it
+- [ ] From `Lifecycle version` 0.2.0 on, the `Teach-back` header is present, as a date or `none`.
+      An artifact written under 0.1.0 predates that header and is checked without it; one whose
+      lifecycle version cannot be read is checked as 0.2.0 or later
+- [ ] `State` is `confirmed` only if no open point remains and, from 0.2.0 on, the `Teach-back`
+      header carries a date
 
 Report pass or fail per item. Never fix content: a missing value is the author's to supply.
 
@@ -135,7 +139,8 @@ inputs match and offer `resume / start-new / discard`.
   it exists starts the interview. The available-skills listing answers the question without side
   effects.
 - **Installed is not runnable.** At v0.1.11 the delegated skill requires its methodology spec in
-  the current repository and stops without it. Treat that stop exactly like a missing plugin.
+  the current repository and stops without it. That stop ends this skill too, with the second reply in the precondition —
+not the "not installed" one.
 - **A file input imports content.** In Goose, `input_type: file` reads the file and substitutes its
   contents; it is not a path. An author who says "the recipe takes a path" usually means a `string`
   parameter — ask, and record the answer in the "Imports a file" column.
