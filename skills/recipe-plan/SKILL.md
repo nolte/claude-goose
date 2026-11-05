@@ -1,6 +1,6 @@
 ---
 name: recipe-plan
-description: "Plans a Goose recipe from a confirmed recipe requirement artifact: maps every requirement to a recipe element, marks every applicable baseline criterion satisfied by construction or a risk, and returns requirements that cannot be built as named conflicts. Owns the plan format because no shared capability accepts a requirement artifact without a GitHub issue; use `nolte-engineering:implementation-plan-author` for issue-driven plans. Invoke when a confirmed project/recipes/<slug>/requirements.md exists and the user wants the recipe planned, or asks which recipe fields, parameters and extensions a requirement needs; also German. Don't use to capture requirements (recipe-requirements-elicit) or to write the recipe (recipe-implement)."
+description: "Plans a Goose recipe from a confirmed recipe requirement artifact: maps every requirement to a recipe element, marks every applicable baseline criterion satisfied by construction or a risk, and returns requirements that cannot be built as named conflicts. Use `nolte-engineering:implementation-plan-author` for issue-driven plans. Invoke when a confirmed project/recipes/<slug>/requirements.md exists and the user wants the recipe planned, or asks which recipe fields, parameters and extensions a requirement needs; also German. Don't use to capture requirements (recipe-requirements-elicit) or to write the recipe (recipe-implement)."
 tags: [planning, goose]
 phase: plan
 summary: "Turns a confirmed recipe requirement artifact into a recipe plan: elements, coverage both ways, every baseline criterion decided, conflicts returned."
@@ -37,12 +37,13 @@ cannot be built within the documented rules.
 
 ## Why this skill owns its format
 
-The duplicate check against every skill and agent in `nolte/claude-shared` (v0.1.11) found no
-capability that accepts a requirement artifact without a GitHub issue: `implementation-plan-author`
-requires an issue or an audit report, `feature-decompose` a roadmap item. The plan's work-package
-shape (id, statement, what it serves, dependencies) is borrowed from `implementation-plan-author`'s
-output contract so a later delegation is a drop-in. The upstream proposal is recorded in this
-plugin's `README.md`.
+In the released `nolte/claude-shared` (v0.1.11) no capability accepts a requirement artifact
+without a GitHub issue: `implementation-plan-author` requires an issue or an audit report,
+`feature-decompose` a roadmap item. The change that lets `implementation-plan-author` take one has
+landed upstream but is in no release yet; until it is, this skill keeps the format. The plan's
+work-package shape (id, statement, what it serves, dependencies) is borrowed from
+`implementation-plan-author`'s output contract so the later delegation is a drop-in. The upstream
+record is in `${CLAUDE_PLUGIN_ROOT}/skills/README.md` §Upstream dependencies.
 
 ## User-language policy
 
@@ -54,8 +55,9 @@ Respond in the user's language. The plan is written in English with ids verbatim
    open points; do not plan around them.
 2. Its `baseline_revision` names a directory under `${CLAUDE_PLUGIN_ROOT}/baselines/goose/`. If
    not, stop and name the missing revision; never substitute another.
-3. `${CLAUDE_PLUGIN_ROOT}/skills/VERSION.md` is readable, so the plan can carry the lifecycle
-   version it was written under.
+3. `${CLAUDE_PLUGIN_ROOT}/skills/VERSION.md` is readable. The plan carries the input's
+   `lifecycle_version` unchanged; when the installed version differs, say so in the report so the
+   author knows the plan was written by a newer or older skill than the requirements.
 
 ## Procedure
 
@@ -92,6 +94,20 @@ Respond in the user's language. The plan is written in English with ids verbatim
 | `baseline_revision` not present under the plugin's baselines | Stop; name it; write nothing |
 | Coverage incomplete in either direction | Stop; name the unmapped ids; write nothing |
 | A conflict exists | Write the plan with `State: blocked`; list the conflicts; do not narrow the requirement |
+
+## Gotchas
+
+- **A constraint stated only in `instructions` may be ignored.** Measured on Goose 1.45.0: two
+  separate parameters were disregarded when they appeared only in `instructions`, verbatim and
+  correctly rendered, and honoured as soon as `prompt` named them. No baseline criterion encodes
+  this, so step 4 does not catch it. Plan every requirement that constrains a run into `prompt`,
+  with `instructions` as the longer statement of the same rule.
+- **`input_type: file` imports the file's content; it is not a path.** A requirement for a path the
+  recipe reads under is a `string` parameter. A `file` parameter may carry no default, because a
+  default would inline whatever it points at — this is the conflict example in step 5.
+- **`${CLAUDE_PLUGIN_ROOT}` points at the plugin, not at the repository being worked in.** The
+  baselines are read from the plugin; the requirement artifact and the plan live in the working
+  repository.
 
 ## Hard rules
 

@@ -10,8 +10,9 @@
 
 <!--
 Produced via the nolte-goose `recipe-plan` skill from
-project/recipes/{{slug}}/requirements.md. Every header value except the recipe
-path and the date is carried from that artifact unchanged.
+project/recipes/{{slug}}/requirements.md. Slug, title, baseline revision,
+lifecycle version and review process version are carried from that artifact
+unchanged. The recipe path, the state and the date are decided by this skill.
 -->
 
 ## Elements

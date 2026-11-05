@@ -355,6 +355,21 @@ on the "Validator" line of `skills/README.md` (feature 005, research R8).
 **Revisit when**: `nolte/claude-shared` publishes a pre-commit hook for the validator. The request is
 tracked as an upstream issue linked from `skills/README.md`.
 
+### Spec citation in the skills
+
+**Omitted on purpose.** claude-shared's skill review requires every skill to cite a `spec/...` path
+it implements. The four skills under `skills/` cite none: the specification they implement is feature
+`005` under `specs/005-recipe-lifecycle-skills/`, and the portability guard forbids any reference
+from `skills/` into `specs/`, because a consumer that copies the reusable trees does not have them.
+The `spec/claude/` trees the check expects belong to claude-shared and do not resolve in a consumer
+either. Citing a path that cannot be read would satisfy the check and help no one. The skill-review
+plans under `.audits/skill-review/` keep the finding open rather than downgrade it, which only a
+spec change may do.
+
+**Revisit when**: claude-shared's `skill-review` and `spec-driven-development` specs define a spec
+anchor for plugins that ship from another repository with a Spec Kit layout. Requested upstream
+in https://github.com/nolte/claude-shared/issues/696.
+
 ## Portability: measured in a second repository (2026-08-01)
 
 `SC-014` asks that the artifacts work in another repository after changing only declared inputs.

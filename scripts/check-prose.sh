@@ -26,6 +26,8 @@ if [ ! -d ".vale/config/vocabularies/technical" ]; then
   exit 1
 fi
 # .specify/ and .claude/ are vendored and hashed by the specify CLI; linting
-# them would report defects nobody may fix (FR-033).
-mapfile -t files < <(git ls-files '*.md' | grep -vE '^(\.specify|\.claude)/')
+# them would report defects nobody may fix (FR-033). .audits/ holds review
+# plans whose findings are written in the operator's language, which the English
+# dictionary cannot check; their structure is still linted by markdownlint.
+mapfile -t files < <(git ls-files '*.md' | grep -vE '^(\.specify|\.claude|\.audits)/')
 vale --config=.vale.ini "${files[@]}"

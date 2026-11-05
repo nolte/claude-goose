@@ -1,6 +1,6 @@
 ---
 name: recipe-implement
-description: "Writes a Goose recipe and its declared extension configuration from a ready recipe plan, one element per plan entry, each traced back by comment, and validates it with Goose's own parser before reporting done. Does not open a pull request; use `nolte-shared:pull-request-create` for that. Invoke when a project/recipes/<slug>/plan.md in state ready exists and the user wants the recipe written, or asks to implement, generate or produce the recipe from its plan; also German. Don't use to plan the recipe (recipe-plan), to audit it (recipe-audit), or for code that is not a Goose recipe (nolte-engineering:fullstack-developer)."
+description: "Writes a Goose recipe and its declared extension configuration from a ready recipe plan, one element per plan entry, each traced back by comment, and validates it with Goose's own parser before reporting done. Does not open a pull request; use `nolte-shared:pull-request-create` for that. Invoke when a project/recipes/<slug>/plan.md in state ready exists and the user wants the recipe written, or asks to implement, generate or produce the recipe from its plan; also German. Don't use to plan the recipe (recipe-plan), to audit it (recipe-audit), or for code that is not a Goose recipe (`nolte-engineering:fullstack-developer`, if installed)."
 tags: [implementation, goose]
 phase: build
 summary: "Writes the recipe a ready plan describes, traces every element to its plan entry, and validates it with goose run --explain."
@@ -39,7 +39,7 @@ comment naming its plan entry, checked by Goose's own parser before it is report
 
 Validation, to the host: `goose run --recipe <file> --explain` is Goose's real parser and costs no
 model call. Nothing else. No shared capability authors a Goose recipe; the duplicate check is
-recorded in this plugin's `README.md`. Committing and opening a pull request are
+recorded in `${CLAUDE_PLUGIN_ROOT}/skills/README.md` §Delimitation record. Committing and opening a pull request are
 `nolte-shared:pull-request-create`'s and outside this phase.
 
 ## User-language policy
@@ -50,40 +50,75 @@ written in the language the plan's decided values use.
 ## Preconditions
 
 1. `goose` is on `PATH`. If not, stop: the parser check is not optional, and a skipped check is not
-   a pass.
+   a pass. Run `goose --version`; when it is not 1.45.0, say so in the report, since the parser's
+   verdict is verified against that version only.
 2. The plan exists and its `State` is `ready`. If it is `blocked`, stop and list the conflicts.
-3. `${CLAUDE_PLUGIN_ROOT}/skills/VERSION.md` is readable.
+3. `${CLAUDE_PLUGIN_ROOT}/skills/VERSION.md` is readable. The recipe carries the plan's
+   `lifecycle_version` unchanged; when the installed version differs, say so in the report.
+4. The plan is chosen unambiguously: the slug the user named, or the only
+   `project/recipes/*/plan.md` there is. With several plans and no slug — whatever their states —
+   list each with its state and ask; do not pick one. A `blocked` plan is never skipped silently,
+   since precondition 2 reports its conflicts only when it is the one chosen.
 
 ## Procedure
 
-1. **Read the plan** — header, Elements, Coverage, Criteria. Read `references/traceability-comments.md`.
-2. **Write the recipe** at the plan's target path:
+1. **Read the plan** — header, Elements, Coverage, Criteria. Before writing, read
+   `references/traceability-comments.md` for the provenance-block format and the rules for each
+   element's `# P-<n> ← R-<m>` comment.
+2. **Compose the recipe** from the plan, in full, before touching the target path:
    - the provenance block first, with `slug`, `baseline_revision`, `lifecycle_version` and
      `review_process_version` carried from the plan header unchanged;
    - one recipe element per `P-<n>` row, with its decided value or shape, and nothing the plan does
      not list;
    - a `# P-<n> ← R-<m>` comment on the line before each top-level element, each `parameters[]`
      entry and each `extensions[]` entry, as the reference describes.
-   Where the plan names extension configurations that live in their own files, write those beside
-   the recipe with the same provenance block.
-3. **Validate** with the host:
+   Where the plan names extension configurations that live in their own files, compose those too,
+   with the same provenance block.
+3. **Confirm, then write.** Before writing anything, collect every composed file whose path
+   already holds a file, keep that file's current content, and show all the diffs in one message
+   with one question: overwrite all of them, or none. Hand edits in those files are lost on
+   regeneration; that is the author's decision, not this skill's. On "none", write nothing and
+   stop. Otherwise write every composed file — new and overwritten alike — exactly as composed and
+   shown; do not compose it again.
+4. **Validate** with the host:
 
    ```sh
    goose run --recipe <target path> --explain
    ```
 
-   If any output line begins with `Error:`, reply with that output verbatim, leave the file in
-   place for inspection, and stop. Do not present the recipe as done, and do not edit the plan to
+   If the command exits non-zero or any line of its stdout or stderr begins with `Error:`, reply with
+   that output verbatim, together with the rejected content of every file step 3 wrote. Put the
+   disk back as it was, then stop: restore every file step 3 overwrote to the content it kept,
+   and remove every file step 3 created. A recipe that worked before is never replaced by a
+   rejected one, and a recipe and its extension configurations never end up from different runs.
+   The parser reads the recipe; whether it also checks extension configurations kept in their own
+   files is not established, so the report names those files as not validated by the parser.
+   Do not present the recipe as done, and do not edit the plan to
    make the recipe fit. The parser stops at the first defect; report what it said, not what you
    suspect it would say next.
-4. **Report**: the recipe path, the parser's acceptance, and a table of each recipe part with the
+5. **Report**: the recipe path, the parser's acceptance, and a table of each recipe part with the
    plan element and requirement it traces to. Say that the next phase is `recipe-audit` with the
    plan's `baseline_revision` and `output_path project/recipes/<slug>/review-report.md`.
 
 ## Output
 
-The recipe file(s) at the plan's target path, in state `validated` (parser accepted) or `rejected`
-(parser output reported verbatim). No other file is written.
+Either `validated`: the recipe file(s) at the plan's target path, the recipe accepted by the
+parser. Or `rejected`: the parser output and the rejected content in the reply, and the target
+paths as they were before the run. Or nothing, when the author declined the overwrite. No other
+file is written.
+
+## Gotchas
+
+- **The parser reports on stderr.** On Goose 1.45.0 a rejected recipe prints `Error: <reason>` on
+  stderr, nothing on stdout, and exits `1`. Read both streams and the exit code; stdout alone looks
+  like silence.
+- **The parser stops at the first defect.** A second defect surfaces only after the first is fixed
+  in the plan and the recipe regenerated.
+- **The first shell call may be refused once.** One recorded run had its first Bash attempt refused
+  although the `goose` pattern was permitted, and the parser call then ran. A single refusal is not
+  "Goose is missing"; repeat the parser call once as its own command before stopping.
+- **`${CLAUDE_PLUGIN_ROOT}` points at the plugin, not at the repository being worked in.** The plan
+  and the recipe live in the working repository.
 
 ## Hard rules
 
@@ -93,5 +128,7 @@ The recipe file(s) at the plan's target path, in state `validated` (parser accep
 - Never edit the plan or the requirement artifact from this skill.
 - Never report the recipe as done without the parser's acceptance, and never skip the parser
   because Goose is missing.
-- Never move or rewrite a traceability comment to make a later edit look planned.
+- Never move or rewrite a traceability comment to make a later edit look planned. Regenerating the
+  whole recipe from a changed plan, after the confirmation in procedure step 3, rewrites every
+  comment from the plan and is not such an edit.
 - Never commit, push or open a pull request; that is the operator's call and another skill's job.

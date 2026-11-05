@@ -80,7 +80,7 @@ from it.
 
 | Section | Content | Source |
 |---|---|---|
-| Header | `slug`, `baseline_revision` (a concrete id, never `latest`), `lifecycle_version`, `review_process_version`, date | Resolved once here (research `R9`, `R14`) |
+| Header | `slug`, `baseline_revision` (a concrete id, never `latest`), `lifecycle_version`, `review_process_version`, date; from lifecycle 0.2.0 also `Teach-back` (the confirmation date, or `none`) | Resolved once here (research `R9`, `R14`) |
 | Generic artifact | Path of `project/requirements/<slug>.md` | Written by `requirements-elicit` |
 | Recipe profile | Purpose; inputs (name, required or optional, carries a default, imports a file); host capabilities needed; execution mode (`interactive`, `headless`, `both`); output shape; prohibited behaviour | The recipe question set |
 | Baseline check | For each captured input or property: the criterion it would violate by construction, if any; every declared gap of the pinned revision that applies | `ruleset.md` and `coverage.md` of the pinned revision |
@@ -91,7 +91,9 @@ existing directory under `baselines/goose/`; every input has all four attributes
 section is present even when empty ("none" is a claim, silence is not).
 
 **State**: `draft` while open points exist and the author has not confirmed; `confirmed` once the
-author has confirmed the recipe profile in a teach-back. Only a `confirmed` artifact is a valid
+author has confirmed the recipe profile in a teach-back, which from lifecycle 0.2.0 the `Teach-back`
+header records by date (an artifact written under 0.1.0 has no such header and is not required to).
+Only a `confirmed` artifact is a valid
 input to `recipe-plan`; a `draft` one makes `recipe-plan` stop and name the open points.
 
 ### Recipe plan
@@ -125,8 +127,10 @@ the plan names.
 | Host validation | `goose run --recipe <file> --explain` accepts it before it is reported done (spec `FR-022`) |
 | Provenance | A leading comment block naming `slug`, `baseline_revision`, `lifecycle_version` and `review_process_version` (spec `FR-024`) |
 
-**State**: `rejected` (parser error, reported verbatim) or `validated`. Only `validated` is an input
-to `recipe-audit` within a lifecycle.
+**State**: `validated` (the parser accepted the files at the target path) or `rejected` (a run
+outcome: the parser error and the rejected content are reported verbatim, and the target paths are
+put back as they were before the run). Only `validated` is an input to `recipe-audit` within a
+lifecycle.
 
 ### Review report
 
@@ -162,8 +166,8 @@ binding, and none points from any of those trees back into a skill.
 requirements.md[draft] ──author confirms──► requirements.md[confirmed]
 requirements.md[confirmed] ──recipe-plan──► plan.md[ready] | plan.md[blocked]
 plan.md[blocked] ──author decides──► requirements.md[draft]   (a conflict reopens the requirement)
-plan.md[ready] ──recipe-implement──► recipe.yaml[validated] | recipe.yaml[rejected]
-recipe.yaml[rejected] ──fix──► recipe-implement again
+plan.md[ready] ──recipe-implement──► recipe.yaml[validated] | run[rejected]   (target paths unchanged)
+run[rejected] ──fix the plan──► recipe-implement again
 recipe.yaml[validated] ──recipe-audit──► review-report.md
 review-report.md with a deviation ──author decides──► plan.md or requirements.md, never recipe.yaml alone
 ```

@@ -20,7 +20,7 @@ What the recipe takes from its caller. Each becomes a candidate parameter.
 - Per path-shaped input: "Should the recipe read that file's contents, or only know where it is?"
   — this decides `Imports a file`, and it is the question most often answered wrong.
 - "Is there an input you would want pre-filled for convenience?" — probe: a pre-filled
-  file-importing input is the case `R-004` exists for.
+  file-importing input is the case the criterion forbidding defaults on file parameters exists for.
 
 ## 2. Host capabilities
 
@@ -29,7 +29,8 @@ What the recipe needs the host to be able to do.
 - "What does the recipe have to be able to *do* — read files, run commands, reach the network,
   call another recipe, ask the user something?"
 - Per capability: "Does that mean running code on the machine?" — record `Executes code: yes/no`.
-  Any `yes` is surfaced in the baseline check under `R-007` and `GAP-EXT-SEMANTICS`.
+  Any `yes` is surfaced in the baseline check under the criterion on code-executing extensions
+  and the gap on extension field semantics.
 - "Is there anything the recipe must be *unable* to do?" — feeds dimension 5.
 
 ## 3. Execution mode
@@ -37,15 +38,16 @@ What the recipe needs the host to be able to do.
 - "Will someone be at the keyboard while it runs, or does it run on its own — in a pipeline, on a
   schedule, from another tool?"
 - If "on its own" or "both": record `headless`. This is a requirement, not a detail, because it
-  decides whether the recipe needs a `prompt` (`R-010`). If the author does not know, record the
-  mode as an open point and say the audit will report `R-010` as undecided.
+  decides whether the recipe needs a `prompt` (the criterion on headless use). If the author does
+  not know, record the mode as an open point and say the audit will report that criterion as
+  undecided.
 
 ## 4. Output shape
 
 - "When it finishes, what should exist that did not before? A file, a message, a structured
   answer, a change somewhere?"
 - "Does anything downstream read that output by machine?" — a `yes` means a structured response,
-  which the baseline lists under `GAP-RECIPE-FIELDS`.
+  which the baseline lists under the gap on unchecked recipe fields.
 - "What should it hand back when it cannot finish?"
 
 ## 5. Prohibited behaviour
@@ -65,16 +67,29 @@ ${CLAUDE_PLUGIN_ROOT}/baselines/goose/<baseline_revision>/coverage.md
 ```
 
 For each captured requirement, find the criterion or gap whose `applies_to` and expectation match
-it, and record one row in the artifact's Baseline check table. The mapping below is what the
-`2026-08-02` revision yields; confirm each id exists in the pinned `ruleset.md` before writing it:
+it, and record one row in the artifact's Baseline check table. Take every id from the pinned
+`ruleset.md` and `coverage.md`, never from this file:
 
 | Captured | Look for | Consequence to record |
 |---|---|---|
-| An optional input with `Imports a file: yes` | The criterion forbidding defaults on file parameters (`R-004` in 2026-08-02) | violates by construction |
-| An optional input with no default | The criterion requiring defaults on optional parameters (`R-003`) | violates by construction |
-| Execution mode `headless` or unknown | The criterion requiring `prompt` for headless use (`R-010`) | by construction if a prompt is planned; otherwise cannot be decided until the mode is known |
-| Any host capability | The criterion surfacing code-executing extensions (`R-007`) and the gap on extension field semantics (`GAP-EXT-SEMANTICS`) | reported as judgment call / cannot be decided by the audit |
-| A structured output, a retry need, a sub-recipe, or settings | The gap on those recipe fields (`GAP-RECIPE-FIELDS`) | cannot be decided by the audit |
+| An optional input with `Imports a file: yes` | The criterion forbidding defaults on file parameters | violates by construction |
+| An optional input with no default | The criterion requiring defaults on optional parameters | violates by construction |
+| Execution mode `headless` or unknown | The criterion requiring `prompt` for headless use | by construction if a prompt is planned; otherwise cannot be decided until the mode is known |
+| Any host capability | The criterion surfacing code-executing extensions, and the gap on extension field semantics | reported as judgment call / cannot be decided by the audit |
+| A structured output, a retry need, a sub-recipe, or settings | The gap on those recipe fields | cannot be decided by the audit |
+
+### Known mapping — revision 2026-08-02
+
+For orientation only. A later revision may renumber or add criteria; the pinned files decide.
+
+| Look for | Id in 2026-08-02 |
+|---|---|
+| No default on file parameters | `R-004` |
+| Defaults on optional parameters | `R-003` |
+| `prompt` for headless use | `R-010` |
+| Code-executing extensions surfaced | `R-007` |
+| Extension field semantics | `GAP-EXT-SEMANTICS` |
+| Unchecked recipe fields | `GAP-RECIPE-FIELDS` |
 
 When no row applies, the table reads "none". The section is never omitted: "none" is a claim,
 silence is not.

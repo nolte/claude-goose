@@ -64,7 +64,7 @@ format because no shared capability accepts a requirement artifact without a Git
 | Delegates to | The host's parser for validation: `goose run --recipe <file> --explain`. Nothing authors the recipe on its behalf |
 | Adds | The recipe and its extension configuration at the plan's target path, traceability comments, the provenance block, the parser check |
 | Output | The recipe file(s) in state `validated`, or a verbatim parser rejection |
-| Resumable | No; one approval span |
+| Resumable | No; one approval span — every overwrite is confirmed in a single question before the first write |
 
 **Boundary sentence**: "Writes a Goose recipe and its declared extension configuration from a ready
 recipe plan, one element per plan entry, each traced back by comment, and validates it with Goose's
@@ -115,6 +115,10 @@ subject.
 Install the <plugin> plugin at <minimum release> or later from <marketplace>.
 Nothing was written.
 ```
+
+`recipe-requirements-elicit` has a second form, for a delegation target that is installed but stops
+at its own precondition because its methodology spec is missing; it is stated verbatim in that
+skill. Both forms write nothing and do nothing else.
 
 The minimum release is the one this feature was verified against and is recorded in
 `skills/README.md`; it moves only with a recorded re-verification.
