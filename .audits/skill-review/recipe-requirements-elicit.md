@@ -69,7 +69,7 @@ Next concrete action: Autor ergänzt in `SKILL.md` §Resuming a run die fehlende
       Fix: Im Template-Header ein Feld `**Teach-back**: {{YYYY-MM-DD — confirmed by author | none}}` ergänzen, oder in `SKILL.md` festlegen, dass der Teach-back-Nachweis im generischen Artefakt steht, und `validate` Punkt 9 dorthin verweisen lassen.
       Verify: `validate` Punkt 9 lässt sich an einem aus dem Template erzeugten Artefakt prüfen, ohne eine andere Datei zu lesen (oder der Punkt nennt das Artefakt, in dem der Nachweis steht).
 
-- [x] [skill-management.consistent-terminology] Drei ID-Schemata kollidieren. Die Rezept-Anforderungen im Template heißen `R-1`/`R-{{n}}`, die Baseline-Kriterien `R-004`/`R-xxx` und die Anforderungen des generischen Artefakts `R1`. In der Baseline-Check-Tabelle stehen `R-{{n}}` und `R-xxx` nebeneinander in benachbarten Spalten. `recipe-plan` und ein menschlicher Leser können ein Kriterium dort leicht für eine Anforderung halten und umgekehrt. → deferred: https://github.com/nolte/claude-goose/issues/10
+- [x] [skill-management.consistent-terminology] Drei ID-Schemata kollidieren. Die Rezept-Anforderungen im Template heißen `R-1`/`R-{{n}}`, die Baseline-Kriterien `R-004`/`R-xxx` und die Anforderungen des generischen Artefakts `R1`. In der Baseline-Check-Tabelle stehen `R-{{n}}` und `R-xxx` nebeneinander in benachbarten Spalten. `recipe-plan` und ein menschlicher Leser können ein Kriterium dort leicht für eine Anforderung halten und umgekehrt.
       Where: `templates/recipe-requirements.template.md:26`, `:32`, `:51`; `references/recipe-question-set.md:73-77`.
       Fix: Den Rezept-Anforderungen ein eigenes Präfix geben (z. B. `RR-1`) und es in Template, Question-Set und `validate` einheitlich verwenden.
       Verify: `grep -nE '\bR-[0-9]' skills/recipe-requirements-elicit/templates/` findet nur noch Baseline-Kriterien.
@@ -141,4 +141,4 @@ Next concrete action: Autor ergänzt in `SKILL.md` §Resuming a run die fehlende
 - 2026-11-05 — I minimum version — Fail-closed-Meldung verlangt Release > v0.1.11; Stop des Ziels an eigener Precondition wird wie fehlende Installation behandelt — verified: Precondition gelesen
 - 2026-11-05 — I question duplicates — Schritt 3 übernimmt bereits Erfasstes aus dem generischen Artefakt — verified: Schritt 3 gelesen
 - 2026-11-05 — W id prefixes — deferred, MAJOR format change per skills/VERSION.md §Semantics — tracked: https://github.com/nolte/claude-goose/issues/10
-2026-11-05 — consistent-terminology — recipe requirements renamed to `RR-<n>` (lifecycle 0.3.0, #10) — verified: `grep -nE '\bR-[0-9]' skills/recipe-requirements-elicit/templates/` matches only `R-0nn` baseline criteria
+- 2026-11-05 — consistent-terminology — recipe requirements renamed to `RR-<n>` (lifecycle 0.3.0, #10) — verified: `grep -nE '\bR-[0-9]' skills/recipe-requirements-elicit/templates/` matches only `R-0nn` baseline criteria

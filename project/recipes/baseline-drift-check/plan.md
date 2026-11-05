@@ -18,6 +18,8 @@ Second plan for this slug. The first plan followed the artifact's original resul
 artifact was revised on 2026-09-24 to `unchanged` / `drifted` / `unreachable` and to state that
 R-007 is not triggered by a `builtin` extension. This plan replaces the first one entirely.
 
+Migrated by hand from lifecycle 0.1.0 to 0.3.0 on 2026-11-05 (#10); content unchanged.
+
 Requirement ids: `RR-1` … `RR-5` are the input and capability ids of requirements.md; `R1` … `R8`
 are the functional requirements of the generic artifact it names
 (project/requirements/baseline-drift-check.md). Both sets are covered below.

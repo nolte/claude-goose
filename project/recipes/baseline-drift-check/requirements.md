@@ -14,6 +14,10 @@ HAND-WRITTEN for the first lifecycle run (feature 005, task T024), in the shape 
 nolte-goose recipe-requirements-elicit template. Not produced by that skill: its delegation
 target cannot run in a consumer until an upstream fix ships (specs/005 research R5). The
 baseline check below was done by reading baselines/goose/2026-08-02/ruleset.md and coverage.md.
+
+Migrated by hand from lifecycle 0.1.0 to 0.3.0 on 2026-11-05 (#10): recipe requirement ids
+renamed R-<n> to RR-<n>. The Teach-back header was added then, with the date the author states
+the profile was confirmed; no teach-back step recorded it at the time.
 -->
 
 ## Purpose

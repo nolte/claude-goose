@@ -55,7 +55,7 @@ written in the language the plan's decided values use.
 2. The plan exists and its `State` is `ready`. If it is `blocked`, stop and list the conflicts.
 3. `${CLAUDE_PLUGIN_ROOT}/skills/VERSION.md` is readable. The recipe carries the plan's
    `lifecycle_version` unchanged; when the installed version differs, say so in the report. A
-   plan whose `lifecycle_version` is below 0.3.0 traces to `R-<n>` ids; stop and say it needs
+   plan whose `lifecycle_version` is below 0.3.0, missing or unreadable traces to `R-<n>` ids; stop and say it needs
    migrating to `RR-<n>` first.
 4. The plan is chosen unambiguously: the slug the user named, or the only
    `project/recipes/*/plan.md` there is. With several plans and no slug — whatever their states —

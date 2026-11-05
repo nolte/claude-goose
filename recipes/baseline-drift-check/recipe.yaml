@@ -1,5 +1,6 @@
 # nolte-goose lifecycle — slug: baseline-drift-check  baseline_revision: 2026-08-02
 # lifecycle_version: 0.3.0  review_process_version: 1.0.0
+# Written by recipe-implement at 0.1.0 (RESULTS.md Runs 6-7); ids migrated by hand to 0.3.0 on 2026-11-05 (#10).
 
 # P-1 ← R4
 title: "Baseline Drift Check"

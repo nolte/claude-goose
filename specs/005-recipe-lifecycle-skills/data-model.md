@@ -87,8 +87,11 @@ from it.
 | Open points | Everything the author could not answer | Never a guessed value (spec `FR-017`) |
 
 **Validation**: the generic artifact exists at the named path; `baseline_revision` names an
-existing directory under `baselines/goose/`; every input has all four attributes; the baseline check
-section is present even when empty ("none" is a claim, silence is not).
+existing directory under `baselines/goose/`; every input has all four attributes; from lifecycle
+0.3.0 every input and capability row id is a recipe requirement `RR-<n>`, distinct from baseline
+criteria `R-0nn` and generic requirements `R<n>` (an artifact below 0.3.0 needs migrating before
+`recipe-plan` accepts it); the baseline check section is present even when empty ("none" is a claim,
+silence is not).
 
 **State**: `draft` while open points exist and the author has not confirmed; `confirmed` once the
 author has confirmed the recipe profile in a teach-back, which from lifecycle 0.2.0 the `Teach-back`

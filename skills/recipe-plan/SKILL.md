@@ -58,7 +58,7 @@ Respond in the user's language. The plan is written in English with ids verbatim
 3. `${CLAUDE_PLUGIN_ROOT}/skills/VERSION.md` is readable. The plan carries the input's
    `lifecycle_version` unchanged; when the installed version differs, say so in the report so the
    author knows the plan was written by a newer or older skill than the requirements. A
-   requirement artifact whose `lifecycle_version` is below 0.3.0 names its recipe requirements
+   requirement artifact whose `lifecycle_version` is below 0.3.0, missing or unreadable names its recipe requirements
    `R-<n>`, the shape baseline criteria have; stop and say it needs migrating to `RR-<n>` first.
 
 ## Procedure

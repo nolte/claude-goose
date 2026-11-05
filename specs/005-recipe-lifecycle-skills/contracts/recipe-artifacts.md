@@ -126,11 +126,11 @@ the line before it:
 # nolte-goose lifecycle — slug: <slug>  baseline_revision: <id>
 # lifecycle_version: <semver>  review_process_version: <semver>
 
-# P-2 ← RR-1
+# P-1 ← R4
 title: "Baseline Drift Check"
 
 parameters:
-  # P-3 ← RR-2
+  # P-3 ← RR-1, R1, R7
   - key: revision
     input_type: string
     requirement: required
