@@ -17,6 +17,7 @@ either artifact by hand and have the next skill accept it (spec `FR-002`).
 **Review process version**: <semver>            # from the review process's VERSION.md
 **Generic artifact**: project/requirements/<slug>.md
 **State**: draft | confirmed
+**Teach-back**: <YYYY-MM-DD, confirmed by the author> | none   # since lifecycle 0.2.0; absent in 0.1.0 artifacts
 **Date**: <YYYY-MM-DD>
 
 ## Purpose

@@ -110,10 +110,12 @@ those files, not this one.
   session; one measured review took 197 seconds, and the shell tool stops a command after 120
   seconds unless told otherwise. A run cut off that way is not a failed review, and the no-retry
   rule below would turn it into one. Start it with a timeout of 600000 ms, or in the background.
-- **The binding's exit codes mean different things.** `2` is a precondition or usage error, raised
-  before any review starts. `3` means the review session ended normally but wrote no new report —
-  a review that stopped early leaves an explanation on stdout and exits `0`, so the binding checks
-  the report file itself. Any other non-zero code is the host CLI's own.
+- **Read the binding's stderr, not only its exit code.** The binding's own refusals print a line
+  beginning `run.sh:` on stderr and exit `2` before any review starts. A missing option value is
+  reported by the shell (`--<name> needs a value`), and its exit code depends on which shell runs
+  `sh`. `3` means the review session ended normally but wrote no new report — a review that stopped
+  early leaves an explanation on stdout and exits `0`, so the binding checks the report file
+  itself. Every other non-zero code, a `2` included, is passed through from the host CLI.
 - **`${CLAUDE_PLUGIN_ROOT}` points at the plugin, not at the repository being worked in.**
   `subject_path` and `output_path` are resolved against the current working directory; the process
   tree and the baselines are reached through the plugin root.

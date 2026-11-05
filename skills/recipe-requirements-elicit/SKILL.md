@@ -56,9 +56,18 @@ Install the nolte-shared plugin from the nolte/claude-shared marketplace, at a r
 Nothing was written.
 ```
 
-The same reply applies when the delegated skill is installed but stops at its own precondition
-because its methodology spec is missing — that is what v0.1.11 does in a repository other than
-claude-shared. Do not conduct an interview of your own in its place, do not try an un-namespaced name, and do not
+When the delegated skill is installed but stops at its own precondition because its methodology
+spec is missing — that is what v0.1.11 does in a repository other than claude-shared — stop and
+reply exactly:
+
+```text
+recipe-requirements-elicit needs nolte-shared:requirements-elicit, which is installed but stopped
+at its own precondition: its methodology spec is not available in this repository.
+No released version of nolte-shared ships that spec to other repositories yet (newest: v0.1.11).
+Nothing was written.
+```
+
+In either case, do not conduct an interview of your own in its place, do not try an un-namespaced name, and do not
 write any file. The generic method is that skill's, and a copy of it here is the duplicate this
 plugin exists to avoid.
 
@@ -106,8 +115,9 @@ Named `validate`, not `audit`, to match the same operation of the delegated
 - [ ] Every input that imports a file and is optional appears in the Baseline check with the
       criterion that forbids a default on it
 - [ ] Open points are listed, or "none"
-- [ ] `State` is `confirmed` only if no open point remains and the `Teach-back` header carries a
-      date
+- [ ] `State` is `confirmed` only if no open point remains and, for an artifact whose
+      `Lifecycle version` is 0.2.0 or later, the `Teach-back` header carries a date. An artifact
+      written under 0.1.0 predates that header and is checked without it
 
 Report pass or fail per item. Never fix content: a missing value is the author's to supply.
 

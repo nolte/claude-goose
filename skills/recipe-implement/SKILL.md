@@ -56,37 +56,41 @@ written in the language the plan's decided values use.
 3. `${CLAUDE_PLUGIN_ROOT}/skills/VERSION.md` is readable. The recipe carries the plan's
    `lifecycle_version` unchanged; when the installed version differs, say so in the report.
 4. The plan is chosen unambiguously: the slug the user named, or the only
-   `project/recipes/*/plan.md` in state `ready`. With several candidates and no slug, list them and
-   ask; do not pick one.
-5. If a file already exists at the plan's target path, show how it differs from what the plan
-   produces and ask before overwriting. Hand edits in that file are lost on regeneration; that is
-   the author's decision, not this skill's.
+   `project/recipes/*/plan.md` there is. With several plans and no slug — whatever their states —
+   list each with its state and ask; do not pick one. A `blocked` plan is never skipped silently,
+   since precondition 2 reports its conflicts only when it is the one chosen.
 
 ## Procedure
 
 1. **Read the plan** — header, Elements, Coverage, Criteria. Before writing, read
    `references/traceability-comments.md` for the provenance-block format and the rules for each
    element's `# P-<n> ← R-<m>` comment.
-2. **Write the recipe** at the plan's target path:
+2. **Compose the recipe** from the plan, in full, before touching the target path:
    - the provenance block first, with `slug`, `baseline_revision`, `lifecycle_version` and
      `review_process_version` carried from the plan header unchanged;
    - one recipe element per `P-<n>` row, with its decided value or shape, and nothing the plan does
      not list;
    - a `# P-<n> ← R-<m>` comment on the line before each top-level element, each `parameters[]`
      entry and each `extensions[]` entry, as the reference describes.
-   Where the plan names extension configurations that live in their own files, write those beside
-   the recipe with the same provenance block.
-3. **Validate** with the host:
+   Where the plan names extension configurations that live in their own files, compose those too,
+   with the same provenance block.
+3. **Confirm an overwrite.** If a file already exists at a target path, keep its current content,
+   show the diff between it and the composed content, and ask before overwriting. Hand edits in
+   that file are lost on regeneration; that is the author's decision, not this skill's. Write
+   exactly the content the diff showed; do not compose it again.
+4. **Validate** with the host:
 
    ```sh
    goose run --recipe <target path> --explain
    ```
 
-   If the command exits non-zero or any line of its stdout or stderr begins with `Error:`, reply with that output verbatim, leave the file in
-   place for inspection, and stop. Do not present the recipe as done, and do not edit the plan to
+   If the command exits non-zero or any line of its stdout or stderr begins with `Error:`, reply with
+   that output verbatim and stop. When step 3 overwrote a file, restore the content it kept, so a
+   recipe that worked before is not replaced by a rejected one, and include the rejected content in
+   the reply for inspection; otherwise leave the new file in place. Do not present the recipe as done, and do not edit the plan to
    make the recipe fit. The parser stops at the first defect; report what it said, not what you
    suspect it would say next.
-4. **Report**: the recipe path, the parser's acceptance, and a table of each recipe part with the
+5. **Report**: the recipe path, the parser's acceptance, and a table of each recipe part with the
    plan element and requirement it traces to. Say that the next phase is `recipe-audit` with the
    plan's `baseline_revision` and `output_path project/recipes/<slug>/review-report.md`.
 
@@ -117,6 +121,6 @@ The recipe file(s) at the plan's target path, in state `validated` (parser accep
 - Never report the recipe as done without the parser's acceptance, and never skip the parser
   because Goose is missing.
 - Never move or rewrite a traceability comment to make a later edit look planned. Regenerating the
-  whole recipe from a changed plan, after the confirmation in precondition 5, rewrites every
+  whole recipe from a changed plan, after the confirmation in procedure step 3, rewrites every
   comment from the plan and is not such an edit.
 - Never commit, push or open a pull request; that is the operator's call and another skill's job.
