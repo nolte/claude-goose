@@ -57,7 +57,9 @@ Respond in the user's language. The plan is written in English with ids verbatim
    not, stop and name the missing revision; never substitute another.
 3. `${CLAUDE_PLUGIN_ROOT}/skills/VERSION.md` is readable. The plan carries the input's
    `lifecycle_version` unchanged; when the installed version differs, say so in the report so the
-   author knows the plan was written by a newer or older skill than the requirements.
+   author knows the plan was written by a newer or older skill than the requirements. A
+   requirement artifact whose `lifecycle_version` is below 0.3.0, missing or unreadable names its recipe requirements
+   `R-<n>`, the shape baseline criteria have; stop and say it needs migrating to `RR-<n>` first.
 
 ## Procedure
 
@@ -68,10 +70,12 @@ Respond in the user's language. The plan is written in English with ids verbatim
    `response`, `sub_recipes`, and any other documented field — one row `P-<n>` with the requirement
    ids it serves and the decided value or shape. Decide the recipe's target path and record it in
    the header.
-3. **Build the coverage table** both ways. Every `R-<n>` from the requirement artifact must appear
+3. **Build the coverage table** both ways. Every `RR-<n>` from the requirement artifact must appear
    with at least one element; every `P-<n>` must serve at least one requirement. If either fails,
    do not write the plan: name the unmapped id and ask the author whether it is a missing element or
-   a requirement that should not exist.
+   a requirement that should not exist. Three id schemes meet here: `RR-<n>` is a recipe requirement,
+   `R<n>` a generic requirement from the generic artifact, `R-0nn` a baseline criterion. An element
+   may serve `RR-<n>` and `R<n>` ids; a criterion is never served, it belongs under Criteria.
 4. **Decide every criterion.** For each criterion in the pinned `ruleset.md`, exactly one row:
    `by construction` with the element that satisfies it, or `risk` with the reason. A criterion
    whose `applies_to` does not match any planned element is still listed, as `by construction` with

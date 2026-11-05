@@ -21,18 +21,18 @@ A comment on the line before each top-level element, each `parameters[]` entry a
 `extensions[]` entry:
 
 ```yaml
-# P-2 ← R-1
+# P-1 ← R4
 title: "Baseline Drift Check"
 
 parameters:
-  # P-3 ← R-2
+  # P-3 ← RR-1, R1, R7
   - key: revision
     input_type: string
     requirement: required
     description: "Baseline revision to check for source drift"
 
 extensions:
-  # P-6 ← R-4
+  # P-6 ← RR-4, RR-5
   - type: builtin
     name: developer
 ```
@@ -41,8 +41,10 @@ Rules:
 
 - A comment names exactly one plan element. Several recipe lines may carry the same element id when
   one element spans them (a `parameters[]` entry is one element; its `options` list is part of it).
-- The `R-<m>` after the arrow is the requirement id the plan's Elements table lists for that element.
-  When an element serves several requirements, list them comma-separated: `# P-4 ← R-2, R-5`.
+- The ids after the arrow are exactly those the plan's Elements table lists in the Serves column for
+  that element, comma-separated and in that order: recipe requirements `RR-<m>`, generic
+  requirements `R<n>`, or both. An element that serves only generic requirements carries no `RR`
+  id: `# P-1 ← R4`. A baseline criterion `R-0nn` never appears there.
 - A recipe line with no element comment above it, at the levels listed, is a defect: it means the
   recipe contains something the plan did not decide.
 - Comments are not moved or rewritten by a later edit. A change to the recipe goes through the plan

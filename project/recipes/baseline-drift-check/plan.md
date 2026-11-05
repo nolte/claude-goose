@@ -2,7 +2,7 @@
 
 **Slug**: baseline-drift-check
 **Baseline revision**: 2026-08-02
-**Lifecycle version**: 0.1.0
+**Lifecycle version**: 0.3.0
 **Review process version**: 1.0.0
 **Recipe path**: recipes/baseline-drift-check/recipe.yaml
 **State**: ready
@@ -18,7 +18,9 @@ Second plan for this slug. The first plan followed the artifact's original resul
 artifact was revised on 2026-09-24 to `unchanged` / `drifted` / `unreachable` and to state that
 R-007 is not triggered by a `builtin` extension. This plan replaces the first one entirely.
 
-Requirement ids: `R-1` … `R-5` are the input and capability ids of requirements.md; `R1` … `R8`
+Migrated by hand from lifecycle 0.1.0 to 0.3.0 on 2026-11-05 (#10); content unchanged.
+
+Requirement ids: `RR-1` … `RR-5` are the input and capability ids of requirements.md; `R1` … `R8`
 are the functional requirements of the generic artifact it names
 (project/requirements/baseline-drift-check.md). Both sets are covered below.
 -->
@@ -29,12 +31,12 @@ are the functional requirements of the generic artifact it names
 |---|---|---|---|
 | P-1 | `title` | R4 | `"Baseline Drift Check"` |
 | P-2 | `description` | R4 | One sentence: read-only check of one published baseline revision for source drift, comparing each recorded `source_commit` with the current upstream commit and printing the `verification.md` rows for the maintainer to append |
-| P-3 | `parameters[revision]` | R-1, R1, R7 | `input_type: string`, `requirement: required`, no default; description "Baseline revision directory name under `<baselines_dir>/goose/`, e.g. 2026-08-02" |
-| P-4 | `parameters[baselines_dir]` | R-2, R1, R8 | `input_type: string`, `requirement: optional`, `default: "./baselines"`; description "Directory holding `goose/<revision>/`. A path the recipe reads under, deliberately not `input_type: file`" |
-| P-5 | `parameters[repo]` | R-3, R2, R8 | `input_type: string`, `requirement: optional`, `default: "aaif-goose/goose"`; description "Upstream repository queried for the current commit of each source path" |
-| P-6 | `extensions[developer]` | R-4, R-5 | `type: builtin`, `name: developer`. Supplies file reading (R-4) and `shell` for `gh api` and `date` (R-5). Declared explicitly so the code-executing capability is visible in the recipe rather than inherited silently from the host's defaults. The declared list equals the needed set, so the unverified question whether an explicit list replaces the defaults (RESULTS O-1) cannot strip a needed tool. Documented fields only: `type` and `name` (S-001, S-004); no `timeout`, `bundled` or other value is set because the pinned revision documents no constraint on them (S-009) |
-| P-7 | `instructions` | R-4, R-5, R1, R2, R3, R5, R6, R7 | The method, see "Element details" below: locate and parse `sources.md`, query one commit per `source_path` with `gh api`, classify with the `verification.md` vocabulary, print rows, and the four prohibitions verbatim |
-| P-8 | `prompt` | R-1, R-2, R-3, R4, R1, R2, R3, R5, R6, R7, R8 | The headless starting impulse. Names all three parameters by template variable and restates every constraint that must hold: the file to read, the exact `gh api` command with `{{ repo }}`, the missing-revision behaviour, the row format, the three result words and the summary line, and all four prohibitions (RESULTS O-12: a constraint stated only in `instructions` was ignored twice) |
+| P-3 | `parameters[revision]` | RR-1, R1, R7 | `input_type: string`, `requirement: required`, no default; description "Baseline revision directory name under `<baselines_dir>/goose/`, e.g. 2026-08-02" |
+| P-4 | `parameters[baselines_dir]` | RR-2, R1, R8 | `input_type: string`, `requirement: optional`, `default: "./baselines"`; description "Directory holding `goose/<revision>/`. A path the recipe reads under, deliberately not `input_type: file`" |
+| P-5 | `parameters[repo]` | RR-3, R2, R8 | `input_type: string`, `requirement: optional`, `default: "aaif-goose/goose"`; description "Upstream repository queried for the current commit of each source path" |
+| P-6 | `extensions[developer]` | RR-4, RR-5 | `type: builtin`, `name: developer`. Supplies file reading (RR-4) and `shell` for `gh api` and `date` (RR-5). Declared explicitly so the code-executing capability is visible in the recipe rather than inherited silently from the host's defaults. The declared list equals the needed set, so the unverified question whether an explicit list replaces the defaults (RESULTS O-1) cannot strip a needed tool. Documented fields only: `type` and `name` (S-001, S-004); no `timeout`, `bundled` or other value is set because the pinned revision documents no constraint on them (S-009) |
+| P-7 | `instructions` | RR-4, RR-5, R1, R2, R3, R5, R6, R7 | The method, see "Element details" below: locate and parse `sources.md`, query one commit per `source_path` with `gh api`, classify with the `verification.md` vocabulary, print rows, and the four prohibitions verbatim |
+| P-8 | `prompt` | RR-1, RR-2, RR-3, R4, R1, R2, R3, R5, R6, R7, R8 | The headless starting impulse. Names all three parameters by template variable and restates every constraint that must hold: the file to read, the exact `gh api` command with `{{ repo }}`, the missing-revision behaviour, the row format, the three result words and the summary line, and all four prohibitions (RESULTS O-12: a constraint stated only in `instructions` was ignored twice) |
 
 Not planned, on purpose: `version` (documented to default to `"1.0.0"`), `activities`, `response`,
 `retry`, `settings`, `sub_recipes`. No requirement calls for them; leaving the last four absent keeps
@@ -80,11 +82,11 @@ for P-3, P-4 and P-5.
 
 | Requirement | Elements |
 |---|---|
-| R-1 | P-3, P-8 |
-| R-2 | P-4, P-8 |
-| R-3 | P-5, P-8 |
-| R-4 | P-6, P-7 |
-| R-5 | P-6, P-7 |
+| RR-1 | P-3, P-8 |
+| RR-2 | P-4, P-8 |
+| RR-3 | P-5, P-8 |
+| RR-4 | P-6, P-7 |
+| RR-5 | P-6, P-7 |
 | R1 | P-3, P-4, P-7, P-8 |
 | R2 | P-5, P-7, P-8 |
 | R3 | P-7, P-8 |

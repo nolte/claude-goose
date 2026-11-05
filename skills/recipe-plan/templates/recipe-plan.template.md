@@ -19,13 +19,13 @@ unchanged. The recipe path, the state and the date are decided by this skill.
 
 | Id | Recipe element | Serves | Decided value or shape |
 |---|---|---|---|
-| P-1 | {{field or entry, e.g. `parameters[repo_path]`}} | R-1 | {{value}} |
+| P-1 | {{field or entry, e.g. `parameters[repo_path]`}} | RR-1 | {{value}} |
 
 ## Coverage
 
 | Requirement | Elements |
 |---|---|
-| R-1 | P-1 |
+| RR-1 | P-1 |
 
 <!-- Every requirement id from requirements.md appears; every P-<n> appears in at least one row. -->
 

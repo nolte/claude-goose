@@ -14,6 +14,10 @@ Produced via the nolte-goose `recipe-requirements-elicit` skill. The generic
 requirement set, gap matrix and KPI live in the generic artifact named above,
 written by nolte-shared:requirements-elicit. This file adds only what a Goose
 recipe needs. `baseline_revision` is a concrete id, never `latest`.
+
+Three id schemes meet here and are never interchangeable: `RR-<n>` is a
+recipe requirement (this file), `R-0nn` a baseline criterion (ruleset.md), and
+`R<n>` a generic requirement (the generic artifact).
 -->
 
 ## Purpose
@@ -24,13 +28,13 @@ recipe needs. `baseline_revision` is a concrete id, never `latest`.
 
 | Id | Name | Required | Default | Imports a file | Serves |
 |---|---|---|---|---|---|
-| R-1 | {{name}} | {{yes / no}} | {{value / none}} | {{yes / no}} | {{requirement ids from the generic artifact}} |
+| RR-1 | {{name}} | {{yes / no}} | {{value / none}} | {{yes / no}} | {{requirement ids from the generic artifact}} |
 
 ## Host capabilities
 
 | Id | Capability | Why needed | Executes code |
 |---|---|---|---|
-| R-{{n}} | {{what the recipe needs from the host}} | {{reason}} | {{yes / no}} |
+| RR-{{n}} | {{what the recipe needs from the host}} | {{reason}} | {{yes / no}} |
 
 ## Execution mode
 
@@ -49,7 +53,7 @@ the recipe must carry a prompt.
 
 | Requirement | Criterion or gap | Consequence |
 |---|---|---|
-| R-{{n}} | {{R-xxx from ruleset.md, or GAP-xxx from coverage.md}} | {{violates by construction / cannot be decided by the audit / by construction}} |
+| RR-{{n}} | {{R-xxx from ruleset.md, or GAP-xxx from coverage.md}} | {{violates by construction / cannot be decided by the audit / by construction}} |
 
 <!-- "none" when empty. This section is never omitted. -->
 

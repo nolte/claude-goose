@@ -189,7 +189,7 @@ revision and audited against a newer one would fail its first audit for reasons 
 ## R10 — Traceability inside the recipe
 
 **Decision**: Each top-level recipe element and each parameter or extension entry carries a YAML
-comment naming the plan element it realises (`# P-3 ← R-2`). The plan is the index from element id
+comment naming the plan element it realises (`# P-3 ← RR-2`). The plan is the index from element id
 to requirement id.
 
 **Rationale**: `FR-023` without a second file. Goose ignores comments, so no criterion is affected;

@@ -700,6 +700,15 @@ not the rate. One defective subject with three defects, all decided by the host;
 (`R-002`, `R-007`, `R-010`) and the `judgment call` path were not tried. One host, one day, one model, five
 sessions in parallel.
 
+### Migration of the lifecycle recipe to 0.3.0 (2026-11-05)
+
+Lifecycle 0.3.0 renamed recipe requirements `R-<n>` to `RR-<n>` (#10). `baseline-drift-check` was migrated
+by hand, not regenerated: the ids in `requirements.md`, `plan.md` and the recipe's comments were renamed,
+the lifecycle version raised, and a provenance line added that says so. Goose ignores comments, so the
+recipe the host loads is unchanged. **Measured**: `goose run --recipe recipes/baseline-drift-check/recipe.yaml
+--explain` exits 0 with no `Error:` line. **Not run**: `recipe-plan` or `recipe-implement` at 0.3.0 on this
+artifact, and an audit of the migrated recipe.
+
 ### Not run, and why
 
 | Scenario | Skill | Blocked by |

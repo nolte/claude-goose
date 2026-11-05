@@ -6,6 +6,17 @@ The shape of the two artifacts the lifecycle introduces, and the comment convent
 recipe. `data-model.md` states the rules; this file fixes the on-disk form so a person can write
 either artifact by hand and have the next skill accept it (spec `FR-002`).
 
+Three id schemes meet in these artifacts and must not be confused. Since lifecycle 0.3.0:
+
+| Id | Names | Owned by |
+|---|---|---|
+| `RR-<n>` | A recipe requirement | `requirements.md` here |
+| `R-0nn` | A baseline criterion | `ruleset.md` of the pinned revision |
+| `R<n>` | A requirement of the generic artifact | `project/requirements/<slug>.md`, written by `nolte-shared:requirements-elicit` |
+
+Plan elements are `P-<n>`. An artifact written under 0.2.0 or earlier uses `R-<n>` for a recipe
+requirement and is no longer accepted by the next phase.
+
 ## `project/recipes/<slug>/requirements.md`
 
 ```markdown
@@ -28,13 +39,13 @@ either artifact by hand and have the next skill accept it (spec `FR-002`).
 
 | Id | Name | Required | Default | Imports a file | Serves |
 |---|---|---|---|---|---|
-| R-1 | <name> | yes / no | <value> / none | yes / no | <requirement ids from the generic artifact> |
+| RR-1 | <name> | yes / no | <value> / none | yes / no | <requirement ids from the generic artifact> |
 
 ## Host capabilities
 
 | Id | Capability | Why needed | Executes code |
 |---|---|---|---|
-| R-<n> | <what the recipe needs from the host> | <reason> | yes / no |
+| RR-<n> | <what the recipe needs from the host> | <reason> | yes / no |
 
 ## Execution mode
 
@@ -53,7 +64,7 @@ it decides whether the recipe must carry a prompt.
 
 | Requirement | Criterion or gap | Consequence |
 |---|---|---|
-| R-<n> | <R-xxx from ruleset.md, or GAP-xxx from coverage.md> | violates by construction / cannot be decided by the audit |
+| RR-<n> | <R-xxx from ruleset.md, or GAP-xxx from coverage.md> | violates by construction / cannot be decided by the audit |
 
 "none" when empty. The section is never omitted.
 
@@ -79,13 +90,13 @@ it decides whether the recipe must carry a prompt.
 
 | Id | Recipe element | Serves | Decided value or shape |
 |---|---|---|---|
-| P-1 | <field or entry, e.g. `parameters[repo_path]`> | R-1 | <value> |
+| P-1 | <field or entry, e.g. `parameters[repo_path]`> | RR-1 | <value> |
 
 ## Coverage
 
 | Requirement | Elements |
 |---|---|
-| R-1 | P-1, P-4 |
+| RR-1 | P-1, P-4 |
 
 Every requirement id from requirements.md appears; every P-<n> appears in at least one row.
 
@@ -115,11 +126,11 @@ the line before it:
 # nolte-goose lifecycle — slug: <slug>  baseline_revision: <id>
 # lifecycle_version: <semver>  review_process_version: <semver>
 
-# P-2 ← R-1
+# P-1 ← R4
 title: "Baseline Drift Check"
 
 parameters:
-  # P-3 ← R-2
+  # P-3 ← RR-1, R1, R7
   - key: revision
     input_type: string
     requirement: required

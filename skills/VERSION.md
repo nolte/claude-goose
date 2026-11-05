@@ -1,6 +1,6 @@
 # Lifecycle Version
 
-**0.2.0**
+**0.3.0**
 
 The semantic version of the four-phase recipe lifecycle — requirements, plan, implementation, audit
 — as a multi-stage plan, required by Constitution Principle II ("Plans Are Versioned Artifacts").
@@ -27,12 +27,16 @@ changed yardstick.
   refusal that only rejects input the previous version would have mishandled.
 - **PATCH** — wording and clarification with no behavioural change.
 
+While the version is 0.x (pre-release), a change that would be MAJOR raises MINOR, so 1.0.0 stays
+the first release.
+
 ## History
 
 | Version | Date | Change |
 |---|---|---|
 | 0.1.0 | 2026-09-24 | Initial. Four skills authored; pre-release |
 | 0.2.0 | 2026-11-05 | From the first skill review. `recipe-requirements-elicit`: a `Teach-back` header field, a checkpoint after every approval gate, no criterion id fixed in the question set. `recipe-implement`: refuses an ambiguous plan choice, confirms every overwrite in one question before the first write, and puts the target paths back when the parser rejects the result (not yet exercised in a recorded run; `RESULTS.md` Run 7 predates it). `recipe-audit`: names extension configurations as subjects. All four: a Gotchas section. Artifacts written under 0.1.0 are still accepted: `validate` checks the `Teach-back` header only from 0.2.0 on |
+| 0.3.0 | 2026-11-05 | Recipe requirements are `RR-<n>`, distinct from baseline criteria `R-0nn` and generic requirements `R<n>`; `recipe-requirements-elicit` `validate` checks the row ids. Artifacts written under 0.2.0 or earlier are no longer accepted by the next phase: `recipe-plan` and `recipe-implement` stop on them and ask for migration. The one existing artifact (baseline-drift-check) was migrated |
 
 **0.x means pre-release.** Per Constitution Principle V the lifecycle is not released until every
 skill has performed real work in this repository and one recipe has passed through all four phases.
