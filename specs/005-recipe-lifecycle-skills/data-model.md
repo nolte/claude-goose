@@ -123,7 +123,7 @@ the plan names.
 | Attribute | Rule |
 |---|---|
 | Elements | Only what the plan lists; an element without a `P-<n>` comment is a defect (spec `FR-021`) |
-| Traceability | A YAML comment on each top-level element, parameter and extension entry: `# P-<n> ← R-<m>` (research `R10`) |
+| Traceability | A YAML comment on each top-level element, parameter and extension entry: `# P-<n> ← RR-<m>` (research `R10`) |
 | Host validation | `goose run --recipe <file> --explain` accepts it before it is reported done (spec `FR-022`) |
 | Provenance | A leading comment block naming `slug`, `baseline_revision`, `lifecycle_version` and `review_process_version` (spec `FR-024`) |
 
@@ -148,7 +148,7 @@ spec `FR-007` requires and the reader test `SC-003` is run against.
 
 ```text
 project/requirements/<slug>.md  ◄── referenced by ── requirements.md
-requirements.md  ── R-<m> ids ──►  plan.md  ── P-<n> ids ──►  recipe.yaml
+requirements.md  ── RR-<m> ids ──►  plan.md  ── P-<n> ids ──►  recipe.yaml
 recipe.yaml  ── subject_path ──►  review-report.md
 requirements.md.baseline_revision == plan.md.baseline_revision == recipe.yaml provenance
                                   == review-report.md digest baseline=

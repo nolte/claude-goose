@@ -98,9 +98,9 @@ With a confirmed `project/recipes/baseline-drift-check/requirements.md`:
 /nolte-goose:recipe-implement
 ```
 
-**Pass**: `plan.md` is `ready`, its coverage table lists every `R-<n>` and every `P-<n>`, and its
+**Pass**: `plan.md` is `ready`, its coverage table lists every `RR-<n>` and every `P-<n>`, and its
 criteria table lists every criterion of the pinned `ruleset.md` exactly once. The recipe at the
-plan's path carries the provenance block and a `P-<n> ← R-<m>` comment on every element; and
+plan's path carries the provenance block and a `P-<n> ← RR-<m>` comment on every element; and
 
 ```sh
 goose run --recipe <recipe path> --explain

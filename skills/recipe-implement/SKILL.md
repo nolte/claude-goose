@@ -54,7 +54,9 @@ written in the language the plan's decided values use.
    verdict is verified against that version only.
 2. The plan exists and its `State` is `ready`. If it is `blocked`, stop and list the conflicts.
 3. `${CLAUDE_PLUGIN_ROOT}/skills/VERSION.md` is readable. The recipe carries the plan's
-   `lifecycle_version` unchanged; when the installed version differs, say so in the report.
+   `lifecycle_version` unchanged; when the installed version differs, say so in the report. A
+   plan whose `lifecycle_version` is below 0.3.0 traces to `R-<n>` ids; stop and say it needs
+   migrating to `RR-<n>` first.
 4. The plan is chosen unambiguously: the slug the user named, or the only
    `project/recipes/*/plan.md` there is. With several plans and no slug — whatever their states —
    list each with its state and ask; do not pick one. A `blocked` plan is never skipped silently,
@@ -64,13 +66,13 @@ written in the language the plan's decided values use.
 
 1. **Read the plan** — header, Elements, Coverage, Criteria. Before writing, read
    `references/traceability-comments.md` for the provenance-block format and the rules for each
-   element's `# P-<n> ← R-<m>` comment.
+   element's `# P-<n> ← RR-<m>` comment.
 2. **Compose the recipe** from the plan, in full, before touching the target path:
    - the provenance block first, with `slug`, `baseline_revision`, `lifecycle_version` and
      `review_process_version` carried from the plan header unchanged;
    - one recipe element per `P-<n>` row, with its decided value or shape, and nothing the plan does
      not list;
-   - a `# P-<n> ← R-<m>` comment on the line before each top-level element, each `parameters[]`
+   - a `# P-<n> ← RR-<m>` comment on the line before each top-level element, each `parameters[]`
      entry and each `extensions[]` entry, as the reference describes.
    Where the plan names extension configurations that live in their own files, compose those too,
    with the same provenance block.

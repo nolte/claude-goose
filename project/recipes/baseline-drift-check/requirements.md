@@ -2,10 +2,11 @@
 
 **Slug**: baseline-drift-check
 **Baseline revision**: 2026-08-02
-**Lifecycle version**: 0.1.0
+**Lifecycle version**: 0.3.0
 **Review process version**: 1.0.0
 **Generic artifact**: project/requirements/baseline-drift-check.md
 **State**: confirmed
+**Teach-back**: 2026-09-24, confirmed by the author
 **Date**: 2026-09-24
 
 <!--
@@ -26,9 +27,9 @@ Stage 2 of `baselines/MAINTENANCE.md` for the maintainer of `baselines/`.
 
 | Id | Name | Required | Default | Imports a file | Serves |
 |---|---|---|---|---|---|
-| R-1 | `revision` | yes | none | no | R1, R7 |
-| R-2 | `baselines_dir` | no | `./baselines` | no | R1, R8 |
-| R-3 | `repo` | no | `aaif-goose/goose` | no | R2, R8 |
+| RR-1 | `revision` | yes | none | no | R1, R7 |
+| RR-2 | `baselines_dir` | no | `./baselines` | no | R1, R8 |
+| RR-3 | `repo` | no | `aaif-goose/goose` | no | R2, R8 |
 
 `baselines_dir` is a path the recipe *reads from*, not a file to import: the recipe reads one file
 under it that it locates itself. Typing it as a file input would inline a single file and hide the
@@ -38,8 +39,8 @@ directory (the same reason the review process types `subject_path` as a string).
 
 | Id | Capability | Why needed | Executes code |
 |---|---|---|---|
-| R-4 | Read files under `baselines_dir` | R1 | no |
-| R-5 | Run `gh api` against the upstream repository | R2 | yes |
+| RR-4 | Read files under `baselines_dir` | R1 | no |
+| RR-5 | Run `gh api` against the upstream repository | R2 | yes |
 
 Both are supplied by the Developer extension, which is enabled by default in Goose 1.45.0
 (`RESULTS.md` O-1). Whether to declare it explicitly is a plan decision.
@@ -71,11 +72,11 @@ Nothing is machine-read downstream; the maintainer pastes the rows.
 
 | Requirement | Criterion or gap | Consequence |
 |---|---|---|
-| R-2, R-3 | R-003 (optional parameters carry defaults) | by construction — both carry defaults |
-| R-2 | R-004 (file parameters carry no defaults) | not applicable — typed as a string, not a file |
+| RR-2, RR-3 | R-003 (optional parameters carry defaults) | by construction — both carry defaults |
+| RR-2 | R-004 (file parameters carry no defaults) | not applicable — typed as a string, not a file |
 | Execution mode headless | R-010 (headless recipe declares `prompt`) | by construction — the plan must include a prompt element |
-| R-5 | R-007 (code-executing extensions are surfaced) | not triggered — R-007's decision procedure covers `inline_python` and `stdio`; a `builtin` extension is outside it (found by the first `recipe-plan` run) |
-| R-4, R-5 | GAP-EXT-SEMANTICS | cannot be decided by the audit; expected `undecided` if an extension is declared |
+| RR-5 | R-007 (code-executing extensions are surfaced) | not triggered — R-007's decision procedure covers `inline_python` and `stdio`; a `builtin` extension is outside it (found by the first `recipe-plan` run) |
+| RR-4, RR-5 | GAP-EXT-SEMANTICS | cannot be decided by the audit; expected `undecided` if an extension is declared |
 | Output shape | GAP-RECIPE-FIELDS | not triggered — no `response`, `retry`, `settings`, `sub_recipes` needed |
 
 ## Open points

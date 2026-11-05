@@ -111,6 +111,8 @@ Named `validate`, not `audit`, to match the same operation of the delegated
 - [ ] `baseline_revision` is a concrete id and exists under `${CLAUDE_PLUGIN_ROOT}/baselines/goose/`
 - [ ] Both version fields are present
 - [ ] Every input row carries all of: required, default, imports-a-file, serves
+- [ ] Every Inputs and Host capabilities row id is a recipe requirement `RR-<n>` — not a baseline
+      criterion `R-0nn` nor a generic requirement `R<n>`, which only appear in other columns
 - [ ] Execution mode is one of `interactive`, `headless`, `both`, with a reason
 - [ ] The Baseline check section is present — "none" or rows — and every id it names exists in the
       pinned revision
