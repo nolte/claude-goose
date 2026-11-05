@@ -64,7 +64,7 @@ format because no shared capability accepts a requirement artifact without a Git
 | Delegates to | The host's parser for validation: `goose run --recipe <file> --explain`. Nothing authors the recipe on its behalf |
 | Adds | The recipe and its extension configuration at the plan's target path, traceability comments, the provenance block, the parser check |
 | Output | The recipe file(s) in state `validated`, or a verbatim parser rejection |
-| Resumable | No; one approval span |
+| Resumable | No; one approval span — every overwrite is confirmed in a single question before the first write |
 
 **Boundary sentence**: "Writes a Goose recipe and its declared extension configuration from a ready
 recipe plan, one element per plan entry, each traced back by comment, and validates it with Goose's

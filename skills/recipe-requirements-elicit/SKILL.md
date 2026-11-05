@@ -52,8 +52,8 @@ invocation in step 2 is refused because the name is unknown — stop and reply e
 
 ```text
 recipe-requirements-elicit needs nolte-shared:requirements-elicit, which is not installed.
-Install the nolte-shared plugin from the nolte/claude-shared marketplace, at the minimum release
-named in this plugin's skills/README.md.
+Install the nolte-shared plugin at the first release after v0.1.11 or later from the
+nolte/claude-shared marketplace; this plugin's skills/README.md says whether that release exists yet.
 Nothing was written.
 ```
 
@@ -64,8 +64,8 @@ reply exactly:
 ```text
 recipe-requirements-elicit needs nolte-shared:requirements-elicit, which is installed but stopped
 at its own precondition: its methodology spec is not available in this repository.
-Use a nolte-shared release that ships that spec to other repositories; this plugin's
-skills/README.md names the minimum.
+Use the first nolte-shared release after v0.1.11 or later, which ships that spec to other
+repositories; this plugin's skills/README.md says whether that release exists yet.
 Nothing was written.
 ```
 
@@ -156,4 +156,4 @@ not the "not installed" one.
 - Never write `latest` as a baseline revision.
 - Never mark the artifact `confirmed` without an explicit teach-back confirmation.
 - Never omit the Baseline check section; "none" is a claim, silence is not.
-- Never proceed without the delegation target; fail closed with the message above.
+- Never proceed without the delegation target; fail closed with whichever of the two replies above matches: not listed, or listed but stopped.

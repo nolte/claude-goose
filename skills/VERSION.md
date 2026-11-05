@@ -32,7 +32,7 @@ changed yardstick.
 | Version | Date | Change |
 |---|---|---|
 | 0.1.0 | 2026-09-24 | Initial. Four skills authored; pre-release |
-| 0.2.0 | 2026-11-05 | From the first skill review. `recipe-requirements-elicit`: a `Teach-back` header field, a checkpoint after every approval gate, no criterion id fixed in the question set. `recipe-implement`: refuses an ambiguous plan choice, asks before overwriting an existing recipe and restores it when the parser rejects the replacement. `recipe-audit`: names extension configurations as subjects. All four: a Gotchas section. Artifacts written under 0.1.0 are still accepted: `validate` checks the `Teach-back` header only from 0.2.0 on |
+| 0.2.0 | 2026-11-05 | From the first skill review. `recipe-requirements-elicit`: a `Teach-back` header field, a checkpoint after every approval gate, no criterion id fixed in the question set. `recipe-implement`: refuses an ambiguous plan choice, confirms every overwrite in one question before the first write, and puts the target paths back when the parser rejects the result (not yet exercised in a recorded run; `RESULTS.md` Run 7 predates it). `recipe-audit`: names extension configurations as subjects. All four: a Gotchas section. Artifacts written under 0.1.0 are still accepted: `validate` checks the `Teach-back` header only from 0.2.0 on |
 
 **0.x means pre-release.** Per Constitution Principle V the lifecycle is not released until every
 skill has performed real work in this repository and one recipe has passed through all four phases.

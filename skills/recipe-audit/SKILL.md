@@ -114,8 +114,8 @@ those files, not this one.
   review starts, but the host CLI's codes are passed through unchanged and can be `2` as well.
   Decide by stderr: a refusal of the binding's names `run.sh` — as a `run.sh:` line, or, for a
   missing option value, as the shell's own `<path>/run.sh: … needs a value`, which exits `2` under
-  dash and `1` under bash. A failed `cd` into the plugin tree prints only the shell's `cd` error and
-  exits `2`. `3` means the review session ended normally but wrote no new report — a review that
+  dash and `1` under bash. A failed `cd` into the plugin tree is reported by the shell the same way, prefixed
+  with the script path, and exits `2`. `3` means the review session ended normally but wrote no new report — a review that
   stopped early leaves an explanation on stdout and exits `0`, so the binding checks the report
   file itself.
 - **An optional input is omitted, not passed empty.** The binding refuses an empty option value,

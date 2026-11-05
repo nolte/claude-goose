@@ -74,10 +74,12 @@ written in the language the plan's decided values use.
      entry and each `extensions[]` entry, as the reference describes.
    Where the plan names extension configurations that live in their own files, compose those too,
    with the same provenance block.
-3. **Write** each composed file at its path. Where no file exists yet, write it. Where one exists,
-   keep its current content, show the diff between it and the composed content, and ask before
-   overwriting; hand edits in that file are lost on regeneration, and that is the author's
-   decision, not this skill's. Write exactly the content the diff showed; do not compose it again.
+3. **Confirm, then write.** Before writing anything, collect every composed file whose path
+   already holds a file, keep that file's current content, and show all the diffs in one message
+   with one question: overwrite all of them, or none. Hand edits in those files are lost on
+   regeneration; that is the author's decision, not this skill's. On "none", write nothing and
+   stop. Otherwise write every composed file — new and overwritten alike — exactly as composed and
+   shown; do not compose it again.
 4. **Validate** with the host:
 
    ```sh
@@ -89,6 +91,8 @@ written in the language the plan's decided values use.
    disk back as it was, then stop: restore every file step 3 overwrote to the content it kept,
    and remove every file step 3 created. A recipe that worked before is never replaced by a
    rejected one, and a recipe and its extension configurations never end up from different runs.
+   The parser reads the recipe; whether it also checks extension configurations kept in their own
+   files is not established, so the report names those files as not validated by the parser.
    Do not present the recipe as done, and do not edit the plan to
    make the recipe fit. The parser stops at the first defect; report what it said, not what you
    suspect it would say next.
@@ -98,9 +102,10 @@ written in the language the plan's decided values use.
 
 ## Output
 
-Either `validated`: the recipe file(s) at the plan's target path, accepted by the parser. Or
-`rejected`: the parser output and the rejected content in the reply, and the target paths as they
-were before the run. No other file is written.
+Either `validated`: the recipe file(s) at the plan's target path, the recipe accepted by the
+parser. Or `rejected`: the parser output and the rejected content in the reply, and the target
+paths as they were before the run. Or nothing, when the author declined the overwrite. No other
+file is written.
 
 ## Gotchas
 
